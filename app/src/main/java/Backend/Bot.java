@@ -3,16 +3,16 @@ package Backend;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static Backend.GameHandler.ROWS;
-import static Backend.GameHandler.getRowPoints;
 
-class Bot extends AbstractPlayer {
+public class Bot extends AbstractPlayer {
 
-    private final GameHandler gh;
+/*    private final GameHandler gh;
     Bot(GameHandler gh){
         this.gh = gh;
     }
-    public int tellMove() {
+*/    public int tellMove() {
+        System.out.println("Please, make a move");
+
         int index = ThreadLocalRandom.current().nextInt(0, hand.size());
         int value = hand.get(index);
         hand.remove(Integer.valueOf(value));
@@ -28,9 +28,9 @@ class Bot extends AbstractPlayer {
     }
 
     public int tellChosenRow() {
-        int minPoints = Integer.MAX_VALUE;
+//        int minPoints = Integer.MAX_VALUE;
         int index = 0;
-        ArrayList<ArrayList<Integer>> board = gh.getBoard();
+/*        ArrayList<ArrayList<Integer>> board = gh.getBoard();
         for (int i = 0; i < ROWS; i++){
             ArrayList<Integer> row = board.get(i);
             int rowPoints = getRowPoints(row);
@@ -39,7 +39,7 @@ class Bot extends AbstractPlayer {
                 index = i;
             }
         }
-        return index;
+*/        return index;
     }
 
 }

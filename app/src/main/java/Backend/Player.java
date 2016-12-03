@@ -2,9 +2,8 @@ package Backend;
 
 import java.util.Scanner;
 
-import static Backend.GameHandler.ROWS;
-
 public class Player  extends AbstractPlayer{
+
     public int tellMove() {
         //by tapping the screen
         System.out.println("Please, make a move");

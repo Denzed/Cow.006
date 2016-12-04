@@ -1,81 +1,52 @@
 <resources>
     <string name="app_name">Cow.006</string>
-
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-
-    <string name="action_settings">Settings</string>
-    <string name="title_activity_setup_solo_game_activity">Set up</string>
-
-    <!-- Strings related to Settings -->
-
-    <!-- Example General settings -->
-    <string name="pref_header_general">General</string>
-
-    <string name="pref_title_social_recommendations">Enable social recommendations</string>
-    <string name="pref_description_social_recommendations">Recommendations for people to contact
-        based on your message history
+    <string name="title_activity_rules">Rules</string>
+    <string name="game_rules">
+    The goal is to be the player with the lowest number of points. To do this, the players should
+        try to get rid of their cards, especially the ones with more cattle heads.\n\n
+    Cow.006 is played using a special card deck that in the original version has a cattle head in
+        the center of the card and a variable number of small cattle heads on the top. The cards are
+        numbered 1 to 104, each giving 1, 2, 3, 5 or 7 points (i.e. cattle heads) to the person who
+        picks it up.\n\n
+    In the deck there are:\n
+    - 1 card with 7 cattle heads溶umber 55\n
+    - 8 cards with 5 cattle heads葉he multiples of 11, i.e. 11, 22, 33, and so on through 99,
+        except for 55\n
+    - 10 cards with 3 cattle heads葉he multiples of ten, i.e. 10, 20, 30, and so through 100\n
+    - 9 cards with 2 cattle heads葉he multiples of five which are not multiples of ten, i.e. 5, 15,
+        25, and so on through 95, except for 55\n
+    - 76 cards with 1 cattle head葉he rest of the cards from 1 through 104\n\n
+    Preparation\n
+    Ten cards are dealt to each player.\n
+    Four uncovered cards are arranged on the table to form a vertical line.\n\n
+    Gameplay\n
+    At each turn, each player selects a card to play, and puts the card face down on the table. When
+        all the players have selected a card, the cards are uncovered.\n\n
+    Starting with the lowest valued card, and continuing in increasing order, each player must put
+        their card at the end of one of the four rows on the table, following these rules:\n\n
+    The card must be put on a row where the latest (end) card is lower in value than the card that
+        is about to be played.\n\n
+    The card must be put on the row where the latest (end) card is the closest in value to the card
+        that is about to be played (if your card is 33, then place it next to the 30 not the 29, for
+        example)\n\n
+    If the row where the played card must be placed already contains 5 cards (the player\'s card is
+        the 6th), the player must gather the 5 cards on the table, leaving only the 6th card in
+        their place to start a new row. The gathered cards must be taken separated and never mixed
+        with the hand cards. The sum of the number of cattle head on the gathered cards will be
+        calculated at the end of the round.\n\n
+    If the played card is lower than all the latest cards present on the four rows, the player must
+        choose a row and gather the cards on that row (usually the row with the fewest cattle
+        heads), leaving only the played card on the row.\n\n
+    The cards of all the players are played following these rules, from the lowest player card to
+        the highest one.\n\n
+    At the end of the turn, the players each select a new card to play; this is repeated for 10
+        turns until all the cards in the hand are played.\n\n
+    End of the game\n
+    After the 10 turns, each player counts the cattle heads on the cards gathered from the table
+        during the round. The score of each player is collected on the paper and a new hand
+        starts.\n\n
+    The game ends when a player collects a total of 66 or more cattle heads. The winner is the
+        player who has collected the fewest cattle heads.\n\n
     </string>
-
-    <string name="pref_title_display_name">Display name</string>
-    <string name="pref_default_display_name">John Smith</string>
-
-    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
-    <string-array name="pref_example_list_titles">
-        <item>Always</item>
-        <item>When possible</item>
-        <item>Never</item>
-    </string-array>
-    <string-array name="pref_example_list_values">
-        <item>1</item>
-        <item>0</item>
-        <item>-1</item>
-    </string-array>
-
-    <!-- Example settings for Data & Sync -->
-    <string name="pref_header_data_sync">Data &amp; sync</string>
-
-    <string name="pref_title_sync_frequency">Sync frequency</string>
-    <string-array name="pref_sync_frequency_titles">
-        <item>15 minutes</item>
-        <item>30 minutes</item>
-        <item>1 hour</item>
-        <item>3 hours</item>
-        <item>6 hours</item>
-        <item>Never</item>
-    </string-array>
-    <string-array name="pref_sync_frequency_values">
-        <item>15</item>
-        <item>30</item>
-        <item>60</item>
-        <item>180</item>
-        <item>360</item>
-        <item>-1</item>
-    </string-array>
-
-    <string-array name="list_preference_entries">
-        <item>Entry 1</item>
-        <item>Entry 2</item>
-        <item>Entry 3</item>
-    </string-array>
-
-    <string-array name="list_preference_entry_values">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-    </string-array>
-
-    <string-array name="multi_select_list_preference_default_value" />
-
-    <string name="pref_title_system_sync_settings">System sync settings</string>
-
-    <!-- Example settings for Notifications -->
-    <string name="pref_header_notifications">Notifications</string>
-
-    <string name="pref_title_new_message_notifications">New message notifications</string>
-
-    <string name="pref_title_ringtone">Ringtone</string>
-    <string name="pref_ringtone_silent">Silent</string>
-
-    <string name="pref_title_vibrate">Vibrate</string>
+    <string name="title_activity_setup_solo_game">Setup solo game</string>
 </resources>

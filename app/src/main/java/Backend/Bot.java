@@ -4,33 +4,25 @@ import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 
-public class Bot extends AbstractPlayer {
+class Bot extends AbstractPlayer {
 
-/*    private final GameHandler gh;
-    Bot(GameHandler gh){
-        this.gh = gh;
+    public Bot(int playersNumber) {
+        super(playersNumber);
     }
-*/    public int tellMove() {
-        System.out.println("Please, make a move");
 
+    public int tellMove() {
+        //Just choose a random card
         int index = ThreadLocalRandom.current().nextInt(0, hand.size());
         int value = hand.get(index);
         hand.remove(Integer.valueOf(value));
-
-        System.out.print("Played: " + value);
-        System.out.print(" Cards left: ");
-        for (int x : hand){
-            System.out.print(x + " ");
-        }
-        System.out.println();
-
         return value;
     }
 
     public int tellChosenRow() {
-//        int minPoints = Integer.MAX_VALUE;
+        //Just choose a row to get as few points as possible
+        int minPoints = Integer.MAX_VALUE;
         int index = 0;
-/*        ArrayList<ArrayList<Integer>> board = gh.getBoard();
+        ArrayList<ArrayList<Integer>> board = this.board;
         for (int i = 0; i < ROWS; i++){
             ArrayList<Integer> row = board.get(i);
             int rowPoints = getRowPoints(row);
@@ -39,7 +31,7 @@ public class Bot extends AbstractPlayer {
                 index = i;
             }
         }
-*/        return index;
+        return index;
     }
 
 }

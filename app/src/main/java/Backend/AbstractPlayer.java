@@ -3,7 +3,7 @@ package Backend;
 import java.util.*;
 import static Backend.AbstractPlayer.updateStateTypes.*;
 
-abstract class AbstractPlayer {
+public abstract class AbstractPlayer {
     protected static final int CARD_PENALTY[] = {0,
             1, 1, 1, 1, 2, 1, 1, 1, 1, 3,
             5, 1, 1, 1, 2, 1, 1, 1, 1, 3,
@@ -23,19 +23,86 @@ abstract class AbstractPlayer {
     static final int STOP_POINTS = 66;
     protected int id;
     protected int playersNumber;
+    public int chosenRowIndex;
+    public int chosenCardIndex;
 
     enum updateStateTypes { ADD_CARD, CLEAR_ROW }
     protected ArrayList<Integer> scores;
     protected ArrayList<Integer> hand;
     protected ArrayList<ArrayList<Integer>> board;
 
-    protected AbstractPlayer(int playersNumber){
+    protected volatile boolean choosingRowToTake;
+    protected volatile boolean choosingCardToTake;
+
+    protected Queue<Move> queue;
+
+
+    protected AbstractPlayer(int playersNumber) {
         this.playersNumber = playersNumber;
         scores = new ArrayList<>(Collections.nCopies(playersNumber, 0));
+        queue = new ArrayDeque<>();
     }
+
+
+    private class Move {
+        updateStateTypes type;
+        int player, card;
+        ArrayList<Integer> row;
+
+        private Move(updateStateTypes type, int player, ArrayList<Integer> row, int card){
+            this.type = type;
+            this.player = player;
+            this.row = row;
+            this.card = card;
+        }
+    }
+
+    public synchronized PriorityQueue<Integer> getCardsFromQueue(){
+        PriorityQueue<Integer> res = new PriorityQueue<>();
+        for (Move move : queue){
+            res.add(move.card);
+        }
+        return res;
+    }
+
+    public synchronized Queue<Move> getQueue() {
+        return queue;
+    }
+
+    public synchronized void updateOneMove(){
+        Move move = queue.poll();
+        updateState(move.type, move.player, move.row, move.card);
+    }
+
+    public synchronized boolean isChoosingRowToTake(){
+        return choosingRowToTake;
+    }
+
+    public synchronized void setChoosingRowToTake(boolean value){
+        choosingRowToTake = value;
+    }
+
+    public boolean isChoosingCardToTake() {
+        return choosingCardToTake;
+    }
+
+    public void setChoosingCardToTake(boolean value) {
+        choosingCardToTake = value;
+    }
+
     public abstract int tellMove();
 
     public abstract int tellChosenRow();
+
+    public synchronized void tellRow(int index){
+        setChoosingRowToTake(false);
+        chosenRowIndex = index;
+    }
+
+    public synchronized void tellCard(int index){
+        setChoosingCardToTake(false);
+        chosenCardIndex = index;
+    }
 
     public void setHand(ArrayList<Integer> hand) {
         this.hand = hand;
@@ -57,27 +124,27 @@ abstract class AbstractPlayer {
     }
 
 
-    void playRound(boolean smallestTook, int chosenRowIndex, ArrayList<Map.Entry<Integer, Integer>> moves) {
+    synchronized void playRound(boolean smallestTook, int chosenRowIndex, ArrayList<Map.Entry<Integer, Integer>> moves) {
 
         int smallestCard = moves.get(0).getValue();
         int playerIndexWithSmallestCard = moves.get(0).getKey();
         if (smallestTook) {
             ArrayList<Integer> chosenRow = board.get(chosenRowIndex);
-            updateState(CLEAR_ROW, playerIndexWithSmallestCard, chosenRow, smallestCard);
+            queue.add(new Move(CLEAR_ROW, playerIndexWithSmallestCard, chosenRow, smallestCard));
         }
         else {
             ArrayList<Integer> updatingRow = getUpdatingRow(smallestCard);
-            updateState(ADD_CARD, playerIndexWithSmallestCard, updatingRow, smallestCard);
+            queue.add(new Move(ADD_CARD, playerIndexWithSmallestCard, updatingRow, smallestCard));
         }
         for (int i = 1; i < playersNumber; i++){
             int currentCard = moves.get(i).getValue();
             int currentPlayer = moves.get(i).getKey();
             ArrayList<Integer> updatingRow = getUpdatingRow(currentCard);
             if (updatingRow.size() == COLUMNS){
-                updateState(CLEAR_ROW, currentPlayer, updatingRow, currentCard);
+                queue.add(new Move(CLEAR_ROW, currentPlayer, updatingRow, currentCard));
             }
             else{
-                updateState(ADD_CARD, currentPlayer, updatingRow, currentCard);
+                queue.add(new Move(ADD_CARD, currentPlayer, updatingRow, currentCard));
             }
         }
     }
@@ -109,7 +176,7 @@ abstract class AbstractPlayer {
         for (Integer card : row){
             res += CARD_PENALTY[card];
         }
-        return  res;
+        return res;
     }
 
     protected void updateScore(int playerIndex, int points){
@@ -136,4 +203,7 @@ abstract class AbstractPlayer {
         return scores.get(getId());
     }
 
+    ArrayList<Integer> getScores(){
+        return scores;
+    }
 }

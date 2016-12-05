@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static Backend.Server.*;
+
 public class Server {
 
     private static ServerSocket serverSocket = null;
@@ -46,7 +46,7 @@ public class Server {
             for (ClientThread connection : connections){
                 ok &= connection.clientInput != null && connection.clientOutput != null;
             }
-            canCreateHandler |= ok;
+            canCreateHandler = ok;
         }
 
         new GameHandler(connections).playGame();

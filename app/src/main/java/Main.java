@@ -6,10 +6,13 @@ public class Main {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
-                    new Client(new Player(1 + opponents)).connectToServer();
-                } catch (Exception e) {
-                    e.printStackTrace();
+                while (true){
+                    try {
+                        new Client(new Player(1 + opponents)).connectToServer();
+                        break;
+                    } catch (Exception e) {
+
+                    }
                 }
 
             }
@@ -19,6 +22,7 @@ public class Main {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
+
                     try {
                         new Client(new Bot(1 + opponents)).connectToServer();
                     } catch (Exception e) {

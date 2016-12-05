@@ -34,10 +34,13 @@ public class Client implements Runnable {
         tmp.start();
 
         while (!isClosed) {}
+
         tmp.join();
 
         clientSocket.close();
     }
+
+
 
     public void run() {
 
@@ -74,7 +77,9 @@ public class Client implements Runnable {
                             connectedPlayer.setId(id);
                             break;
                         case "Move": {
-                            clientOutput.println(connectedPlayer.tellMove());
+                            connectedPlayer.setChoosingCardToTake(true);
+                            while (connectedPlayer.isChoosingCardToTake()){}
+                            clientOutput.println(connectedPlayer.chosenCardIndex);
                             break;
                         }
                         case "Min": {
@@ -82,7 +87,9 @@ public class Client implements Runnable {
                             break;
                         }
                         case "Choose": {
-                            clientOutput.println(connectedPlayer.tellChosenRow());
+                            connectedPlayer.setChoosingRowToTake(true);
+                            while (connectedPlayer.isChoosingRowToTake()){}
+                            clientOutput.println(connectedPlayer.chosenRowIndex);
                             break;
                         }
                         case "Moves":

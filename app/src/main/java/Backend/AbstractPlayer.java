@@ -38,12 +38,12 @@ abstract public class AbstractPlayer {
 
     public abstract int tellChosenRow();
 
-    void setHand(ArrayList<Integer> hand) {
+    public void setHand(ArrayList<Integer> hand) {
         this.hand = hand;
         Collections.sort(this.hand);
     }
 
-    void setBoard(ArrayList<ArrayList<Integer>> board){
+    public void setBoard(ArrayList<ArrayList<Integer>> board){
         this.board = board;
     }
 

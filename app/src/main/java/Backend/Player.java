@@ -11,37 +11,29 @@ public class Player  extends AbstractPlayer{
     }
 
     public int tellMove() {
-        askForAMove();
-
-        int value;
-        Scanner in = new Scanner(System.in);
-        while(true) {
-            value = in.nextInt();
-            if (hand.contains(value)) {
-                hand.remove(Integer.valueOf(value));
-                System.out.print("Played: " + value);
-                break;
-            }
-            else {
-                System.out.println("You don't have this card");
-            }
+        setChoosingCardToTake(true);
+        while (isChoosingCardToTake()){}
+        int value = chosenCardIndex;
+        if (hand.contains(value)) {
+            hand.remove(Integer.valueOf(value));
+            System.out.print("Played: " + value);
+        }
+        else {
+            System.out.println("You don't have this card");
         }
         return value;
     }
 
     public int tellChosenRow() {
-        askForAChoice();
+        setChoosingRowToTake(true);
+        while (isChoosingRowToTake()){}
 
-        int index;
-        Scanner in = new Scanner(System.in);
-        while(true) {
-            index = in.nextInt();
-            if (0 <= index && index < ROWS) {
-                return index;
-            }
-            else {
-                System.out.println("Not in range");
-            }
+        int index = chosenRowIndex;
+        if (0 <= index && index < ROWS) {
+            return index;
+        } else {
+            System.out.println("Not in range");
+            return 0;
         }
     }
 

@@ -77,9 +77,7 @@ public class Client implements Runnable {
                             connectedPlayer.setId(id);
                             break;
                         case "Move": {
-                            connectedPlayer.setChoosingCardToTake(true);
-                            while (connectedPlayer.isChoosingCardToTake()){}
-                            clientOutput.println(connectedPlayer.chosenCardIndex);
+                            clientOutput.println(connectedPlayer.tellMove());
                             break;
                         }
                         case "Min": {
@@ -87,9 +85,7 @@ public class Client implements Runnable {
                             break;
                         }
                         case "Choose": {
-                            connectedPlayer.setChoosingRowToTake(true);
-                            while (connectedPlayer.isChoosingRowToTake()){}
-                            clientOutput.println(connectedPlayer.chosenRowIndex);
+                            clientOutput.println(connectedPlayer.tellChosenRow());
                             break;
                         }
                         case "Moves":

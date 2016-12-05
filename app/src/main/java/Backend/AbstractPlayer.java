@@ -23,8 +23,8 @@ public abstract class AbstractPlayer {
     static final int STOP_POINTS = 66;
     protected int id;
     protected int playersNumber;
-    public int chosenRowIndex;
-    public int chosenCardIndex;
+    public volatile int chosenRowIndex;
+    public volatile int chosenCardIndex;
 
     enum updateStateTypes { ADD_CARD, CLEAR_ROW }
     protected ArrayList<Integer> scores;
@@ -41,6 +41,11 @@ public abstract class AbstractPlayer {
         this.playersNumber = playersNumber;
         scores = new ArrayList<>(Collections.nCopies(playersNumber, 0));
         queue = new ArrayDeque<>();
+        board = new ArrayList<>();
+        for (int i = 0; i < ROWS; ++i) {
+            board.add(new ArrayList<>());
+        }
+        hand = new ArrayList<>();
     }
 
 
@@ -59,9 +64,10 @@ public abstract class AbstractPlayer {
 
     public synchronized PriorityQueue<Integer> getCardsFromQueue(){
         PriorityQueue<Integer> res = new PriorityQueue<>();
-        for (Move move : queue){
+        for (Move move: queue){
             res.add(move.card);
         }
+        System.out.println("Player requested move queue of length " + res.size());
         return res;
     }
 
@@ -95,13 +101,13 @@ public abstract class AbstractPlayer {
     public abstract int tellChosenRow();
 
     public synchronized void tellRow(int index){
-        setChoosingRowToTake(false);
         chosenRowIndex = index;
+        setChoosingRowToTake(false);
     }
 
-    public synchronized void tellCard(int index){
+    public synchronized void tellCard(int card){
+        chosenCardIndex = card;
         setChoosingCardToTake(false);
-        chosenCardIndex = index;
     }
 
     public void setHand(ArrayList<Integer> hand) {

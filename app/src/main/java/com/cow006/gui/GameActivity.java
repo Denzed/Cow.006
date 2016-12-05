@@ -8,7 +8,10 @@ import android.os.Bundle;
 import java.io.IOException;
 import java.util.Arrays;
 
+import Backend.AbstractPlayer;
+import Backend.Bot;
 import Backend.Client;
+import Backend.Player;
 import Backend.Server;
 
 public class GameActivity extends AppCompatActivity {
@@ -41,21 +44,30 @@ public class GameActivity extends AppCompatActivity {
 
     public void onPostCreate(Bundle bundle) {
         super.onPostCreate(bundle);
-        GameView.LocalPlayer lp = new GameView.LocalPlayer(bots);
+        Player lp = new Player(1 + bots);
 
         new Thread(new Runnable() {
             public void run() {
-                Client client = new Client(lp);
-                while (true) {
-                    try {
-                        client.connectToServer();
-                        break;
-                    } catch (IOException | InterruptedException e) {
-                        System.err.println("Connection to server failed! Trying to reconnect...");
-                    }
+                try {
+                    new Client(lp).connectToServer();
+                } catch (IOException | InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
         }).start();
+
+        for (int i = 0; i < bots; i++) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        new Client(new Bot(1 + bots)).connectToServer();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        }
 
         ((GameView) findViewById(R.id.custom_game_view)).setPlayer(lp);
     }

@@ -12,7 +12,7 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import Backend.AbstractPlayer;
+import Backend.Player;
 
 
 public class GameView extends View {
@@ -29,7 +29,7 @@ public class GameView extends View {
                  recoil = 300;
 
     private int focusedCard = 0;
-    private AbstractPlayer player;
+    private Player player;
 
     public GameView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -141,21 +141,16 @@ public class GameView extends View {
     }
 
     protected void drawQueue(Canvas canvas) {
-        if (player.getQueue() == null) {
-            return;
-        }
         float paddingLeft = getWidth() - cardWidth * (1 + fieldsOffsetInCards / 2),
               paddingTop = cardHeight * fieldsOffsetInCards / 2;
-        for (int card: player.getQueue()) {
+        System.out.println("Got queue of size " + player.getCardsFromQueue().size());
+        for (int card: player.getCardsFromQueue()) {
             drawCard(canvas, paddingLeft, paddingTop, card);
             paddingTop += cardHeight * (1 + fieldsOffsetInCards / 2);
         }
     }
 
     protected void drawBoard(Canvas canvas) {
-        if (player.getBoard() == null) {
-            return;
-        }
         float paddingTop = cardHeight * fieldsOffsetInCards / 2;
         for (ArrayList<Integer> row: player.getBoard()) {
             float paddingLeft = cardWidth * fieldsOffsetInCards / 2;
@@ -185,13 +180,14 @@ public class GameView extends View {
         drawQueue(canvas);
         drawBoard(canvas);
         drawHand(canvas);
-        if (!player.getQueue.isEmpty() && !player.isChoosingRowToTake()) {
-            player.update();
+        if (!player.getCardsFromQueue().isEmpty() && !player.isChoosingRowToTake()) {
+            player.updateOneMove();
             try {
                 Thread.sleep(300);
             } catch (InterruptedException e) {
                 // Ignore
             }
+            invalidate();
         }
     }
 
@@ -206,7 +202,7 @@ public class GameView extends View {
     public boolean onTouchEvent(MotionEvent event) {
         if (!player.isChoosingRowToTake() &&
                 (System.currentTimeMillis() - lastEvent < recoil ||
-                        !player.getQueue.isEmpty())) {
+                        !player.getCardsFromQueue().isEmpty())) {
             return false;
         }
         lastEvent = System.currentTimeMillis();
@@ -244,7 +240,7 @@ public class GameView extends View {
                     zoomedPaddingLeft + zoomedWidth, zoomedPaddingTop + zoomedHeight)) {
                 if (card == focusedCard) {
                     focusedCard = 0;
-                    player.tellMove(card);
+                    player.tellCard(card);
                 } else {
                     focusedCard = card;
                 }
@@ -256,7 +252,7 @@ public class GameView extends View {
         return false;
     }
 
-    public void setPlayer(AbstractPlayer p) {
+    public void setPlayer(Player p) {
         player = p;
         invalidate();
     }

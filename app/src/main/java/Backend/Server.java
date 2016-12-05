@@ -14,7 +14,7 @@ public class Server {
     static final int CONNECTIONS_NUMBER = 4;
     static List<ClientThread> connections = Collections.synchronizedList(new ArrayList<ClientThread>());
     private static final int REMOTE_NUMBER = 1;
-    private static final int PORT_NUMBER = 2222;
+    private static final int PORT_NUMBER = 8080;
 
     public static void main(String[] Args) throws IOException {
         getConnections();
@@ -65,8 +65,11 @@ class ClientThread extends Thread {
         try {
             clientInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             clientOutput = new PrintWriter(clientSocket.getOutputStream(), true);
-            if (connections.size() == CONNECTIONS_NUMBER){
-                new GameHandler(connections).playGame();
+            System.out.println(clientOutput);
+            synchronized (this) {
+                if (connections.size() == CONNECTIONS_NUMBER) {
+                    new GameHandler(connections).playGame();
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

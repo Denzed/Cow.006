@@ -1,7 +1,5 @@
 package Backend;
 
-import javafx.util.Pair;
-
 import java.io.IOException;
 import java.util.*;
 
@@ -16,9 +14,9 @@ class GameHandler {
         playersNumber = connections.size();
         this.connections = connections;
         for (int i = 0; i < playersNumber; i++) {
-            System.out.println(connections.get(i));
+            ////System.out.println(connections.get(i));
         }
-        System.out.println("HANDLER CREATED");
+        ////System.out.println("HANDLER CREATED");
     }
 
     void playGame() throws IOException {
@@ -34,14 +32,16 @@ class GameHandler {
                 synchronized (connections.get(i)){
                     ClientThread currentConnection = connections.get(i);
                     currentConnection.clientOutput.println("Score");
+                    //System.out.println("Score");
                     stop |= Integer.parseInt(currentConnection.clientInput.readLine()) >= STOP_POINTS;
                 }
             }
         }
-        System.out.println("???");
+        ////System.out.println("???");
         for (int i = 0; i < playersNumber; i++){
-            System.out.println("GAME OVER");
+            ////System.out.println("GAME OVER");
             synchronized (connections.get(i)) {
+                //System.out.println("Game over");
                 connections.get(i).clientOutput.println("Game over");
             }
         }
@@ -55,8 +55,9 @@ class GameHandler {
         Collections.shuffle(deck);
 
         for (int i = 0; i < playersNumber; i++){
-            synchronized (connections.get(i)){
+            synchronized (connections.get(i)) {
                 ClientThread currentConnection = connections.get(i);
+                //System.out.println("Cards");
                 currentConnection.clientOutput.println("Cards");
                 for (int j = i * ROUNDS; j < (i + 1) * ROUNDS; j++){
                     currentConnection.clientOutput.println(deck.get(j));
@@ -74,6 +75,7 @@ class GameHandler {
         for (int i = 0; i < playersNumber; i++) {
             synchronized (connections.get(i)) {
                 ClientThread currentConnection = connections.get(i);
+                //System.out.println("Move");
                 currentConnection.clientOutput.println("Move");
                 int value = Integer.parseInt(currentConnection.clientInput.readLine());
                 moves.add(new AbstractMap.SimpleEntry<>(i, value));
@@ -92,6 +94,7 @@ class GameHandler {
             }
         });
 
+        //System.out.println("Min");
         connections.get(0).clientOutput.println("Min");
         int minOnBoard = Integer.parseInt(connections.get(0).clientInput.readLine());
         int smallestCard = moves.get(0).getValue();
@@ -99,6 +102,7 @@ class GameHandler {
         int chosenRowIndex = -1;
         if (minOnBoard > smallestCard) {
             int playerIndexWithSmallestCard = moves.get(0).getKey();
+            //System.out.println("Choose");
             connections.get(playerIndexWithSmallestCard).clientOutput.println("Choose");
             chosenRowIndex = Integer.parseInt(connections.get(playerIndexWithSmallestCard).clientInput.readLine());
             smallestTook = true;
@@ -107,6 +111,7 @@ class GameHandler {
         for (int i = 0; i < playersNumber; i++) {
             synchronized (connections.get(i)) {
                 ClientThread currentConnection = connections.get(i);
+                //System.out.println("Moves\n" + smallestTook + "\n" + chosenRowIndex);
                 currentConnection.clientOutput.println("Moves\n" + smallestTook + "\n" + chosenRowIndex);
             }
         }
@@ -114,6 +119,7 @@ class GameHandler {
             synchronized (connections.get(i)) {
                 ClientThread currentConnection = connections.get(i);
                 for (int j = 0; j < playersNumber; j++) {
+                    //System.out.println(moves.get(j).getKey() + "\n" + moves.get(j).getValue());
                     currentConnection.clientOutput.println(moves.get(j).getKey() + "\n" + moves.get(j).getValue());
                 }
             }

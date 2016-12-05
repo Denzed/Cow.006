@@ -13,7 +13,7 @@ import static Backend.AbstractPlayer.ROWS;
 public class Client implements Runnable {
 
     private static final String LOCALHOST = "localhost";
-    private static final int PORT_NUMBER = 2222;
+    private static final int PORT_NUMBER = 8080;
 
     private AbstractPlayer connectedPlayer;
     private BufferedReader clientInput = null;
@@ -30,8 +30,8 @@ public class Client implements Runnable {
             e.printStackTrace();
         }
     }
-    public void connectToServer() throws IOException {
-        System.out.print("???");
+    public synchronized void connectToServer() throws IOException {
+        //System.out.print("???");
 
         Socket clientSocket = new Socket(LOCALHOST, PORT_NUMBER);
         clientInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -39,14 +39,14 @@ public class Client implements Runnable {
         Thread tmp = new Thread(this);
         tmp.start();
         while (!isClosed) {
-//            System.out.println("?" + isClosed);
+//            //System.out.println("?" + isClosed);
         }
 /*        try {
             tmp.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        System.out.println("I A M C L O S E D");
+        //System.out.println("I A M C L O S E D");
 */
         clientInput.close();
         clientSocket.close();
@@ -60,7 +60,7 @@ public class Client implements Runnable {
         try {
             while (!isClosed) {
                 messageFromServer = clientInput.readLine();
-                System.out.println("messageFromServer: " + messageFromServer);
+                //System.out.println("messageFromServer: " + messageFromServer);
                 switch (messageFromServer) {
                     case "Type":
                         clientOutput.println(connectedPlayer.getClass().getSimpleName());
@@ -111,13 +111,13 @@ public class Client implements Runnable {
                         isClosed = true;
                         break;
                 }
-                System.out.println("Iterated in Client.run()");
+                //System.out.println("Iterated in Client.run()");
 
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("CLOSE ME!!!" + isClosed);
+        //System.out.println("CLOSE ME!!!" + isClosed);
 
     }
 }

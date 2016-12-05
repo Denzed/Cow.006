@@ -5,8 +5,8 @@ import java.util.*;
 import static Backend.AbstractPlayer.updateStateTypes.*;
 
 
-abstract class AbstractPlayer {
-    private static final int CARD_PENALTY[] = {0,
+abstract public class AbstractPlayer {
+    protected static final int CARD_PENALTY[] = {0,
             1, 1, 1, 1, 2, 1, 1, 1, 1, 3,
             5, 1, 1, 1, 2, 1, 1, 1, 1, 3,
             1, 5, 1, 1, 2, 1, 1, 1, 1, 3,
@@ -18,20 +18,20 @@ abstract class AbstractPlayer {
             1, 1, 1, 1, 2, 1, 1, 5, 1, 3,
             1, 1, 1, 1, 2, 1, 1, 1, 5, 3,
             1, 1, 1, 1};
-    static final int DECK_SIZE = 104;
-    static final int ROUNDS = 10;
-    static final int ROWS = 4;
-    private static final int COLUMNS = 5;
+    protected static final int DECK_SIZE = 104;
+    protected static final int ROUNDS = 10;
+    protected static final int ROWS = 4;
+    protected static final int COLUMNS = 5;
     static final int STOP_POINTS = 66;
-    private int id;
-    int playersNumber;
+    protected int id;
+    protected int playersNumber;
 
     enum updateStateTypes { ADD_CARD, CLEAR_ROW }
-    List<Integer> scores = Arrays.asList(0, 0, 0, 0);
-    ArrayList<Integer> hand;
-    ArrayList<ArrayList<Integer>> board;
+    protected List<Integer> scores = Arrays.asList(0, 0, 0, 0);
+    protected ArrayList<Integer> hand;
+    protected ArrayList<ArrayList<Integer>> board;
 
-    AbstractPlayer(int playersNumber){
+    protected AbstractPlayer(int playersNumber){
         this.playersNumber = playersNumber;
     }
     public abstract int tellMove();
@@ -81,7 +81,7 @@ abstract class AbstractPlayer {
         }
     }
 
-    private ArrayList<Integer> getUpdatingRow(int card) {
+    protected ArrayList<Integer> getUpdatingRow(int card) {
         int maxCard = 0;
         ArrayList<Integer> row = board.get(0);
         for (int i = 0; i < ROWS; i++){
@@ -95,7 +95,7 @@ abstract class AbstractPlayer {
         return row;
     }
 
-    private void updateState(updateStateTypes type, int choosingPlayer, ArrayList <Integer> row, int card) {
+    protected void updateState(updateStateTypes type, int choosingPlayer, ArrayList <Integer> row, int card) {
         if (type == CLEAR_ROW) {
             updateScore(choosingPlayer, getRowPoints(row));
           row.clear();
@@ -111,8 +111,16 @@ abstract class AbstractPlayer {
         return  res;
     }
 
-    private void updateScore(int playerIndex, int points){
+    protected void updateScore(int playerIndex, int points){
         scores.set(playerIndex, scores.get(playerIndex) + points);
+    }
+
+    public List<Integer> getHand() {
+        return hand;
+    }
+
+    public ArrayList<ArrayList<Integer>> getBoard() {
+        return board;
     }
 
     void setId(int id) {

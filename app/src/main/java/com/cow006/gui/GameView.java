@@ -1,5 +1,6 @@
 package com.cow006.gui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -8,12 +9,16 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.SeekBar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.PriorityQueue;
+import java.util.Scanner;
 import java.util.TreeMap;
+
+import Backend.AbstractPlayer;
 
 /**
  * TODO: document your custom view class.
@@ -33,10 +38,44 @@ public class GameView extends View {
 
     private boolean isChoosingRowToTake = false;
     private int focusedCard = 0;
-    private ArrayList<Integer> hand;
-    private ArrayList<ArrayList<Integer>> board;
     private PriorityQueue<Integer> cardQueue;
-    private TreeMap<Integer,Integer> score;
+    private LocalPlayer player;
+
+    static class LocalPlayer extends AbstractPlayer {
+        public LocalPlayer(int playersNumber) {
+            super(playersNumber);
+        }
+
+
+        protected int move = 0,
+                      row = -1;
+
+        public synchronized void setMove(int card) {
+            move = card;
+        }
+
+        public synchronized void setRow(int r) {
+            row = r;
+        }
+
+        public synchronized int tellMove() {
+            while (move == 0) {
+            }
+            hand.remove(Integer.valueOf(move));
+            int res = move;
+            move = 0;
+            return res;
+        }
+
+        public synchronized int tellChosenRow() {
+
+            while(row == -1) {
+            }
+            int res = row;
+            row = -1;
+            return res;
+        }
+    }
 
     public GameView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -64,16 +103,11 @@ public class GameView extends View {
         mTextPaint.setTextAlign(Paint.Align.CENTER);
         mTextPaint.setColor(Color.BLACK);
 
-        // Init board
-        hand = new ArrayList<>();
+        // Set up emptyQueue
         cardQueue = new PriorityQueue<>();
-        board = new ArrayList<>();
 
-        // Dummy values
-        // TODO: add GameHandler
-        isChoosingRowToTake = true;
-        hand.addAll(Arrays.asList(1, 5, 10, 11, 55, 2, 6, 12, 13, 100));
-        cardQueue.addAll(Arrays.asList(3, 4, 77));
+        // Set up player
+        player = null;
     }
 
     @Override
@@ -143,10 +177,10 @@ public class GameView extends View {
     }
 
     protected void drawHand(Canvas canvas) {
-        int n = hand.size();
+        int n = player.getHand().size();
         float paddingLeft = (getWidth() - cardWidth * (n + 1) / 2) / 2,
               paddingTop = getHeight() - cardHeight * (1 + fieldsOffsetInCards);
-        for (int card: hand) {
+        for (int card: player.getHand()) {
             drawCard(canvas, paddingLeft, paddingTop, card);
             paddingLeft += cardWidth / 2;
         }
@@ -162,8 +196,11 @@ public class GameView extends View {
     }
 
     protected void drawBoard(Canvas canvas) {
+        if (player.getBoard() == null) {
+            return;
+        }
         float paddingTop = cardHeight * fieldsOffsetInCards / 2;
-        for (ArrayList<Integer> row: board) {
+        for (ArrayList<Integer> row: player.getBoard()) {
             float paddingLeft = cardWidth * fieldsOffsetInCards / 2;
             if (isChoosingRowToTake) {
                 canvas.drawRect(paddingLeft / 2,
@@ -185,6 +222,9 @@ public class GameView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        if (player == null) {
+            return;
+        }
         drawQueue(canvas);
         drawBoard(canvas);
         drawHand(canvas);
@@ -209,7 +249,7 @@ public class GameView extends View {
                 if (paddingLeft <= x && x < paddingRight &&
                         paddingTop <= y && y < paddingBottom) {
                     isChoosingRowToTake = false;
-                    // TODO: add GameHandler interaction
+                    player.setRow(i);
                     invalidate();
                     return true;
                 }
@@ -217,11 +257,11 @@ public class GameView extends View {
             }
             return false;
         }
-        int n = hand.size();
+        int n = player.getHand().size();
         float paddingLeft = (getWidth() + cardWidth * (n - 3) / 2) / 2,
                 paddingTop = getHeight() - cardHeight * (1 + fieldsOffsetInCards);
         ArrayList<Integer> handReversed = new ArrayList<>();
-        handReversed.addAll(hand);
+        handReversed.addAll(player.getHand());
         Collections.reverse(handReversed);
         for (int card: handReversed) {
             float zoom = (card == focusedCard ? focusedZoom : 1),
@@ -232,9 +272,8 @@ public class GameView extends View {
             if (zoomedPaddingLeft <= x && x < zoomedPaddingLeft + zoomedWidth &&
                     zoomedPaddingTop <= y && y < zoomedPaddingTop + zoomedHeight) {
                 if (card == focusedCard) {
-                    // TODO: add GameHandler interaction
                     focusedCard = 0;
-                    hand.remove(Integer.valueOf(card));
+                    player.setMove(card);
                 } else {
                     focusedCard = card;
                 }
@@ -244,5 +283,10 @@ public class GameView extends View {
             paddingLeft -= cardWidth / 2;
         }
         return false;
+    }
+
+    public void setPlayer(LocalPlayer p) {
+        player = p;
+        invalidate();
     }
 }

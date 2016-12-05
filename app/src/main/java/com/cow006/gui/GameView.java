@@ -11,21 +11,16 @@ import android.view.View;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.PriorityQueue;
-import java.util.Random;
 
 import Backend.AbstractPlayer;
 
-/**
- * TODO: document your custom view class.
- */
+
 public class GameView extends View {
     private float mTextHeight;
     private TextPaint mTextPaint;
     private Paint cardPaints[], strokePaint;
 
     private float fieldsOffsetInCards = 0.17f;
-//    private float cardCoefficient = (2 - fieldsOffsetInCards) / 11,
     private float cardCoefficient = 1 / (6 + 7 * fieldsOffsetInCards),
                   cardWidth, cardHeight;
     private float focusedZoom = (21 * fieldsOffsetInCards + 1) / (2 - cardCoefficient) / 2;
@@ -33,141 +28,8 @@ public class GameView extends View {
     private long lastEvent = 0,
                  recoil = 300;
 
-    private boolean isChoosingRowToTake = false;
     private int focusedCard = 0;
-    private PriorityQueue<Integer> cardQueue;
-    private LocalPlayer player;
-    private SimpleHandler handler;
-
-    static class LocalPlayer extends AbstractPlayer {
-        public int n;
-        public SimpleHandler h;
-
-        protected int move = 0,
-                row = -1;
-
-        public LocalPlayer(int playersNumber) {
-            super(playersNumber);
-            n = playersNumber;
-        }
-
-        public void setHandler(SimpleHandler sh) {
-            h = sh;
-        }
-
-        public synchronized void setMove(int card) {
-            h.runRound(card);
-            move = card;
-        }
-
-        public synchronized void setRow(int r) {
-            row = r;
-        }
-
-        public synchronized int tellMove() {
-            while (move == 0) {
-            }
-            hand.remove(Integer.valueOf(move));
-            int res = move;
-            move = 0;
-            return res;
-        }
-
-        public synchronized int tellChosenRow() {
-
-            while(row == -1) {
-            }
-            int res = row;
-            row = -1;
-            return res;
-        }
-    }
-
-    private class SimpleHandler {
-        int n;
-        ArrayList<ArrayList<Integer>> hands, board;
-
-        public SimpleHandler(int nPlayers) {
-            n = nPlayers;
-            ArrayList<Integer> deck = new ArrayList<>();
-            for (int i = 1; i <= 104; ++i) {
-                deck.add(i);
-            }
-            hands = new ArrayList<>(nPlayers);
-            for (int j = 0; j < nPlayers; ++j) {
-                hands.add(new ArrayList<>());
-                for (int i = 0; i < 10; ++i) {
-                    int k = new Random().nextInt(deck.size());
-                    hands.get(j).add(deck.get(k));
-                    deck.remove(k);
-                }
-            }
-            board = new ArrayList<>(4);
-            for (int i = 0; i < 4; ++i) {
-                board.add(new ArrayList<>());
-                int k = new Random().nextInt(deck.size());
-                board.get(i).add(deck.get(k));
-                deck.remove(k);
-            }
-            player = new LocalPlayer(nPlayers);
-            updatePlayer();
-        }
-
-        public void updatePlayer() {
-            player.setBoard(board);
-            player.setHand(hands.get(0));
-        }
-
-        public int getMinimalTop() {
-            int res = 104;
-            for (int i = 0; i < 4; ++i) {
-                int k = board.get(i).get(board.get(i).size() - 1);
-                if (k < res) {
-                    res = k;
-                }
-            }
-            return res;
-        }
-
-        public void runRound(int playerCard) {
-            cardQueue.add(playerCard);
-            hands.get(0).remove(Integer.valueOf(playerCard));
-            for (int i = 1; i < n; ++i) {
-                int k = new Random().nextInt(hands.get(i).size());
-                cardQueue.add(hands.get(i).get(k));
-                hands.get(i).remove(k);
-            }
-            updatePlayer();
-            if (cardQueue.peek() < getMinimalTop()) {
-                if (cardQueue.peek().intValue() == playerCard) {
-                    isChoosingRowToTake = true;
-                } else {
-                    int k = new Random().nextInt(4);
-                    takeRow(k);
-                }
-                invalidate();
-            }
-        }
-
-        public void runQueue() {
-            int card = cardQueue.peek();
-            cardQueue.remove();
-            int j = -1;
-            for (int i = 0; i < 4; ++i) {
-                if (card > board.get(i).get(board.get(i).size() - 1) &&
-                        (j == -1 || board.get(i).get(board.get(i).size() - 1) > board.get(j).get(board.get(j).size() - 1))) {
-                    j = i;
-                }
-            }
-            if (board.get(j).size() == 5) {
-                board.get(j).clear();
-            }
-            board.get(j).add(card);
-            updatePlayer();
-        }
-
-
-    }
+    private AbstractPlayer player;
 
     public GameView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -194,9 +56,6 @@ public class GameView extends View {
         mTextPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
         mTextPaint.setTextAlign(Paint.Align.CENTER);
         mTextPaint.setColor(Color.BLACK);
-
-        // Set up emptyQueue
-        cardQueue = new PriorityQueue<>();
 
         // Set up player
         player = null;
@@ -269,6 +128,9 @@ public class GameView extends View {
     }
 
     protected void drawHand(Canvas canvas) {
+        if (player.getHand() == null) {
+            return;
+        }
         int n = player.getHand().size();
         float paddingLeft = (getWidth() - cardWidth * (n + 1) / 2) / 2,
               paddingTop = getHeight() - cardHeight * (1 + fieldsOffsetInCards);
@@ -279,9 +141,12 @@ public class GameView extends View {
     }
 
     protected void drawQueue(Canvas canvas) {
+        if (player.getQueue() == null) {
+            return;
+        }
         float paddingLeft = getWidth() - cardWidth * (1 + fieldsOffsetInCards / 2),
               paddingTop = cardHeight * fieldsOffsetInCards / 2;
-        for (int card: cardQueue) {
+        for (int card: player.getQueue()) {
             drawCard(canvas, paddingLeft, paddingTop, card);
             paddingTop += cardHeight * (1 + fieldsOffsetInCards / 2);
         }
@@ -294,11 +159,7 @@ public class GameView extends View {
         float paddingTop = cardHeight * fieldsOffsetInCards / 2;
         for (ArrayList<Integer> row: player.getBoard()) {
             float paddingLeft = cardWidth * fieldsOffsetInCards / 2;
-            if (isChoosingRowToTake) {
-                System.out.println("L:");
-                System.out.println(paddingLeft / 2);
-                System.out.println("R:");
-                System.out.println(paddingTop / 2);
+            if (player.isChoosingRowToTake()) {
                 canvas.drawRect(paddingLeft / 2,
                                 paddingTop / 2,
                                 paddingLeft +
@@ -315,13 +176,6 @@ public class GameView extends View {
         }
     }
 
-    protected  void takeRow(int row) {
-        handler.board.get(row).clear();
-        player.getBoard().get(row).add(cardQueue.remove());
-        handler.updatePlayer();
-        invalidate();
-    }
-
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -331,27 +185,34 @@ public class GameView extends View {
         drawQueue(canvas);
         drawBoard(canvas);
         drawHand(canvas);
-        if (!cardQueue.isEmpty() && !isChoosingRowToTake) {
-            handler.runQueue();
+        if (!player.getQueue.isEmpty() && !player.isChoosingRowToTake()) {
+            player.update();
             try {
                 Thread.sleep(300);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                // Ignore
             }
-            invalidate();
         }
+    }
+
+    private boolean insideRect(float x, float y,
+                               float xLeft, float yTop,
+                               float xRight, float yBottom) {
+        return xLeft <= x && x < xRight &&
+                yTop <= y && y < yBottom;
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (!isChoosingRowToTake &&
-                (System.currentTimeMillis() - lastEvent < recoil || !cardQueue.isEmpty())) {
+        if (!player.isChoosingRowToTake() &&
+                (System.currentTimeMillis() - lastEvent < recoil ||
+                        !player.getQueue.isEmpty())) {
             return false;
         }
         lastEvent = System.currentTimeMillis();
         float x = event.getX(),
               y = event.getY();
-        if (isChoosingRowToTake) {
+        if (player.isChoosingRowToTake()) {
             float paddingTop = cardHeight * fieldsOffsetInCards / 2;
             for (int i = 0; i < 4; ++i) {
                 float paddingLeft = cardWidth * fieldsOffsetInCards / 2,
@@ -359,11 +220,8 @@ public class GameView extends View {
                               4 * cardWidth * (1 + fieldsOffsetInCards / 2) -
                               cardWidth * fieldsOffsetInCards / 4,
                       paddingBottom = paddingTop + cardHeight * (1 + fieldsOffsetInCards / 4);
-                if (paddingLeft <= x && x < paddingRight &&
-                        paddingTop <= y && y < paddingBottom) {
-                    isChoosingRowToTake = false;
-                    player.setRow(i);
-                    takeRow(i);
+                if (insideRect(x, y, paddingLeft, paddingTop, paddingRight, paddingBottom)) {
+                    player.tellRow(i);
                     invalidate();
                     return true;
                 }
@@ -374,8 +232,7 @@ public class GameView extends View {
         int n = player.getHand().size();
         float paddingLeft = (getWidth() + cardWidth * (n - 3) / 2) / 2,
                 paddingTop = getHeight() - cardHeight * (1 + fieldsOffsetInCards);
-        ArrayList<Integer> handReversed = new ArrayList<>();
-        handReversed.addAll(player.getHand());
+        ArrayList<Integer> handReversed = new ArrayList<>(player.getHand());
         Collections.reverse(handReversed);
         for (int card: handReversed) {
             float zoom = (card == focusedCard ? focusedZoom : 1),
@@ -383,11 +240,11 @@ public class GameView extends View {
                     zoomedHeight = zoom * cardHeight,
                     zoomedPaddingLeft = paddingLeft - zoomedWidth + cardWidth,
                     zoomedPaddingTop = paddingTop - zoomedHeight + cardHeight;
-            if (zoomedPaddingLeft <= x && x < zoomedPaddingLeft + zoomedWidth &&
-                    zoomedPaddingTop <= y && y < zoomedPaddingTop + zoomedHeight) {
+            if (insideRect(x, y, zoomedPaddingLeft, zoomedPaddingTop,
+                    zoomedPaddingLeft + zoomedWidth, zoomedPaddingTop + zoomedHeight)) {
                 if (card == focusedCard) {
                     focusedCard = 0;
-                    player.setMove(card);
+                    player.tellMove(card);
                 } else {
                     focusedCard = card;
                 }
@@ -399,10 +256,8 @@ public class GameView extends View {
         return false;
     }
 
-    public void setPlayer(LocalPlayer p) {
+    public void setPlayer(AbstractPlayer p) {
         player = p;
-        handler = new SimpleHandler(p.n);
-        player.setHandler(handler);
         invalidate();
     }
 }

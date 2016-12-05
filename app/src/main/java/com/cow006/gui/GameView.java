@@ -31,6 +31,7 @@ public class GameView extends View {
     private long lastEvent = 0,
                  recoil = 300;
 
+    private boolean isChoosingRowToTake = false;
     private int focusedCard = 0;
     private ArrayList<Integer> hand;
     private ArrayList<ArrayList<Integer>> board;
@@ -70,6 +71,7 @@ public class GameView extends View {
 
         // Dummy values
         // TODO: add GameHandler
+        isChoosingRowToTake = true;
         hand.addAll(Arrays.asList(1, 5, 10, 11, 55, 2, 6, 12, 13, 100));
         cardQueue.addAll(Arrays.asList(3, 4, 77));
     }
@@ -163,6 +165,15 @@ public class GameView extends View {
         float paddingTop = cardHeight * fieldsOffsetInCards / 2;
         for (ArrayList<Integer> row: board) {
             float paddingLeft = cardWidth * fieldsOffsetInCards / 2;
+            if (isChoosingRowToTake) {
+                canvas.drawRect(paddingLeft / 2,
+                                paddingTop / 2,
+                                paddingLeft +
+                                        4 * cardWidth * (1 + fieldsOffsetInCards / 2) -
+                                        cardWidth * fieldsOffsetInCards / 4,
+                                paddingTop + cardHeight * (1 + fieldsOffsetInCards / 4),
+                                strokePaint);
+            }
             for (int card: row) {
                 drawCard(canvas, paddingLeft, paddingTop, card);
                 paddingLeft += cardWidth * (1 + fieldsOffsetInCards / 2);
@@ -187,6 +198,25 @@ public class GameView extends View {
         lastEvent = System.currentTimeMillis();
         float x = event.getX(),
                 y = event.getY();
+        if (isChoosingRowToTake) {
+            float paddingTop = cardHeight * fieldsOffsetInCards / 2;
+            for (int i = 0; i < 4; ++i) {
+                float paddingLeft = cardWidth * fieldsOffsetInCards / 2,
+                      paddingRight = paddingLeft +
+                              4 * cardWidth * (1 + fieldsOffsetInCards / 2) -
+                              cardWidth * fieldsOffsetInCards / 4,
+                      paddingBottom = paddingTop + cardHeight * (1 + fieldsOffsetInCards / 4);
+                if (paddingLeft <= x && x < paddingRight &&
+                        paddingTop <= y && y < paddingBottom) {
+                    isChoosingRowToTake = false;
+                    // TODO: add GameHandler interaction
+                    invalidate();
+                    return true;
+                }
+                paddingTop += cardHeight * (1 + fieldsOffsetInCards / 2);
+            }
+            return false;
+        }
         int n = hand.size();
         float paddingLeft = (getWidth() + cardWidth * (n - 3) / 2) / 2,
                 paddingTop = getHeight() - cardHeight * (1 + fieldsOffsetInCards);

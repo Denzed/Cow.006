@@ -19,7 +19,7 @@ public class SetupSoloGameActivity extends AppCompatActivity {
         }
     }
 
-    protected void startGame(View view) {
+    public void startGame(View view) {
         Intent intent = new Intent(this, GameActivity.class);
         intent.putExtra("Bot count", ((SeekBar) findViewById(R.id.botNumberSeekBar)).getProgress());
         intent.putExtra("Bot level", ((SeekBar) findViewById(R.id.botLevelSeekBar)).getProgress());

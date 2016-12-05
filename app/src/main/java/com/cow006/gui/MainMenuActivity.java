@@ -13,12 +13,12 @@ public class MainMenuActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main_menu);
     }
 
-    protected void goToRules(View view) {
+    public void goToRules(View view) {
         Intent intent = new Intent(this, RulesActivity.class);
         startActivity(intent);
     }
 
-    protected void goToSoloSetup(View view) {
+    public void goToSoloSetup(View view) {
         Intent intent = new Intent(this, SetupSoloGameActivity.class);
         startActivity(intent);
     }

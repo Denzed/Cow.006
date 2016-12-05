@@ -3,7 +3,7 @@ package Backend;
 import java.util.*;
 import static Backend.AbstractPlayer.updateStateTypes.*;
 
-abstract class AbstractPlayer {
+public abstract class AbstractPlayer {
     protected static final int CARD_PENALTY[] = {0,
             1, 1, 1, 1, 2, 1, 1, 1, 1, 3,
             5, 1, 1, 1, 2, 1, 1, 1, 1, 3,

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 
-class Bot extends AbstractPlayer {
+public class Bot extends AbstractPlayer {
 
     public Bot(int playersNumber) {
         super(playersNumber);

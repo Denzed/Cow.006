@@ -17,7 +17,10 @@ public class Server {
     private static final int PORT_NUMBER = 8080;
 
     public static void main(String[] Args) throws IOException {
-        getConnections();
+        while (true) {
+            getConnections();
+            connections.clear();
+        }
     }
     private static void getConnections() throws IOException{
         try {
@@ -25,17 +28,6 @@ public class Server {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        for (int i = 0; i < CONNECTIONS_NUMBER - REMOTE_NUMBER; i++)
-            new Thread(new Runnable() {
-                public void run()
-                {
-                    try {
-                        new Client(new Bot(4)).connectToServer();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
 
         while (connections.size() < CONNECTIONS_NUMBER) {
             try {
@@ -47,6 +39,18 @@ public class Server {
                 e.printStackTrace();
             }
         }
+
+        boolean canCreateHandler = false;
+        while (!canCreateHandler){
+            boolean ok = (connections.size() == CONNECTIONS_NUMBER);
+            for (ClientThread connection : connections){
+                ok &= connection.clientInput != null && connection.clientOutput != null;
+            }
+            canCreateHandler |= ok;
+        }
+
+        new GameHandler(connections).playGame();
+        serverSocket.close();
     }
 }
 
@@ -65,12 +69,6 @@ class ClientThread extends Thread {
         try {
             clientInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             clientOutput = new PrintWriter(clientSocket.getOutputStream(), true);
-            System.out.println(clientOutput);
-            synchronized (this) {
-                if (connections.size() == CONNECTIONS_NUMBER) {
-                    new GameHandler(connections).playGame();
-                }
-            }
         } catch (IOException e) {
             e.printStackTrace();
         }

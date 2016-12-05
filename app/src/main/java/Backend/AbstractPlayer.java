@@ -1,11 +1,9 @@
 package Backend;
 
 import java.util.*;
-
 import static Backend.AbstractPlayer.updateStateTypes.*;
 
-
-abstract public class AbstractPlayer {
+abstract class AbstractPlayer {
     protected static final int CARD_PENALTY[] = {0,
             1, 1, 1, 1, 2, 1, 1, 1, 1, 3,
             5, 1, 1, 1, 2, 1, 1, 1, 1, 3,
@@ -27,12 +25,13 @@ abstract public class AbstractPlayer {
     protected int playersNumber;
 
     enum updateStateTypes { ADD_CARD, CLEAR_ROW }
-    protected List<Integer> scores = Arrays.asList(0, 0, 0, 0);
+    protected ArrayList<Integer> scores;
     protected ArrayList<Integer> hand;
     protected ArrayList<ArrayList<Integer>> board;
 
     protected AbstractPlayer(int playersNumber){
         this.playersNumber = playersNumber;
+        scores = new ArrayList<>(Collections.nCopies(playersNumber, 0));
     }
     public abstract int tellMove();
 
@@ -41,6 +40,8 @@ abstract public class AbstractPlayer {
     public void setHand(ArrayList<Integer> hand) {
         this.hand = hand;
         Collections.sort(this.hand);
+        System.out.println(hand);
+        System.out.println("SERVER GAVE HAND");
     }
 
     public void setBoard(ArrayList<ArrayList<Integer>> board){
@@ -115,7 +116,7 @@ abstract public class AbstractPlayer {
         scores.set(playerIndex, scores.get(playerIndex) + points);
     }
 
-    public List<Integer> getHand() {
+    public ArrayList<Integer> getHand() {
         return hand;
     }
 

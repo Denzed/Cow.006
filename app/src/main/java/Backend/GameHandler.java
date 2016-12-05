@@ -3,10 +3,7 @@ package Backend;
 import javafx.util.Pair;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 import static Backend.AbstractPlayer.*;
 
@@ -29,7 +26,6 @@ class GameHandler {
         dealCards();
         boolean stop = false;
         while (!stop) {
-            //ПОЧИСТИТЬ ДОСКУ!!!
             dealCards();
             for (int i = 0; i < ROUNDS; i++) {
                 playRound();
@@ -74,16 +70,27 @@ class GameHandler {
     }
 
     private synchronized void playRound() throws IOException {
-        ArrayList<Pair<Integer, Integer>> moves = new ArrayList<>();
+        ArrayList<Map.Entry<Integer, Integer>> moves = new ArrayList<>();
         for (int i = 0; i < playersNumber; i++) {
             synchronized (connections.get(i)) {
                 ClientThread currentConnection = connections.get(i);
                 currentConnection.clientOutput.println("Move");
                 int value = Integer.parseInt(currentConnection.clientInput.readLine());
-                moves.add(new Pair<>(i, value));
+                moves.add(new AbstractMap.SimpleEntry<>(i, value));
             }
         }
-        Collections.sort(moves, Comparator.comparing(Pair::getValue));
+        Collections.sort(moves, new Comparator<Map.Entry<Integer, Integer>>() {
+            @Override
+            public int compare(Map.Entry<Integer, Integer> o1, Map.Entry<Integer, Integer> o2) {
+                if (o1.getValue() > o2.getValue()){
+                    return 1;
+                }
+                if (o1.getValue() < o2.getValue()){
+                    return -1;
+                }
+                return 0;
+            }
+        });
 
         connections.get(0).clientOutput.println("Min");
         int minOnBoard = Integer.parseInt(connections.get(0).clientInput.readLine());

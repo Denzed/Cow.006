@@ -1,11 +1,11 @@
 package Backend;
 
-import javafx.util.Pair;
-
 import java.io.*;
 import java.net.Socket;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Map;
 
 import static Backend.AbstractPlayer.ROUNDS;
 import static Backend.AbstractPlayer.ROWS;
@@ -24,8 +24,15 @@ public class Client implements Runnable {
     public Client(AbstractPlayer connectedPlayer){
         this.connectedPlayer = connectedPlayer;
         playersNumber = this.connectedPlayer.playersNumber;
+        try {
+            connectToServer();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     public void connectToServer() throws IOException {
+        System.out.print("???");
+
         Socket clientSocket = new Socket(LOCALHOST, PORT_NUMBER);
         clientInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         clientOutput = new PrintWriter(clientSocket.getOutputStream(), true);
@@ -89,11 +96,11 @@ public class Client implements Runnable {
                     case "Moves":
                         boolean smallestTook = Boolean.parseBoolean(clientInput.readLine());
                         int chosenRowIndex = Integer.parseInt(clientInput.readLine());
-                        ArrayList<Pair<Integer, Integer>> moves = new ArrayList<>();
+                        ArrayList<Map.Entry<Integer, Integer>> moves = new ArrayList<>();
                         for (int i = 0; i < playersNumber; i++) {
                             int index = Integer.parseInt(clientInput.readLine());
                             int card = Integer.parseInt(clientInput.readLine());
-                            moves.add(new Pair<>(index, card));
+                            moves.add(new AbstractMap.SimpleEntry<>(index, card));
                         }
                         connectedPlayer.playRound(smallestTook, chosenRowIndex, moves);
                         break;

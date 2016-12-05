@@ -13,26 +13,27 @@ public class Server {
     private static ServerSocket serverSocket = null;
     static final int CONNECTIONS_NUMBER = 4;
     static List<ClientThread> connections = Collections.synchronizedList(new ArrayList<ClientThread>());
-
-    static int remote = 0;
     private static final int REMOTE_NUMBER = 1;
     private static final int PORT_NUMBER = 2222;
 
-    public static void main(String[] Args){
+    public static void main(String[] Args) throws IOException {
         getConnections();
     }
-    private static void getConnections() {
+    private static void getConnections() throws IOException{
         try {
             serverSocket = new ServerSocket(PORT_NUMBER);
         } catch (IOException e) {
             e.printStackTrace();
         }
         for (int i = 0; i < CONNECTIONS_NUMBER - REMOTE_NUMBER; i++)
-            new Thread(() -> {
-                try {
-                    new Client(new Bot(4)).connectToServer();
-                } catch (IOException e) {
-                    e.printStackTrace();
+            new Thread(new Runnable() {
+                public void run()
+                {
+                    try {
+                        new Client(new Bot(4)).connectToServer();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }).start();
 

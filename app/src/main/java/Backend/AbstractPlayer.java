@@ -1,11 +1,6 @@
 package Backend;
 
-import javafx.util.Pair;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static Backend.AbstractPlayer.updateStateTypes.*;
 
@@ -61,7 +56,7 @@ abstract class AbstractPlayer {
     }
 
 
-    void playRound(boolean smallestTook, int chosenRowIndex, ArrayList<Pair<Integer, Integer>> moves) {
+    void playRound(boolean smallestTook, int chosenRowIndex, ArrayList<Map.Entry<Integer, Integer>> moves) {
 
         int smallestCard = moves.get(0).getValue();
         int playerIndexWithSmallestCard = moves.get(0).getKey();

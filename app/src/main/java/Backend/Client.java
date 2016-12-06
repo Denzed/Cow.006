@@ -97,7 +97,9 @@ public class Client implements Runnable {
                                 int card = Integer.parseInt(clientInput.readLine());
                                 moves.add(new AbstractMap.SimpleEntry<>(index, card));
                             }
+                            System.out.println("CLIENT MOVES " + connectedPlayer.getId());
                             connectedPlayer.playRound(smallestTook, chosenRowIndex, moves);
+                            System.out.println("CLIENT MOVES DONE " + connectedPlayer.getId());
                             break;
                         case "Score":
                             clientOutput.println(connectedPlayer.getScore());

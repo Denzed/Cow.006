@@ -34,7 +34,7 @@ public class GameActivity extends AppCompatActivity {
             public void run()
             {
                 try {
-                    new Server().main(new String[0]);
+                    Server.main(new String[0]);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -44,7 +44,8 @@ public class GameActivity extends AppCompatActivity {
 
     public void onPostCreate(Bundle bundle) {
         super.onPostCreate(bundle);
-        Player lp = new Player(1 + bots);
+        GameView gw =  (GameView) findViewById(R.id.custom_game_view);
+        GameView.LocalPlayer lp = gw.new LocalPlayer(1 + bots);
 
         new Thread(new Runnable() {
             public void run() {
@@ -69,6 +70,6 @@ public class GameActivity extends AppCompatActivity {
             }).start();
         }
 
-        ((GameView) findViewById(R.id.custom_game_view)).setPlayer(lp);
+        gw.setPlayer(lp);
     }
 }

@@ -11,6 +11,7 @@ import android.view.View;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Map;
 
 import Backend.Player;
 
@@ -29,7 +30,21 @@ public class GameView extends View {
                  recoil = 300;
 
     private int focusedCard = 0;
-    private Player player;
+    private LocalPlayer player;
+
+    public class LocalPlayer extends Player {
+        LocalPlayer(int nPlayers) {
+            super(nPlayers);
+        }
+
+        @Override
+        protected synchronized void playRound(boolean smallestTook,
+                                    int chosenRowIndex,
+                                    ArrayList<Map.Entry<Integer,Integer>> moves) {
+            super.playRound(smallestTook, chosenRowIndex, moves);
+            postInvalidate();
+        }
+    }
 
     public GameView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -252,7 +267,7 @@ public class GameView extends View {
         return false;
     }
 
-    public void setPlayer(Player p) {
+    public void setPlayer(LocalPlayer p) {
         player = p;
         invalidate();
     }

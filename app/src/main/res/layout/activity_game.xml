@@ -10,4 +10,20 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.cow006.gui.GameActivity">
 
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="horizontal"
+            android:id="@+id/game_scores" />
+
+        <com.cow006.gui.GameView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/game_view" />
+    </LinearLayout>
 </RelativeLayout>

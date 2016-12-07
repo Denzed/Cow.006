@@ -1,6 +1,7 @@
 package com.cow006.gui;
 
 import android.content.Intent;
+import android.graphics.Canvas;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -25,7 +26,7 @@ public class GameActivity extends AppCompatActivity {
         if (ab != null) {
             ab.hide();
         }
-        setContentView(R.layout.game_view);
+        setContentView(R.layout.activity_game);
 
         Intent intent = getIntent();
         bots = intent.getIntExtra("Bot count", 5);
@@ -44,7 +45,7 @@ public class GameActivity extends AppCompatActivity {
 
     public void onPostCreate(Bundle bundle) {
         super.onPostCreate(bundle);
-        GameView gw =  (GameView) findViewById(R.id.custom_game_view);
+        GameView gw =  (GameView) findViewById(R.id.game_view);
         GameView.LocalPlayer lp = gw.new LocalPlayer(1 + bots);
 
         new Thread(new Runnable() {
@@ -72,4 +73,5 @@ public class GameActivity extends AppCompatActivity {
 
         gw.setPlayer(lp);
     }
+
 }

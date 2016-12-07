@@ -35,6 +35,8 @@ class GameHandler {
                     stop |= Integer.parseInt(currentConnection.clientInput.readLine()) >= STOP_POINTS;
                 }
             }
+
+
         }
         System.out.println("???");
         for (int i = 0; i < playersNumber; i++){
@@ -71,6 +73,8 @@ class GameHandler {
         for (int i = 0; i < playersNumber; i++) {
             synchronized (connections.get(i)) {
                 ClientThread currentConnection = connections.get(i);
+                System.out.println("SERVER MOVE " + i);
+
                 currentConnection.clientOutput.println("Move");
                 int value = Integer.parseInt(currentConnection.clientInput.readLine());
                 moves.add(new AbstractMap.SimpleEntry<>(i, value));

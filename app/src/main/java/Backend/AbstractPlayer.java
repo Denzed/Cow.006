@@ -82,7 +82,7 @@ public abstract class AbstractPlayer {
         for (Move move: queue){
             res.add(move.card);
         }
-        System.out.println("Player requested move queue of length " + res.size());
+        System.out.println("Player requested move queue of length " + "<" + res.size() + ">");
         return res;
     }
 

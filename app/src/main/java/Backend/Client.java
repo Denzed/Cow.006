@@ -53,12 +53,18 @@ public class Client implements Runnable {
                 while (!isClosed) {
                     messageFromServer = clientInput.readLine();
                     System.out.println("messageFromServer: " + messageFromServer);
+                    System.out.println(connectedPlayer.getQueue().size() + "= size, id = " + connectedPlayer.getId());
+
                     switch (messageFromServer) {
                         case "Players":
                             clientOutput.println(connectedPlayer.playersNumber);
                             break;
                         case "Type":
                             clientOutput.println(connectedPlayer.getClass().getSimpleName());
+                            break;
+                        case "Queue":
+                            System.out.println(connectedPlayer.getQueue().size() + " id = " + connectedPlayer.getId());
+                            clientOutput.println(connectedPlayer.getQueue().isEmpty());
                             break;
                         case "Cards":
                             ArrayList<Integer> hand = new ArrayList<>();

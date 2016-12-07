@@ -35,8 +35,21 @@ class GameHandler {
                     stop |= Integer.parseInt(currentConnection.clientInput.readLine()) >= STOP_POINTS;
                 }
             }
-
-
+            boolean canDealOnceMore = false;
+            while (!canDealOnceMore) {
+                boolean isQueueEmpty = true;
+                for (int i = 0; i < playersNumber; i++) {
+                    synchronized (connections.get(i)) {
+                        ClientThread currentConnection = connections.get(i);
+                        currentConnection.clientOutput.println("Queue");
+                        isQueueEmpty &= Boolean.parseBoolean(currentConnection.clientInput.readLine());
+                    }
+                }
+                canDealOnceMore = isQueueEmpty;
+            }
+            for (int i = 0; i < 10000; i++){
+                System.out.print("+");
+            }
         }
         System.out.println("???");
         for (int i = 0; i < playersNumber; i++){

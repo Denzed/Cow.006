@@ -53,7 +53,7 @@ public class Client implements Runnable {
                 while (!isClosed) {
                     messageFromServer = clientInput.readLine();
                     System.out.println("messageFromServer: " + messageFromServer);
-                    System.out.println(connectedPlayer.getQueue().size() + "= size, id = " + connectedPlayer.getId());
+//                    System.out.println(connectedPlayer.getQueue().size() + "= size, id = " + connectedPlayer.getId());
 
                     switch (messageFromServer) {
                         case "Players":
@@ -65,6 +65,9 @@ public class Client implements Runnable {
                         case "Queue":
                             System.out.println(connectedPlayer.getQueue().size() + " id = " + connectedPlayer.getId());
                             clientOutput.println(connectedPlayer.getQueue().isEmpty());
+                            break;
+                        case "Clear":
+                            connectedPlayer.board.clear();
                             break;
                         case "Cards":
                             ArrayList<Integer> hand = new ArrayList<>();
@@ -104,6 +107,7 @@ public class Client implements Runnable {
                                 moves.add(new AbstractMap.SimpleEntry<>(index, card));
                             }
                             System.out.println("CLIENT MOVES " + connectedPlayer.getId());
+
                             connectedPlayer.playRound(smallestTook, chosenRowIndex, moves);
                             System.out.println("CLIENT MOVES DONE " + connectedPlayer.getId());
                             break;

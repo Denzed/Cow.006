@@ -36,10 +36,10 @@ public class GameView extends View {
     private float cardCoefficient = 1 / (6 + 7 * fieldsOffsetInCards),
     cardWidth,
     cardHeight;
-    private float focusedZoom = (21 * fieldsOffsetInCards + 1) / (2 - cardCoefficient) / 2;
+    private float focusedZoom = (25 * fieldsOffsetInCards + 1) / (2 - cardCoefficient) / 2;
 
     private long lastEvent = 0,
-                 recoil = 300;
+                 recoil = 400;
 
     private int focusedCard = 0;
     private LocalPlayer player;
@@ -192,7 +192,7 @@ public class GameView extends View {
             scoresList.remove(index);
             playerList.remove(index);
         }
-        System.out.println(stringBuilder.toString());
+//        System.out.println(stringBuilder.toString());
         TextView scoresView = (TextView) parentActivity.findViewById(R.id.game_scores);
         scoresView.setText(stringBuilder.toString());
     }
@@ -229,7 +229,7 @@ public class GameView extends View {
     protected void drawQueue(Canvas canvas) {
         float paddingLeft = getWidth() - cardWidth * (1 + fieldsOffsetInCards / 2),
               paddingTop = cardHeight * fieldsOffsetInCards / 2;
-        System.out.println("Got queue of size " + player.getCardsFromQueue().size());
+//        System.out.println("Got queue of size " + player.getCardsFromQueue().size());
         for (int card: player.getCardsFromQueue()) {
             drawCard(canvas, paddingLeft, paddingTop, card);
             paddingTop += cardHeight * (1 + fieldsOffsetInCards / 2);
@@ -270,7 +270,7 @@ public class GameView extends View {
         if (!player.getCardsFromQueue().isEmpty() && !player.isChoosingRowToTake()) {
             player.updateOneMove();
             try {
-                Thread.sleep(300);
+                Thread.sleep(recoil);
             } catch (InterruptedException e) {
                 // Ignore
             }

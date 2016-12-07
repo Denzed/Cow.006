@@ -13,8 +13,8 @@ import static Backend.Server.CONNECTIONS_NUMBER;
 public class Server {
 
     private static ServerSocket serverSocket = null;
-//    static volatile int CONNECTIONS_NUMBER = 1;
-    static volatile int CONNECTIONS_NUMBER = 4;
+    static volatile int CONNECTIONS_NUMBER = 1;
+//    static volatile int CONNECTIONS_NUMBER = 4;
 
     static List<ClientThread> connections = Collections.synchronizedList(new ArrayList<ClientThread>());
     private static final int REMOTE_NUMBER = 1;
@@ -33,16 +33,16 @@ public class Server {
             e.printStackTrace();
         }
 
-/*        Socket clientSocket = serverSocket.accept();
+        Socket clientSocket = serverSocket.accept();
         ClientThread connection = new ClientThread(clientSocket);
         connections.add(connection);
         connection.start();
         while (CONNECTIONS_NUMBER == 1){}
-*/
+
         while (connections.size() < CONNECTIONS_NUMBER) {
             try {
-                Socket clientSocket = serverSocket.accept();
-                ClientThread connection = new ClientThread(clientSocket);
+                /*Socket*/ clientSocket = serverSocket.accept();
+                /*ClientThread*/ connection = new ClientThread(clientSocket);
                 connections.add(connection);
                 connection.start();
             } catch (IOException e) {
@@ -79,9 +79,9 @@ class ClientThread extends Thread {
         try {
             clientInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             clientOutput = new PrintWriter(clientSocket.getOutputStream(), true);
-/*            clientOutput.println("Players");
+            clientOutput.println("Players");
             CONNECTIONS_NUMBER = Integer.parseInt(clientInput.readLine());
-*/
+
         } catch (IOException e) {
             e.printStackTrace();
         }

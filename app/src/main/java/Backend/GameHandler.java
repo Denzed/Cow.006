@@ -13,17 +13,19 @@ class GameHandler {
 
         playersNumber = connections.size();
         this.connections = connections;
-        for (int i = 0; i < playersNumber; i++) {
+/*        for (int i = 0; i < playersNumber; i++) {
             System.out.println(connections.get(i));
         }
         System.out.println("HANDLER CREATED");
+*/
     }
 
     void playGame() throws IOException {
 
-        System.out.println("PLAY GAME");
+//        System.out.println("PLAY GAME");
         boolean stop = false;
         while (!stop) {
+            System.out.println("10  ROUNDS");
             dealCards();
             for (int i = 0; i < ROUNDS; i++) {
                 playRound();
@@ -37,10 +39,19 @@ class GameHandler {
             }
             boolean canDealOnceMore = false;
             while (!canDealOnceMore) {
+                for (int i = 0; i < 10000; i++){
+                    System.out.print("=");
+                }
                 boolean isQueueEmpty = true;
                 for (int i = 0; i < playersNumber; i++) {
                     synchronized (connections.get(i)) {
                         ClientThread currentConnection = connections.get(i);
+                        currentConnection.clientOutput.println("Type");
+                        String type = currentConnection.clientInput.readLine();
+                        System.out.println(type);
+                        if (!type.equals("LocalPlayer")){
+                            continue;
+                        }
                         currentConnection.clientOutput.println("Queue");
                         isQueueEmpty &= Boolean.parseBoolean(currentConnection.clientInput.readLine());
                     }
@@ -50,8 +61,14 @@ class GameHandler {
             for (int i = 0; i < 10000; i++){
                 System.out.print("+");
             }
+            for (int i = 0; i < playersNumber; i++){
+                synchronized (connections.get(i)) {
+                    connections.get(i).clientOutput.println("Clear");
+                }
+            }
+
         }
-        System.out.println("???");
+//        System.out.println("???");
         for (int i = 0; i < playersNumber; i++){
             synchronized (connections.get(i)) {
                 connections.get(i).clientOutput.println("Game over");
@@ -86,7 +103,7 @@ class GameHandler {
         for (int i = 0; i < playersNumber; i++) {
             synchronized (connections.get(i)) {
                 ClientThread currentConnection = connections.get(i);
-                System.out.println("SERVER MOVE " + i);
+//                System.out.println("SERVER MOVE " + i);
 
                 currentConnection.clientOutput.println("Move");
                 int value = Integer.parseInt(currentConnection.clientInput.readLine());

@@ -52,6 +52,7 @@ public class GameActivity extends AppCompatActivity {
             public void run() {
                 try {
                     new Client(lp).connectToServer();
+                    Thread.sleep(2000);
                 } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
                 }

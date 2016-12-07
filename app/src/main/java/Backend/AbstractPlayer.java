@@ -227,7 +227,7 @@ public abstract class AbstractPlayer {
         this.id = id;
     }
 
-    int getId(){
+    public int getId(){
         return id;
     }
 
@@ -235,7 +235,11 @@ public abstract class AbstractPlayer {
         return scores.get(getId());
     }
 
-    ArrayList<Integer> getScores(){
+    public int getPlayersNumber() {
+        return playersNumber;
+    }
+
+    public ArrayList<Integer> getScores(){
         return scores;
     }
 }

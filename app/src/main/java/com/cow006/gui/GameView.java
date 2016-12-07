@@ -1,29 +1,41 @@
 package com.cow006.gui;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
+import android.graphics.RectF;
 import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
+import java.util.TreeMap;
 
 import Backend.Player;
 
 
 public class GameView extends View {
+    GameActivity parentActivity;
     private float mTextHeight;
     private TextPaint mTextPaint;
-    private Paint cardPaints[], strokePaint;
+    private Bitmap cardBitmaps[];
+    private float strokeWidth = 2;
+    private Paint strokePaint,
+                  cardPaints[],
+                  bitmapPaint;
 
     private float fieldsOffsetInCards = 0.17f;
     private float cardCoefficient = 1 / (6 + 7 * fieldsOffsetInCards),
-                  cardWidth, cardHeight;
+    cardWidth,
+    cardHeight;
     private float focusedZoom = (21 * fieldsOffsetInCards + 1) / (2 - cardCoefficient) / 2;
 
     private long lastEvent = 0,
@@ -49,15 +61,22 @@ public class GameView extends View {
     public GameView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        // Set up paints to use for drawing cards
+        // Set up paints
         strokePaint = new Paint();
         strokePaint.setStyle(Paint.Style.STROKE);
         strokePaint.setColor(Color.BLACK);
+        strokePaint.setStrokeWidth(strokeWidth);
+
+        bitmapPaint = new Paint();
+        bitmapPaint.setAntiAlias(true);
+        bitmapPaint.setFilterBitmap(true);
+        bitmapPaint.setDither(true);
 
         cardPaints = new Paint[5];
         for (int i = 0; i < 5; ++i) {
             Paint pt = new Paint();
             pt.setStyle(Paint.Style.FILL_AND_STROKE);
+            pt.setStrokeWidth(strokeWidth);
             cardPaints[i] = pt;
         }
         cardPaints[0].setColor(Color.GREEN);
@@ -72,14 +91,46 @@ public class GameView extends View {
         mTextPaint.setTextAlign(Paint.Align.CENTER);
         mTextPaint.setColor(Color.BLACK);
 
+        // Get screen size
+        Display display = null;
+        if (context instanceof GameActivity) {
+            parentActivity = (GameActivity) context;
+            display = parentActivity.getWindowManager().getDefaultDisplay();
+        }
+        Point size = new Point();
+        display.getSize(size);
+        cardWidth = size.x * cardCoefficient;
+        cardHeight = size.y * cardCoefficient;
+
+        // Adjust text size to fit cards
+        mTextPaint.setTextSize(calcTextSize(cardWidth * 0.95f, cardHeight * 0.95f, "100"));
+        mTextHeight = mTextPaint.getFontMetrics().bottom;
+
+        // Draw card bitmaps
+        cardBitmaps = new Bitmap[104];
+        for (int i = 1; i <= 104; ++i) {
+            cardBitmaps[i - 1] = Bitmap.createBitmap(Math.round(cardWidth),
+                                                     Math.round(cardHeight),
+                                                     Bitmap.Config.RGB_565);
+            Canvas tempCanvas = new Canvas(cardBitmaps[i - 1]);
+            tempCanvas.drawRect(0, 0, cardWidth, cardHeight, getCardPaint(i));
+            tempCanvas.drawRect(0, 0, cardWidth, cardHeight, strokePaint);
+            String text = Integer.toString(i);
+            tempCanvas.drawText(text,
+                                cardWidth / 2f,
+                                cardHeight / 2f + mTextHeight,
+                                mTextPaint);
+        }
+
         // Set up player
         player = null;
     }
 
     @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        cardWidth = cardCoefficient * w;
-        cardHeight = cardCoefficient * h;
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        cardWidth = cardCoefficient * (right - left);
+        cardHeight = cardCoefficient * (bottom - top);
+
         mTextPaint.setTextSize(calcTextSize(cardWidth * 0.95f, cardHeight * 0.95f, "100"));
         mTextHeight = mTextPaint.getFontMetrics().bottom;
     }
@@ -102,7 +153,7 @@ public class GameView extends View {
         return l;
     }
 
-    protected Paint getCard(int number) {
+    protected Paint getCardPaint(int number) {
         if (number == 55) {
             return cardPaints[4];
         } else if (number % 10 == number / 10) {
@@ -116,6 +167,36 @@ public class GameView extends View {
         }
     }
 
+    protected void drawScores() {
+        int id = player.getId();
+        ArrayList<Integer> scoresList = new ArrayList<>(player.getScores()),
+                           playerList = new ArrayList<>();
+        for (int i = 0; i < player.getPlayersNumber(); ++i) {
+            playerList.add(i);
+        }
+        StringBuilder stringBuilder = new StringBuilder("Current scores: ");
+        for (int i = 0; i < player.getPlayersNumber(); ++i) {
+            Integer topScore = Collections.max(scoresList);
+            int index = scoresList.indexOf(topScore);
+            if (playerList.get(index) == id) {
+                for (char c : ("" + playerList.get(index)).toCharArray()) {
+                    stringBuilder.append(c);
+                    stringBuilder.append("\u0332");
+                }
+            } else {
+                stringBuilder.append(playerList.get(index));
+            }
+            stringBuilder.append(" - ");
+            stringBuilder.append(scoresList.get(index));
+            stringBuilder.append("; ");
+            scoresList.remove(index);
+            playerList.remove(index);
+        }
+        System.out.println(stringBuilder.toString());
+        TextView scoresView = (TextView) parentActivity.findViewById(R.id.game_scores);
+        scoresView.setText(stringBuilder.toString());
+    }
+
     protected void drawCard(Canvas canvas,
                             float paddingLeft,
                             float paddingTop,
@@ -125,21 +206,11 @@ public class GameView extends View {
               zoomedHeight = zoom * cardHeight;
         paddingLeft -= zoomedWidth - cardWidth;
         paddingTop -= zoomedHeight - cardHeight;
-        canvas.drawRect(paddingLeft,
-                        paddingTop,
-                        paddingLeft + zoomedWidth,
-                        paddingTop + zoomedHeight,
-                        getCard(number));
-        canvas.drawRect(paddingLeft,
-                        paddingTop,
-                        paddingLeft + zoomedWidth,
-                        paddingTop + zoomedHeight,
-                        strokePaint);
-        String text = Integer.toString(number);
-        canvas.drawText(text,
-                        paddingLeft + zoomedWidth / 2,
-                        paddingTop + zoomedHeight / 2 + mTextHeight,
-                        mTextPaint);
+        RectF position = new RectF(paddingLeft,
+                                   paddingTop,
+                                   paddingLeft + zoomedWidth,
+                                   paddingTop + zoomedHeight);
+        canvas.drawBitmap(cardBitmaps[number - 1], null, position, bitmapPaint);
     }
 
     protected void drawHand(Canvas canvas) {
@@ -173,7 +244,7 @@ public class GameView extends View {
                 canvas.drawRect(paddingLeft / 2,
                                 paddingTop / 2,
                                 paddingLeft +
-                                        4 * cardWidth * (1 + fieldsOffsetInCards / 2) -
+                                        5 * cardWidth * (1 + fieldsOffsetInCards / 2) -
                                         cardWidth * fieldsOffsetInCards / 4,
                                 paddingTop + cardHeight * (1 + fieldsOffsetInCards / 4),
                                 strokePaint);
@@ -192,6 +263,7 @@ public class GameView extends View {
         if (player == null) {
             return;
         }
+        drawScores();
         drawQueue(canvas);
         drawBoard(canvas);
         drawHand(canvas);

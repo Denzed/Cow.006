@@ -45,8 +45,8 @@ public class GameView extends View {
     private LocalPlayer player;
 
     public class LocalPlayer extends Player {
-        LocalPlayer(int nPlayers) {
-            super(nPlayers);
+        LocalPlayer(int remoteNumber, int botsNumber) {
+            super(remoteNumber, botsNumber);
         }
 
         @Override
@@ -214,6 +214,7 @@ public class GameView extends View {
     }
 
     protected void drawHand(Canvas canvas) {
+        System.out.println("DRAW HAND");
         if (player.getHand() == null) {
             return;
         }
@@ -227,6 +228,7 @@ public class GameView extends View {
     }
 
     protected void drawQueue(Canvas canvas) {
+        System.out.println("DRAW QUEUE");
         float paddingLeft = getWidth() - cardWidth * (1 + fieldsOffsetInCards / 2),
               paddingTop = cardHeight * fieldsOffsetInCards / 2;
 //        System.out.println("Got queue of size " + player.getCardsFromQueue().size());
@@ -237,6 +239,7 @@ public class GameView extends View {
     }
 
     protected void drawBoard(Canvas canvas) {
+        System.out.println("DRAW BOARD");
         float paddingTop = cardHeight * fieldsOffsetInCards / 2;
         for (ArrayList<Integer> row: player.getBoard()) {
             float paddingLeft = cardWidth * fieldsOffsetInCards / 2;
@@ -259,6 +262,7 @@ public class GameView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        System.out.println("ON DRAW");
         super.onDraw(canvas);
         if (player == null) {
             return;
@@ -268,6 +272,7 @@ public class GameView extends View {
         drawBoard(canvas);
         drawHand(canvas);
         if (!player.getCardsFromQueue().isEmpty() && !player.isChoosingRowToTake()) {
+            System.out.println("UPDATE ONE MOVE");
             player.updateOneMove();
             try {
                 Thread.sleep(recoil);

@@ -31,7 +31,7 @@ public class GameActivity extends AppCompatActivity {
         Intent intent = getIntent();
         bots = intent.getIntExtra("Bot count", 5);
         botLevel = intent.getIntExtra("Bot level", 5);
-        new Thread(new Runnable() {
+/*        new Thread(new Runnable() {
             public void run()
             {
                 try {
@@ -41,36 +41,23 @@ public class GameActivity extends AppCompatActivity {
                 }
             }
         }).start();
+*/
     }
 
     public void onPostCreate(Bundle bundle) {
         super.onPostCreate(bundle);
-        GameView gw =  (GameView) findViewById(R.id.game_view);
-        GameView.LocalPlayer lp = gw.new LocalPlayer(1 + bots);
+        GameView gw = (GameView) findViewById(R.id.game_view);
+        GameView.LocalPlayer lp = gw.new LocalPlayer(2, 2);
 
         new Thread(new Runnable() {
             public void run() {
                 try {
                     new Client(lp).connectToServer();
-                    Thread.sleep(2000);
                 } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         }).start();
-
-        for (int i = 0; i < bots; i++) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        new Client(new Bot(1 + bots)).connectToServer();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
-        }
 
         gw.setPlayer(lp);
     }

@@ -6,8 +6,8 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Bot extends AbstractPlayer {
 
-    public Bot(int playersNumber) {
-        super(playersNumber);
+    public Bot(int remoteNumber, int botsNumber) {
+        super(remoteNumber, botsNumber);
     }
 
     public int tellMove() {

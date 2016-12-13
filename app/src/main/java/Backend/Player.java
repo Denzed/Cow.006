@@ -4,16 +4,18 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 
-public class Player  extends AbstractPlayer{
+public class Player extends AbstractPlayer{
 
-    public Player(int playersNumber) {
-        super(playersNumber);
+    public Player(int remoteNumber, int botsNumber) {
+        super(remoteNumber, botsNumber);
     }
 
     public int tellMove() {
+//        askForAMove();
         setChoosingCardToTake(true);
         while (isChoosingCardToTake()){}
         int value = chosenCardIndex;
+//        int value = new Scanner(System.in).nextInt();
         if (hand.contains(value)) {
             hand.remove(Integer.valueOf(value));
             System.out.print("Played: " + value);
@@ -25,10 +27,12 @@ public class Player  extends AbstractPlayer{
     }
 
     public int tellChosenRow() {
+//        askForAChoice();
         setChoosingRowToTake(true);
         while (isChoosingRowToTake()){}
-
         int index = chosenRowIndex;
+//      int index = new Scanner(System.in).nextInt();
+
         if (0 <= index && index < ROWS) {
             return index;
         } else {

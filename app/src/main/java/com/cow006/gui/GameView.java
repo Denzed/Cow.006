@@ -1,5 +1,6 @@
 package com.cow006.gui;
 
+import android.content.ClipData;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -7,11 +8,15 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.RectF;
+import android.support.v4.view.GestureDetectorCompat;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.Display;
+import android.view.DragEvent;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -23,6 +28,8 @@ import Backend.Player;
 
 
 public class GameView extends View {
+    private static final int NOT_A_CARD = 0;
+
     GameActivity parentActivity;
     private float mTextHeight;
     private TextPaint mTextPaint;
@@ -32,14 +39,16 @@ public class GameView extends View {
                   cardPaints[],
                   bitmapPaint;
 
-    private float fieldsOffsetInCards = 0.17f;
-    private float cardCoefficient = 1 / (6 + 7 * fieldsOffsetInCards),
-    cardWidth,
-    cardHeight;
-    private float focusedZoom = (25 * fieldsOffsetInCards + 1) / (2 - cardCoefficient) / 2;
+    private float cardCoefficient = 0.16f,
+                  fieldsOffsetInCards = 0.5f - cardCoefficient * 11 / 4,
+                  cardWidth,
+                  cardHeight,
+                  focusedZoom = 2 * fieldsOffsetInCards / cardCoefficient + 1;
 
-    private long lastEvent = 0,
-                 recoil = 400;
+    private long recoil = 400;
+    private GestureDetectorCompat gestureDetector;
+
+    private ImageView cardViews[]; // To use in default DragShadowBuilder
 
     private int focusedCard = 0;
     private LocalPlayer player;
@@ -56,6 +65,103 @@ public class GameView extends View {
             super.playRound(smallestTook, chosenRowIndex, moves);
             postInvalidate();
         }
+    }
+
+    private class GestureListener extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onDown(MotionEvent event) {
+            float x = event.getX(),
+                  y = event.getY();
+            if (player.isChoosingRowToTake()) {
+                float paddingTop = cardHeight * fieldsOffsetInCards / 2;
+                for (int i = 0; i < 4; ++i) {
+                    float paddingLeft = cardWidth * fieldsOffsetInCards / 2,
+                          paddingRight = paddingLeft +
+                                  4 * cardWidth * (1 + fieldsOffsetInCards / 2) -
+                                  cardWidth * fieldsOffsetInCards / 4,
+                          paddingBottom = paddingTop + cardHeight * (1 + fieldsOffsetInCards / 4);
+                    if (insideRect(x, y, paddingLeft, paddingTop, paddingRight, paddingBottom)) {
+                        player.tellRow(i);
+                        invalidate();
+                        return true;
+                    }
+                    paddingTop += cardHeight * (1 + fieldsOffsetInCards / 2);
+                }
+                return false;
+            }
+            int card = getCardFromCoordinates(x, y);
+            if (card != focusedCard) {
+                focusedCard = card;
+                invalidate();
+                return true;
+            }
+            return super.onDown(event);
+        }
+
+        @Override
+        public void onLongPress(MotionEvent event) {
+            if (player.isChoosingCardToTake()) {
+                float x = event.getX(),
+                      y = event.getY();
+                if (player.isChoosingCardToTake()) {
+                    int card = getCardFromCoordinates(x, y);
+                    if (card == NOT_A_CARD) {
+                        return;
+                    }
+                    ClipData data = ClipData.newPlainText("", "");
+                    DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(cardViews[card - 1]);
+                    startDrag(data, shadowBuilder, card, 0);
+                }
+            }
+            super.onLongPress(event);
+        }
+    }
+
+    private class CardDragListener implements View.OnDragListener {
+        @Override
+        public boolean onDrag(View v, DragEvent event) {
+            if (v instanceof GameView) {
+                int action = event.getAction();
+                if (action == DragEvent.ACTION_DROP) {
+                    float x = event.getX(),
+                            y = event.getY();
+                    // Check that the card is dragged inside the field box, otherwise reject
+                    float paddingTop = cardHeight * fieldsOffsetInCards / 2,
+                            paddingLeft = cardWidth * fieldsOffsetInCards / 2,
+                            paddingRight = cardWidth * (5 + fieldsOffsetInCards),
+                            paddingBottom = cardHeight * (4 + fieldsOffsetInCards);
+                    if (insideRect(x, y, paddingLeft, paddingTop, paddingRight, paddingBottom)) {
+                        focusedCard = 0;
+                        player.tellCard((Integer) event.getLocalState());
+                        invalidate();
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+    }
+
+    // Gets card number if there is a card in hand at this coordinates, NOT_A_CARD otherwise
+    private int getCardFromCoordinates(float x, float y) {
+        int n = player.getHand().size();
+        float paddingLeft = (getWidth() + cardWidth * (n - 3) / 2) / 2,
+                paddingTop = getHeight() - cardHeight * (1 + fieldsOffsetInCards);
+        ArrayList<Integer> handReversed = new ArrayList<>(player.getHand());
+        Collections.reverse(handReversed);
+        for (int card: handReversed) {
+            float zoom = (card == focusedCard ? focusedZoom : 1),
+                    zoomedWidth = zoom * cardWidth,
+                    zoomedHeight = zoom * cardHeight,
+                    zoomedPaddingLeft = paddingLeft - zoomedWidth + cardWidth,
+                    zoomedPaddingTop = paddingTop - zoomedHeight + cardHeight;
+            if (insideRect(x, y, zoomedPaddingLeft, zoomedPaddingTop,
+                    zoomedPaddingLeft + zoomedWidth, zoomedPaddingTop + zoomedHeight)) {
+                return card;
+            }
+            paddingLeft -= cardWidth / 2;
+        }
+        return 0;
     }
 
     public GameView(Context context, AttributeSet attrs) {
@@ -122,8 +228,25 @@ public class GameView extends View {
                                 mTextPaint);
         }
 
+        // Generate ImageViews with cards inside
+        cardViews = new ImageView[104];
+        for (int card = 1; card <= 104; ++card) {
+            cardViews[card - 1] = new ImageView(context, attrs);
+            cardViews[card - 1].setImageBitmap(cardBitmaps[card - 1]);
+            cardViews[card - 1].layout(0,
+                                       0,
+                                       Math.round(cardWidth * focusedZoom),
+                                       Math.round(cardHeight * focusedZoom));
+        }
+
         // Set up player
         player = null;
+
+        // Set gesture listener
+        gestureDetector = new GestureDetectorCompat(context, new GestureListener());
+
+        // Set OnDragListener
+        setOnDragListener(new CardDragListener());
     }
 
     @Override
@@ -133,13 +256,14 @@ public class GameView extends View {
 
         mTextPaint.setTextSize(calcTextSize(cardWidth * 0.95f, cardHeight * 0.95f, "100"));
         mTextHeight = mTextPaint.getFontMetrics().bottom;
+        invalidate();
     }
 
     protected float calcTextSize(float width, float height, String text) {
         TextPaint tp = new TextPaint();
         float l = 0,
-                r = width,
-                eps = 1e-5f;
+              r = width,
+              eps = 1e-5f;
         while (l + eps < r) {
             float m = (l + r) / 2;
             tp.setTextSize(m);
@@ -287,56 +411,10 @@ public class GameView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (!player.isChoosingRowToTake() &&
-                (System.currentTimeMillis() - lastEvent < recoil ||
-                        !player.getCardsFromQueue().isEmpty())) {
-            return false;
+        if (!gestureDetector.onTouchEvent(event)) {
+            return super.onTouchEvent(event);
         }
-        lastEvent = System.currentTimeMillis();
-        float x = event.getX(),
-              y = event.getY();
-        if (player.isChoosingRowToTake()) {
-            float paddingTop = cardHeight * fieldsOffsetInCards / 2;
-            for (int i = 0; i < 4; ++i) {
-                float paddingLeft = cardWidth * fieldsOffsetInCards / 2,
-                      paddingRight = paddingLeft +
-                              4 * cardWidth * (1 + fieldsOffsetInCards / 2) -
-                              cardWidth * fieldsOffsetInCards / 4,
-                      paddingBottom = paddingTop + cardHeight * (1 + fieldsOffsetInCards / 4);
-                if (insideRect(x, y, paddingLeft, paddingTop, paddingRight, paddingBottom)) {
-                    player.tellRow(i);
-                    invalidate();
-                    return true;
-                }
-                paddingTop += cardHeight * (1 + fieldsOffsetInCards / 2);
-            }
-            return false;
-        }
-        int n = player.getHand().size();
-        float paddingLeft = (getWidth() + cardWidth * (n - 3) / 2) / 2,
-                paddingTop = getHeight() - cardHeight * (1 + fieldsOffsetInCards);
-        ArrayList<Integer> handReversed = new ArrayList<>(player.getHand());
-        Collections.reverse(handReversed);
-        for (int card: handReversed) {
-            float zoom = (card == focusedCard ? focusedZoom : 1),
-                    zoomedWidth = zoom * cardWidth,
-                    zoomedHeight = zoom * cardHeight,
-                    zoomedPaddingLeft = paddingLeft - zoomedWidth + cardWidth,
-                    zoomedPaddingTop = paddingTop - zoomedHeight + cardHeight;
-            if (insideRect(x, y, zoomedPaddingLeft, zoomedPaddingTop,
-                    zoomedPaddingLeft + zoomedWidth, zoomedPaddingTop + zoomedHeight)) {
-                if (card == focusedCard) {
-                    focusedCard = 0;
-                    player.tellCard(card);
-                } else {
-                    focusedCard = card;
-                }
-                invalidate();
-                return true;
-            }
-            paddingLeft -= cardWidth / 2;
-        }
-        return false;
+        return true;
     }
 
     public void setPlayer(LocalPlayer p) {

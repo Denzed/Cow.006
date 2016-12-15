@@ -47,7 +47,7 @@ public class GameActivity extends AppCompatActivity {
     public void onPostCreate(Bundle bundle) {
         super.onPostCreate(bundle);
         GameView gw = (GameView) findViewById(R.id.game_view);
-        GameView.LocalPlayer lp = gw.new LocalPlayer(2, 2);
+        GameView.LocalPlayer lp = gw.new LocalPlayer(2, 0);
 
         new Thread(new Runnable() {
             public void run() {

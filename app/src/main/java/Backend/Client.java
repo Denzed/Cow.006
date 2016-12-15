@@ -16,8 +16,8 @@ public class Client implements Runnable {
 //    private static final String LOCALHOST = "localhost";
     private static final String LOCALHOST = "192.168.210.110";
 
-   private static final int PORT_NUMBER = 8080;
- //   private static final int PORT_NUMBER = 5222;
+  // private static final int PORT_NUMBER = 8080;
+   private static final int PORT_NUMBER = 5222;
 
 
     private AbstractPlayer connectedPlayer;
@@ -55,7 +55,7 @@ public class Client implements Runnable {
                 messageFromServer = clientInput.readLine();
                 System.out.println("messageFromServer: " + messageFromServer);
                 switch (messageFromServer) {
-                    case "Connections":
+                    case "Players":
                         clientOutput.println(connectedPlayer.playersNumber);
                         break;
                     case "Remote":

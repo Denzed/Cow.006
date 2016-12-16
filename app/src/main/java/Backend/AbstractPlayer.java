@@ -1,5 +1,6 @@
 package Backend;
 
+import java.io.Serializable;
 import java.util.*;
 import static Backend.AbstractPlayer.updateStateTypes.*;
 

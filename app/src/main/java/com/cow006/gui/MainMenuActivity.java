@@ -18,6 +18,11 @@ public class MainMenuActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void goToOnlineSetup(View view) {
+        Intent intent = new Intent(this, SetupMultiActivity.class);
+        startActivity(intent);
+    }
+
     public void goToSoloSetup(View view) {
         Intent intent = new Intent(this, SetupSoloGameActivity.class);
         startActivity(intent);

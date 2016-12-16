@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.RectF;
+import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
 import android.text.TextPaint;
 import android.util.AttributeSet;
@@ -19,6 +20,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
@@ -53,7 +55,7 @@ public class GameView extends View {
     private int focusedCard = 0;
     private LocalPlayer player;
 
-    public class LocalPlayer extends Player {
+    public class LocalPlayer extends Player implements Serializable {
         LocalPlayer(int remoteNumber, int botsNumber) {
             super(remoteNumber, botsNumber);
         }
@@ -251,12 +253,15 @@ public class GameView extends View {
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        cardWidth = cardCoefficient * (right - left);
-        cardHeight = cardCoefficient * (bottom - top);
+        super.onLayout(changed, left, top, right, bottom);
+        if (changed) {
+            cardWidth = cardCoefficient * (right - left);
+            cardHeight = cardCoefficient * (bottom - top);
 
-        mTextPaint.setTextSize(calcTextSize(cardWidth * 0.95f, cardHeight * 0.95f, "100"));
-        mTextHeight = mTextPaint.getFontMetrics().bottom;
-        invalidate();
+            mTextPaint.setTextSize(calcTextSize(cardWidth * 0.95f, cardHeight * 0.95f, "100"));
+            mTextHeight = mTextPaint.getFontMetrics().bottom;
+            invalidate();
+        }
     }
 
     protected float calcTextSize(float width, float height, String text) {

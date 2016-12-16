@@ -31,26 +31,19 @@
         android:onClick="goToSoloSetup" />
 
     <Button
-        android:text="Local multiplayer"
+        android:text="Multiplayer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/local_multi_button"
+        android:id="@+id/multi_button"
+        android:layout_alignParentStart="true"
         android:layout_below="@+id/solo_play_button"
-        android:layout_alignParentStart="true" />
-
-    <Button
-        android:text="Online multiplayer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/online_multi_button"
-        android:layout_below="@+id/local_multi_button"
-        android:layout_alignParentStart="true" />
+        android:onClick="goToOnlineSetup" />
 
     <TextView
         android:text="Miscellaneous"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/online_multi_button"
+        android:layout_below="@+id/multi_button"
         android:layout_alignParentStart="true"
         android:layout_marginTop="14dp"
         android:id="@+id/misc_section"
@@ -69,8 +62,8 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/stats_button"
-        android:text="My stats"
+        android:id="@+id/leaderboard_button"
+        android:text="Global leaderboard"
         android:layout_below="@+id/rules_button"
         android:layout_alignParentStart="true" />
 </RelativeLayout>

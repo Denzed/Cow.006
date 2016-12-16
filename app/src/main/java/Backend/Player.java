@@ -1,10 +1,11 @@
 package Backend;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 
-public class Player extends AbstractPlayer{
+public class Player extends AbstractPlayer {
 
     public Player(int remoteNumber, int botsNumber) {
         super(remoteNumber, botsNumber);

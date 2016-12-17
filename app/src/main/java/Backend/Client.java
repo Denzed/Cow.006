@@ -13,8 +13,8 @@ import static Backend.AbstractPlayer.ROWS;
 
 public class Client implements Runnable {
 
-//    private static final String LOCALHOST = "localhost";
-    private static final String LOCALHOST = "192.168.210.110";
+    private static final String LOCALHOST = "localhost";
+    private static final String MY_LAPTOP_HOST = "192.168.210.110";
 
   // private static final int PORT_NUMBER = 8080;
    private static final int PORT_NUMBER = 5222;
@@ -25,14 +25,14 @@ public class Client implements Runnable {
     private PrintWriter clientOutput = null;
     private final int playersNumber;
     private volatile boolean isClosed = false;
-
+    public enum gameTypes { SINGLEPLAYER, MULTIPLAYER }
     public Client(AbstractPlayer connectedPlayer){
         this.connectedPlayer = connectedPlayer;
         playersNumber = this.connectedPlayer.playersNumber;
     }
 
-    public void connectToServer() throws IOException, InterruptedException {
-        Socket clientSocket = new Socket(LOCALHOST, PORT_NUMBER);
+    public void connectToServer(gameTypes gameType) throws IOException, InterruptedException {
+        Socket clientSocket = new Socket(gameType == gameTypes.SINGLEPLAYER ? LOCALHOST : MY_LAPTOP_HOST, PORT_NUMBER);
         clientInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         clientOutput = new PrintWriter(clientSocket.getOutputStream(), true);
         Thread tmp = new Thread(this);

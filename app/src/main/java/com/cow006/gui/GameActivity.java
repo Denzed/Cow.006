@@ -32,7 +32,20 @@ public class GameActivity extends AppCompatActivity {
         Intent intent = getIntent();
         players = intent.getIntExtra("Player count", 0);
         bots = intent.getIntExtra("Bot count", 0);
+        System.out.println("PLAYERS = " + players + " BOTS = " + bots);
         botLevel = intent.getIntExtra("Bot level", 5);
+        if (players == 0){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Server.main(new String[0]);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        }
     }
 
     public void onPostCreate(Bundle bundle) {
@@ -41,16 +54,40 @@ public class GameActivity extends AppCompatActivity {
         GameView gw = (GameView) findViewById(R.id.game_view);
         GameView.LocalPlayer lp = gw.new LocalPlayer(players + 1, bots);
 
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    new Client(lp).connectToServer();
-                } catch (IOException | InterruptedException e) {
-                    e.printStackTrace();
+        if (players == 0) {
+            new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        new Client(lp).connectToServer(Client.gameTypes.SINGLEPLAYER);
+                    } catch (IOException | InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
+            }).start();
+            for (int i = 0; i < bots; i++){
+                new Thread(new Runnable() {
+                    public void run() {
+                        try {
+                            new Client(new Bot(1, bots)).connectToServer(Client.gameTypes.SINGLEPLAYER);
+                        } catch (IOException | InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
             }
-        }).start();
+        }
+        else{
+            new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        new Client(lp).connectToServer(Client.gameTypes.MULTIPLAYER);
+                    } catch (IOException | InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
 
+        }
         gw.setPlayer(lp);
     }
 

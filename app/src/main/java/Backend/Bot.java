@@ -1,6 +1,8 @@
 package Backend;
 
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 
@@ -12,7 +14,7 @@ public class Bot extends AbstractPlayer {
 
     public int tellMove() {
         //Just choose a random card
-        int index = ThreadLocalRandom.current().nextInt(0, hand.size());
+        int index = new Random().nextInt(hand.size());
         int value = hand.get(index);
         hand.remove(Integer.valueOf(value));
         return value;
@@ -34,4 +36,11 @@ public class Bot extends AbstractPlayer {
         return index;
     }
 
+    @Override
+    protected void playRound(boolean smallestTook, int chosenRowIndex, ArrayList<Map.Entry<Integer, Integer>> moves) {
+        super.playRound(smallestTook, chosenRowIndex, moves);
+        while (!getQueue().isEmpty()){
+            updateOneMove();
+        }
+    }
 }

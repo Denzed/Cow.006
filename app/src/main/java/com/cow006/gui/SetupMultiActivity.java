@@ -15,6 +15,7 @@ public class SetupMultiActivity extends AppCompatActivity {
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
             int players = getProgressById(R.id.playerNumberSeekBar),
                 bots = getProgressById(R.id.botNumberSeekBar);
+            System.out.println("SETUP PLAYERS = " + players + " BOTS = " + bots);
             if (players + bots + 1 > TOTAL_PLAYERS) {
                 if (seekBar == findViewById(R.id.playerNumberSeekBar)) {
                     int newProgress = TOTAL_PLAYERS - 1 - players;

@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 
 public class MainMenuActivity extends AppCompatActivity {
+    private static final int RC_SIGN_IN = 9001;
+    private String userID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

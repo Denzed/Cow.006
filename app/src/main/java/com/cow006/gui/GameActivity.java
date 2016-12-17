@@ -1,19 +1,14 @@
 package com.cow006.gui;
 
 import android.content.Intent;
-import android.graphics.Canvas;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.MenuItem;
 
 import java.io.IOException;
-import java.util.Arrays;
 
-import Backend.AbstractPlayer;
 import Backend.Bot;
 import Backend.Client;
-import Backend.Player;
 import Backend.Server;
 
 public class GameActivity extends AppCompatActivity {
@@ -94,7 +89,6 @@ public class GameActivity extends AppCompatActivity {
     public void onBackPressed() {
         System.out.println("USER LEFT THE GAME!");
         // do something useful
-
         super.onBackPressed();
     }
 }

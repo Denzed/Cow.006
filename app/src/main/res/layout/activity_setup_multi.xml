@@ -10,75 +10,28 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.cow006.gui.SetupSoloGameActivity">
 
-    <TextView
-        android:text="@string/bot_number"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/botNumberText"
-        android:layout_below="@+id/playerNumberSeekBar"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:layout_marginTop="13dp" />
-
-    <TextView
-        android:text="@string/bot_level"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/botNumberSeekBar"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:layout_marginTop="13dp"
-        android:id="@+id/botLevelText" />
-
-    <SeekBar
-        style="@style/Widget.AppCompat.SeekBar.Discrete"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:max="9"
-        android:progress="3"
-        android:id="@+id/botNumberSeekBar"
-        android:layout_marginTop="13dp"
-        android:layout_below="@+id/botNumberText"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true" />
-
-    <SeekBar
-        style="@style/Widget.AppCompat.SeekBar.Discrete"
-        android:layout_height="wrap_content"
-        android:max="10"
-        android:progress="3"
-        android:layout_marginTop="13dp"
-        android:id="@+id/botLevelSeekBar"
-        android:layout_below="@+id/botLevelText"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:layout_width="match_parent" />
-
     <Button
         android:text="@string/start_game"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/botLevelSeekBar"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:layout_marginTop="13dp"
         android:id="@+id/startGame"
-        android:onClick="startGame" />
+        android:onClick="startGame"
+        android:layout_below="@+id/playerNumberSeekBar" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/botNumber"
         android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/botNumberText"
-        android:layout_toRightOf="@+id/botNumberText"
         android:layout_marginStart="22dp"
         android:layout_marginLeft="22dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/botLevelSeekBar"
         android:layout_toEndOf="@+id/botNumber"
         android:id="@+id/botLevel"
         android:layout_toRightOf="@+id/botNumber" />

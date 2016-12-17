@@ -129,11 +129,7 @@ public class GameView extends View {
                     }
                     ClipData data = ClipData.newPlainText("", "");
                     DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(cardViews[card - 1]);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        startDragAndDrop(data, shadowBuilder, card, 0);
-                    } else {
-                        startDrag(data, shadowBuilder, card, 0);
-                    }
+                    startDrag(data, shadowBuilder, card, 0);
                 }
             }
             super.onLongPress(event);

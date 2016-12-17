@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.RectF;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
 import android.text.TextPaint;
@@ -128,7 +129,11 @@ public class GameView extends View {
                     }
                     ClipData data = ClipData.newPlainText("", "");
                     DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(cardViews[card - 1]);
-                    startDrag(data, shadowBuilder, card, 0);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        startDragAndDrop(data, shadowBuilder, card, 0);
+                    } else {
+                        startDrag(data, shadowBuilder, card, 0);
+                    }
                 }
             }
             super.onLongPress(event);
@@ -218,7 +223,7 @@ public class GameView extends View {
         // Get screen size
         Point size = new Point(160, 90);
         if (context instanceof GameActivity) {
-            Display display = null;
+            Display display;
             parentActivity = (GameActivity) context;
             display = parentActivity.getWindowManager().getDefaultDisplay();
             display.getSize(size);
@@ -338,8 +343,13 @@ public class GameView extends View {
             scoresList.remove(index);
             playerList.remove(index);
         }
+<<<<<<< HEAD
         System.out.println(stringBuilder.toString());
         TextView scoresView = (TextView) findViewById(R.id.game_scores);
+=======
+//        System.out.println(stringBuilder.toString());
+        TextView scoresView = (TextView) parentActivity.findViewById(R.id.game_scores);
+>>>>>>> 337eb0e2fedfd507b2a6ce3097cbe00cdcc7c712
         if (scoresView != null) {
             scoresView.setText(stringBuilder.toString());
         } else {

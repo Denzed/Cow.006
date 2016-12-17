@@ -15,7 +15,7 @@ public class GameActivity extends AppCompatActivity {
     private int players;
     private int bots;
     private int botLevel;
-
+    private Client localClient;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,13 +49,13 @@ public class GameActivity extends AppCompatActivity {
 
         GameView gw = (GameView) findViewById(R.id.game_view);
         GameView.LocalPlayer lp = gw.new LocalPlayer(players + 1, bots);
-
+        localClient = new Client(lp);
         if (players == 0) {
             new Thread(new Runnable() {
                 public void run() {
                     try {
-                        new Client(lp).connectToServer(Client.gameTypes.SINGLEPLAYER);
-                    } catch (IOException | InterruptedException e) {
+                        localClient.connectToServer(Client.gameTypes.SINGLEPLAYER);
+                    } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
@@ -65,7 +65,7 @@ public class GameActivity extends AppCompatActivity {
                     public void run() {
                         try {
                             new Client(new Bot(1, bots)).connectToServer(Client.gameTypes.SINGLEPLAYER);
-                        } catch (IOException | InterruptedException e) {
+                        } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
@@ -76,7 +76,7 @@ public class GameActivity extends AppCompatActivity {
                 public void run() {
                     try {
                         new Client(lp).connectToServer(Client.gameTypes.MULTIPLAYER);
-                    } catch (IOException | InterruptedException e) {
+                    } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
@@ -89,6 +89,11 @@ public class GameActivity extends AppCompatActivity {
     public void onBackPressed() {
         System.out.println("USER LEFT THE GAME!");
         // do something useful
+        try {
+            localClient.disconnectFromServer();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         super.onBackPressed();
     }
 }

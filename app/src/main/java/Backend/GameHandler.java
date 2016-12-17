@@ -10,14 +10,14 @@ import static java.lang.Boolean.TRUE;
 class GameHandler {
     private int playersNumber;
     private List<ClientThread> connections;
+    private boolean stop = false;
 
     GameHandler(List<ClientThread> connections) {
         playersNumber = connections.size();
         this.connections = connections;
     }
 
-    void playGame() throws IOException {
-        boolean stop = false;
+    void playGame() throws Exception {
         while (!stop) {
             dealCards();
             for (int i = 0; i < ROUNDS; i++) {
@@ -74,17 +74,16 @@ class GameHandler {
             for (int j = ROUNDS * playersNumber; j < ROUNDS * playersNumber + ROWS; j++){
                 currentConnection.clientOutput.println(deck.get(j));
             }
-            currentConnection.clientOutput.println(i);
-        }
+            currentConnection.clientOutput.println(i);}
     }
 
-    private void playRound() throws IOException {
+    private void playRound() throws Exception {
         ExecutorService es = Executors.newFixedThreadPool(playersNumber);
         ArrayList<Future<Map.Entry<Integer, Integer>>> futureMoves = new ArrayList<>();
         for (final ClientThread currentConnection: connections) {
             futureMoves.add(es.submit(new Callable<Map.Entry<Integer, Integer>>() {
                 @Override
-                public Map.Entry<Integer, Integer> call() throws IOException {
+                public Map.Entry<Integer, Integer> call() throws IOException{
                     currentConnection.clientOutput.println("Move");
                     int value = Integer.parseInt(currentConnection.clientInput.readLine());
                     return new AbstractMap.SimpleEntry<>(connections.indexOf(currentConnection), value);
@@ -93,13 +92,8 @@ class GameHandler {
         }
         final ArrayList<Map.Entry<Integer, Integer>> moves = new ArrayList<>();
         for (Future<Map.Entry<Integer, Integer>> f : futureMoves){
-            try {
-                moves.add(f.get());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            moves.add(f.get());
         }
-        assert(moves.size() == playersNumber);
         Collections.sort(moves, new Comparator<Map.Entry<Integer, Integer>>() {
             @Override
             public int compare(Map.Entry<Integer, Integer> o1, Map.Entry<Integer, Integer> o2) {
@@ -130,11 +124,7 @@ class GameHandler {
         }
 
         for (Future <Boolean> f : futureMovesSequence){
-            try {
-                f.get();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            f.get();
         }
 
         connections.get(0).clientOutput.println("Min");
@@ -174,11 +164,7 @@ class GameHandler {
         }
 
         for (Future <Boolean> f : futureSmallestCardInfo){
-            try {
-                f.get();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            f.get();
         }
     }
 }

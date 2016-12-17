@@ -314,6 +314,7 @@ public class GameView extends View {
     }
 
     protected void drawScores() {
+        System.out.println("DRAWSCORES");
         int id = player.getId();
         ArrayList<Integer> scoresList = new ArrayList<>(player.getScores()),
                            playerList = new ArrayList<>();
@@ -338,10 +339,18 @@ public class GameView extends View {
             scoresList.remove(index);
             playerList.remove(index);
         }
+<<<<<<< HEAD
+        System.out.println(stringBuilder.toString());
+        TextView scoresView = (TextView) findViewById(R.id.game_scores);
+=======
 //        System.out.println(stringBuilder.toString());
         TextView scoresView = (TextView) parentActivity.findViewById(R.id.game_scores);
+>>>>>>> 337eb0e2fedfd507b2a6ce3097cbe00cdcc7c712
         if (scoresView != null) {
             scoresView.setText(stringBuilder.toString());
+        } else {
+            System.out.println("WHAT??? NULL???");
+
         }
     }
 

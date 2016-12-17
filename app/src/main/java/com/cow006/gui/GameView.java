@@ -55,9 +55,25 @@ public class GameView extends View {
     private int focusedCard = 0;
     private LocalPlayer player;
 
-    public class LocalPlayer extends Player implements Serializable {
+    public class LocalPlayer extends Player {
         LocalPlayer(int remoteNumber, int botsNumber) {
             super(remoteNumber, botsNumber);
+        }
+
+        @Override
+        protected void setChoosingRowToTake(boolean value) {
+            super.setChoosingRowToTake(value);
+            if (value) {
+                postInvalidate();
+            }
+        }
+
+        @Override
+        protected void setChoosingCardToTake(boolean value) {
+            super.setChoosingCardToTake(value);
+            if (value) {
+                postInvalidate();
+            }
         }
 
         @Override
@@ -122,7 +138,7 @@ public class GameView extends View {
     private class CardDragListener implements View.OnDragListener {
         @Override
         public boolean onDrag(View v, DragEvent event) {
-            if (v instanceof GameView) {
+            if (v == findViewById(R.id.game_view)) {
                 int action = event.getAction();
                 if (action == DragEvent.ACTION_DROP) {
                     float x = event.getX(),
@@ -200,13 +216,13 @@ public class GameView extends View {
         mTextPaint.setColor(Color.BLACK);
 
         // Get screen size
-        Display display = null;
+        Point size = new Point(160, 90);
         if (context instanceof GameActivity) {
+            Display display = null;
             parentActivity = (GameActivity) context;
             display = parentActivity.getWindowManager().getDefaultDisplay();
+            display.getSize(size);
         }
-        Point size = new Point();
-        display.getSize(size);
         cardWidth = size.x * cardCoefficient;
         cardHeight = size.y * cardCoefficient;
 
@@ -322,8 +338,10 @@ public class GameView extends View {
             playerList.remove(index);
         }
 //        System.out.println(stringBuilder.toString());
-        TextView scoresView = (TextView) parentActivity.findViewById(R.id.game_scores);
-        scoresView.setText(stringBuilder.toString());
+        TextView scoresView = (TextView) findViewById(R.id.game_scores);
+        if (scoresView != null) {
+            scoresView.setText(stringBuilder.toString());
+        }
     }
 
     protected void drawCard(Canvas canvas,
@@ -421,10 +439,7 @@ public class GameView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (!gestureDetector.onTouchEvent(event)) {
-            return super.onTouchEvent(event);
-        }
-        return true;
+        return gestureDetector.onTouchEvent(event) || super.onTouchEvent(event);
     }
 
     public void setPlayer(LocalPlayer p) {

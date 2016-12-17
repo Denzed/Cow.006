@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -64,7 +65,7 @@ public class GameActivity extends AppCompatActivity {
                     }
                 }
             }).start();
-            for (int i = 0; i < bots; i++){
+            for (int i = 0; i < bots; i++) {
                 new Thread(new Runnable() {
                     public void run() {
                         try {
@@ -75,8 +76,7 @@ public class GameActivity extends AppCompatActivity {
                     }
                 }).start();
             }
-        }
-        else{
+        } else {
             new Thread(new Runnable() {
                 public void run() {
                     try {
@@ -86,9 +86,15 @@ public class GameActivity extends AppCompatActivity {
                     }
                 }
             }).start();
-
         }
         gw.setPlayer(lp);
     }
 
+    @Override
+    public void onBackPressed() {
+        System.out.println("USER LEFT THE GAME!");
+        // do something useful
+
+        super.onBackPressed();
+    }
 }

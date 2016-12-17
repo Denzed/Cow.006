@@ -11,20 +11,22 @@
     tools:context="com.cow006.gui.SetupSoloGameActivity">
 
     <TextView
-        android:text="Bot number"
+        android:text="@string/bot_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/botNumberText"
         android:layout_below="@+id/playerNumberSeekBar"
         android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
         android:layout_marginTop="13dp" />
 
     <TextView
-        android:text="Bot level"
+        android:text="@string/bot_level"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/botNumberSeekBar"
         android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
         android:layout_marginTop="13dp"
         android:id="@+id/botLevelText" />
 
@@ -32,12 +34,13 @@
         style="@style/Widget.AppCompat.SeekBar.Discrete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:max="10"
+        android:max="9"
         android:progress="3"
         android:id="@+id/botNumberSeekBar"
         android:layout_marginTop="13dp"
         android:layout_below="@+id/botNumberText"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true" />
 
     <SeekBar
         style="@style/Widget.AppCompat.SeekBar.Discrete"
@@ -48,14 +51,16 @@
         android:id="@+id/botLevelSeekBar"
         android:layout_below="@+id/botLevelText"
         android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
         android:layout_width="match_parent" />
 
     <Button
-        android:text="Start game"
+        android:text="@string/start_game"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/botLevelSeekBar"
         android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
         android:layout_marginTop="13dp"
         android:id="@+id/startGame"
         android:onClick="startGame" />
@@ -66,24 +71,29 @@
         android:id="@+id/botNumber"
         android:layout_alignParentTop="true"
         android:layout_toEndOf="@+id/botNumberText"
-        android:layout_marginStart="22dp" />
+        android:layout_toRightOf="@+id/botNumberText"
+        android:layout_marginStart="22dp"
+        android:layout_marginLeft="22dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/botLevelSeekBar"
         android:layout_toEndOf="@+id/botNumber"
-        android:id="@+id/botLevel" />
+        android:id="@+id/botLevel"
+        android:layout_toRightOf="@+id/botNumber" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Player count"
+        android:text="@string/player_count"
         android:id="@+id/playerNumber"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true" />
 
     <SeekBar
+        style="@style/Widget.AppCompat.SeekBar.Discrete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/playerNumberSeekBar"
@@ -91,6 +101,7 @@
         android:layout_below="@+id/botNumber"
         android:layout_alignParentStart="true"
         android:indeterminate="false"
-        android:layout_marginTop="13dp" />
+        android:layout_marginTop="13dp"
+        android:layout_alignParentLeft="true" />
 
 </RelativeLayout>

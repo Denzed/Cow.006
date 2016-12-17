@@ -96,7 +96,7 @@ public abstract class AbstractPlayer {
         return choosingRowToTake;
     }
 
-    void setChoosingRowToTake(boolean value){
+    protected void setChoosingRowToTake(boolean value){
         choosingRowToTake = value;
     }
 
@@ -104,7 +104,7 @@ public abstract class AbstractPlayer {
         return choosingCardToTake;
     }
 
-    void setChoosingCardToTake(boolean value) {
+    protected void setChoosingCardToTake(boolean value) {
         choosingCardToTake = value;
     }
 

@@ -27,4 +27,9 @@ public class MainMenuActivity extends AppCompatActivity {
         Intent intent = new Intent(this, SetupSoloGameActivity.class);
         startActivity(intent);
     }
+
+    public void goToLeaderboard(View view) {
+        Intent intent = new Intent(this, LeaderboardActivity.class);
+        startActivity(intent);
+    }
 }

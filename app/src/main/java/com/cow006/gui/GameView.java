@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.RectF;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
 import android.text.TextPaint;
@@ -128,7 +129,11 @@ public class GameView extends View {
                     }
                     ClipData data = ClipData.newPlainText("", "");
                     DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(cardViews[card - 1]);
-                    startDrag(data, shadowBuilder, card, 0);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        startDragAndDrop(data, shadowBuilder, card, 0);
+                    } else {
+                        startDrag(data, shadowBuilder, card, 0);
+                    }
                 }
             }
             super.onLongPress(event);
@@ -218,7 +223,7 @@ public class GameView extends View {
         // Get screen size
         Point size = new Point(160, 90);
         if (context instanceof GameActivity) {
-            Display display = null;
+            Display display;
             parentActivity = (GameActivity) context;
             display = parentActivity.getWindowManager().getDefaultDisplay();
             display.getSize(size);
@@ -338,7 +343,7 @@ public class GameView extends View {
             playerList.remove(index);
         }
 //        System.out.println(stringBuilder.toString());
-        TextView scoresView = (TextView) findViewById(R.id.game_scores);
+        TextView scoresView = (TextView) parentActivity.findViewById(R.id.game_scores);
         if (scoresView != null) {
             scoresView.setText(stringBuilder.toString());
         }

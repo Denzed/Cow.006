@@ -19,33 +19,29 @@ public class Client implements Runnable {
   // private static final int PORT_NUMBER = 8080;
    private static final int PORT_NUMBER = 5222;
 
-
     private AbstractPlayer connectedPlayer;
     private BufferedReader clientInput = null;
     private PrintWriter clientOutput = null;
     private final int playersNumber;
     private volatile boolean isClosed = false;
+    private Socket clientSocket;
     public enum gameTypes { SINGLEPLAYER, MULTIPLAYER }
     public Client(AbstractPlayer connectedPlayer){
         this.connectedPlayer = connectedPlayer;
         playersNumber = this.connectedPlayer.playersNumber;
     }
 
-    public void connectToServer(gameTypes gameType) throws IOException, InterruptedException {
-        Socket clientSocket = new Socket(gameType == gameTypes.SINGLEPLAYER ? LOCALHOST : MY_LAPTOP_HOST, PORT_NUMBER);
+    public void connectToServer(gameTypes gameType) throws IOException {
+        clientSocket = new Socket(gameType == gameTypes.SINGLEPLAYER ? LOCALHOST : MY_LAPTOP_HOST, PORT_NUMBER);
         clientInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         clientOutput = new PrintWriter(clientSocket.getOutputStream(), true);
-        Thread tmp = new Thread(this);
-        tmp.start();
-
-        while (!isClosed) {}
-
-        tmp.join();
-
-        clientSocket.close();
+        run();
+        disconnectFromServer();
     }
 
-
+    public void disconnectFromServer() throws IOException{
+        clientSocket.close();
+    }
 
     public void run() {
         String messageFromServer = "";
@@ -53,8 +49,11 @@ public class Client implements Runnable {
         try {
             while (!isClosed) {
                 messageFromServer = clientInput.readLine();
-                System.out.println("messageFromServer: " + messageFromServer);
+                System.out.println("messageFromServer: " + messageFromServer + " " + connectedPlayer.getId());
                 switch (messageFromServer) {
+                    case "IsConnected":
+                        clientOutput.println(connectedPlayer.isConnected());
+                        break;
                     case "Players":
                         clientOutput.println(connectedPlayer.playersNumber);
                         break;
@@ -128,7 +127,7 @@ public class Client implements Runnable {
                 }
             }
         } catch(IOException e){
-                e.printStackTrace();
+            e.printStackTrace();
         }
     }
 }

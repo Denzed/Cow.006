@@ -1,6 +1,5 @@
 package Backend;
 
-import java.io.Serializable;
 import java.util.*;
 import static Backend.AbstractPlayer.updateStateTypes.*;
 
@@ -28,6 +27,10 @@ public abstract class AbstractPlayer {
     int botsNumber;
     volatile int chosenRowIndex;
     volatile int chosenCardIndex;
+
+    public boolean isConnected() {
+        return true;
+    }
 
     enum updateStateTypes { ADD_CARD, CLEAR_ROW }
     ArrayList<Integer> scores;

@@ -149,27 +149,18 @@ public abstract class AbstractPlayer {
         int playerIndexWithSmallestCard = moves.get(0).getKey();
         if (smallestTook) {
             Move tmp = (new Move(CLEAR_ROW, playerIndexWithSmallestCard, chosenRowIndex, smallestCard));
-
             queue.add(new Move(CLEAR_ROW, playerIndexWithSmallestCard, chosenRowIndex, smallestCard));
             if (id == 0)
                 System.out.println(tmp.type + " " + tmp.player + " " + tmp.rowIndex + " " + tmp.card);
             updateState(currentBoard, CLEAR_ROW, playerIndexWithSmallestCard, chosenRowIndex, smallestCard);
         }
-        else {
-            int updatingRowIndex = getUpdatingRowIndex(currentBoard, smallestCard);
-            Move tmp = (new Move(ADD_CARD, playerIndexWithSmallestCard, updatingRowIndex, smallestCard));
-            queue.add(new Move(ADD_CARD, playerIndexWithSmallestCard, updatingRowIndex, smallestCard));
-            if (id == 0)
-                System.out.println(tmp.type + " " + tmp.player + " " + tmp.rowIndex + " " + tmp.card);
-            updateState(currentBoard, ADD_CARD, playerIndexWithSmallestCard, updatingRowIndex, smallestCard);
-        }
+
         if (id == 0)
             System.out.println(id + "\tCURBOARD = " + currentBoard);
         if (id == 0)
             System.out.println(id + "\tBOARD = " + board);
 
-        //System.out
-        for (int i = 1; i < playersNumber; i++){
+        for (int i = smallestTook ? 1 : 0; i < playersNumber; i++){
             int currentCard = moves.get(i).getValue();
             int currentPlayer = moves.get(i).getKey();
             int updatingRowIndex = getUpdatingRowIndex(currentBoard, currentCard);
@@ -179,8 +170,7 @@ public abstract class AbstractPlayer {
                 if (id == 0)
                     System.out.println(currentBoard.get(updatingRowIndex).size() + " " +tmp.type + " " + tmp.player + " " + tmp.rowIndex + " " + tmp.card);
                 updateState(currentBoard, CLEAR_ROW, currentPlayer, updatingRowIndex, currentCard);
-            }
-            else{
+            } else {
                 Move tmp = new Move(ADD_CARD, currentPlayer, updatingRowIndex, currentCard);
                 queue.add(new Move(ADD_CARD, currentPlayer, updatingRowIndex, currentCard));
                 if (id == 0)
@@ -193,11 +183,8 @@ public abstract class AbstractPlayer {
                 System.out.println(id + "\tBOARD = " + board);
 
         }
-/*        while (!queue.isEmpty()) {
-            updateOneMove();
-        }
-*/
     }
+
     protected int getUpdatingRowIndex(ArrayList<ArrayList<Integer>> board, int card) {
         int maxCard = 0;
         int index = 0;

@@ -318,23 +318,26 @@ public class GameView extends View {
     }
 
     protected void drawScores() {
-        System.out.println("DRAWSCORES");
         int id = player.getId();
         ArrayList<Integer> scoresList = new ArrayList<>(player.getScores()),
                            playerList = new ArrayList<>();
         for (int i = 0; i < player.getPlayersNumber(); ++i) {
             playerList.add(i);
         }
-        StringBuilder stringBuilder = new StringBuilder("Current scores: ");
+        StringBuilder stringBuilder = new StringBuilder("SCORES: ");
         for (int i = 0; i < player.getPlayersNumber(); ++i) {
             Integer topScore = Collections.max(scoresList);
             int index = scoresList.indexOf(topScore);
             if (playerList.get(index) == id) {
-                for (char c : ("" + playerList.get(index)).toCharArray()) {
+                stringBuilder.append("YOU ");
+            }
+/*            for (char c : ("" + playerList.get(index)).toCharArray()) {
                     stringBuilder.append(c);
                     stringBuilder.append("\u0332");
                 }
-            } else {
+*/
+            else {
+                stringBuilder.append("Opponent #");
                 stringBuilder.append(playerList.get(index));
             }
             stringBuilder.append(" - ");
@@ -343,19 +346,9 @@ public class GameView extends View {
             scoresList.remove(index);
             playerList.remove(index);
         }
-<<<<<<< HEAD
-        System.out.println(stringBuilder.toString());
-        TextView scoresView = (TextView) findViewById(R.id.game_scores);
-=======
-//        System.out.println(stringBuilder.toString());
-        TextView scoresView = (TextView) parentActivity.findViewById(R.id.game_scores);
->>>>>>> 337eb0e2fedfd507b2a6ce3097cbe00cdcc7c712
-        if (scoresView != null) {
-            scoresView.setText(stringBuilder.toString());
-        } else {
-            System.out.println("WHAT??? NULL???");
 
-        }
+        TextView scoresView = (TextView) parentActivity.findViewById(R.id.game_scores);
+        scoresView.setText(stringBuilder.toString());
     }
 
     protected void drawCard(Canvas canvas,
@@ -375,7 +368,6 @@ public class GameView extends View {
     }
 
     protected void drawHand(Canvas canvas) {
-        System.out.println("DRAW HAND");
         if (player.getHand() == null) {
             return;
         }
@@ -389,10 +381,8 @@ public class GameView extends View {
     }
 
     protected void drawQueue(Canvas canvas) {
-        System.out.println("DRAW QUEUE");
         float paddingLeft = getWidth() - cardWidth * (1 + fieldsOffsetInCards / 2),
               paddingTop = cardHeight * fieldsOffsetInCards / 2;
-//        System.out.println("Got queue of size " + player.getCardsFromQueue().size());
         for (int card: player.getCardsFromQueue()) {
             drawCard(canvas, paddingLeft, paddingTop, card);
             paddingTop += cardHeight * (1 + fieldsOffsetInCards / 2);
@@ -400,18 +390,18 @@ public class GameView extends View {
     }
 
     protected void drawBoard(Canvas canvas) {
-        System.out.println("DRAW BOARD");
         float paddingTop = cardHeight * fieldsOffsetInCards / 2;
         for (ArrayList<Integer> row: player.getBoard()) {
             float paddingLeft = cardWidth * fieldsOffsetInCards / 2;
             if (player.isChoosingRowToTake()) {
                 canvas.drawRect(paddingLeft / 2,
-                                paddingTop / 2,
+                                paddingTop,
                                 paddingLeft +
                                         5 * cardWidth * (1 + fieldsOffsetInCards / 2) -
                                         cardWidth * fieldsOffsetInCards / 4,
-                                paddingTop + cardHeight * (1 + fieldsOffsetInCards / 4),
+                                 paddingTop + cardHeight * (1 + fieldsOffsetInCards / 4),
                                 strokePaint);
+
             }
             for (int card: row) {
                 drawCard(canvas, paddingLeft, paddingTop, card);
@@ -423,7 +413,6 @@ public class GameView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        System.out.println("ON DRAW");
         super.onDraw(canvas);
         if (player == null) {
             return;
@@ -433,7 +422,6 @@ public class GameView extends View {
         drawBoard(canvas);
         drawHand(canvas);
         if (!player.getCardsFromQueue().isEmpty() && !player.isChoosingRowToTake()) {
-            System.out.println("UPDATE ONE MOVE");
             player.updateOneMove();
             try {
                 Thread.sleep(recoil);

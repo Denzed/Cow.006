@@ -16,8 +16,8 @@ public class Client implements Runnable {
     private static final String LOCALHOST = "localhost";
     private static final String MY_LAPTOP_HOST = "192.168.210.110";
 
-  // private static final int PORT_NUMBER = 8080;
-   private static final int PORT_NUMBER = 5222;
+    private static final int PORT_NUMBER = 8080;
+//   private static final int PORT_NUMBER = 5222;
 
     private AbstractPlayer connectedPlayer;
     private BufferedReader clientInput = null;
@@ -32,7 +32,9 @@ public class Client implements Runnable {
     }
 
     public void connectToServer(gameTypes gameType) throws IOException {
+        System.out.println("???");
         clientSocket = new Socket(gameType == gameTypes.SINGLEPLAYER ? LOCALHOST : MY_LAPTOP_HOST, PORT_NUMBER);
+        System.out.println("!!!");
         clientInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         clientOutput = new PrintWriter(clientSocket.getOutputStream(), true);
         run();
@@ -40,6 +42,9 @@ public class Client implements Runnable {
     }
 
     public void disconnectFromServer() throws IOException{
+        System.out.println("DISCONNECT");
+        System.out.println(clientSocket);
+        isClosed = true;
         clientSocket.close();
     }
 
@@ -127,7 +132,7 @@ public class Client implements Runnable {
                 }
             }
         } catch(IOException e){
-            e.printStackTrace();
+//            e.printStackTrace();
         }
     }
 }

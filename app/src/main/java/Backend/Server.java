@@ -13,7 +13,7 @@ public class Server {
     public static ServerSocket serverSocket = null;
     private static ArrayList<ArrayList<ClientThread>> connections =
             new ArrayList<>(Collections.nCopies(DECK_SIZE / ROUNDS + 1, new ArrayList<ClientThread>()));
-    private static final int PORT_NUMBER = 5222;
+    private static final int PORT_NUMBER = 8080;
 
     public static void main(String[] Args) throws IOException {
         serverSocket = new ServerSocket(PORT_NUMBER);

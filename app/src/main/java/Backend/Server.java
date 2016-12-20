@@ -10,13 +10,15 @@ import static Backend.AbstractPlayer.ROUNDS;
 
 public class Server {
 
-    public static ServerSocket serverSocket = null;
-    private static ArrayList<ArrayList<ClientThread>> connections =
-            new ArrayList<>(Collections.nCopies(DECK_SIZE / ROUNDS + 1, new ArrayList<ClientThread>()));
-    private static final int PORT_NUMBER = 5222;
+    private static ServerSocket serverSocket = null;
+    private static ArrayList<ArrayList<ClientConnection>> connections =
+            new ArrayList<>(Collections.nCopies(DECK_SIZE / ROUNDS + 1, new ArrayList<ClientConnection>()));
+    private static final int PORT_NUMBER = 8080;
 
     public static void main(String[] Args) throws IOException {
         serverSocket = new ServerSocket(PORT_NUMBER);
+
+        //I think it's OK to have infinite loop here because it's a server
         while (true) {
             System.out.println("BEFORE WAIT");
             waitForConnections();
@@ -24,87 +26,58 @@ public class Server {
         }
     }
 
-    private static synchronized void waitForConnections() {
-        try {
-            System.out.print("TRYING...");
+    private static synchronized void waitForConnections() throws IOException {
+        System.out.print("TRYING...");
+        Socket clientSocket = serverSocket.accept();
+        System.out.println("CONNECTED");
 
-            Socket clientSocket = serverSocket.accept();
-            System.out.println("CONNECTED");
-            ClientThread connection = new ClientThread(clientSocket);
-            connection.start();
-            while (connection.playersNumber == 0) {}
+        ClientConnection connection = new ClientConnection(clientSocket);
+        int playersNumber = connection.getPlayersNumber();
+        connections.get(playersNumber).add(connection);
+        if (connections.get(playersNumber).size() >= playersNumber) {
+            boolean haveEnoughConnectedPlayers = true;
+            ArrayList<ClientConnection> candidates = connections.get(playersNumber);
 
-            connections.get(connection.playersNumber).add(connection);
-            if (connections.get(connection.playersNumber).size() >= connection.playersNumber){
-                boolean haveEnoughConnectedPlayers = true;
-                ArrayList<ClientThread> candidates = connections.get(connection.playersNumber);
-                for (int i = 0; i < connection.playersNumber; i++){
-                    try{
-                        candidates.get(i).clientOutput.println("IsConnected");
-                        Boolean.parseBoolean(candidates.get(i).clientInput.readLine());
-                    }
-                    catch (IOException e){
-                        candidates.remove(i);
-                        haveEnoughConnectedPlayers = false;
-                        break;
-                    }
+            for (int i = 0; i < playersNumber; i++) {
+                try {
+                    candidates.get(i).getClientOutput().println("IsConnected");
+                    candidates.get(i).getClientInput().readLine();
+                } catch (IOException e) {
+                    candidates.remove(i);
+                    haveEnoughConnectedPlayers = false;
+                    break;
                 }
-                if (!haveEnoughConnectedPlayers){
-                    return;
-                }
-
-                final ArrayList<ClientThread> players = new ArrayList<>();
-                while (players.size() < connection.playersNumber){
-                    players.add(candidates.get(0));
-                    candidates.remove(0);
-                }
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            new GameHandler(players).playGame();
-                        } catch (Exception e) {
-                            System.out.println("EXCEPTION!!!");
-                            for (ClientThread currentConnection : players){
-                                try{
-                                    currentConnection.clientOutput.println("Game over");
-                                }
-                                catch (Exception e2){
-                                    //just ignore
-                                }
-                            }
-                            System.out.println("HANDLED!!!");
-                        }
-                    }
-                }).start();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+            if (!haveEnoughConnectedPlayers) {
+                return;
+            }
+
+            final ArrayList<ClientConnection> players = new ArrayList<>();
+            while (players.size() < playersNumber) {
+                players.add(candidates.get(0));
+                candidates.remove(0);
+            }
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        new GameHandler(players).playGame();
+                    } catch (Exception e) {
+                        System.out.println("EXCEPTION!!!");
+                        for (ClientConnection currentConnection : players) {
+                            try {
+                                currentConnection.getClientOutput().println("Game over");
+                            } catch (Exception e2) {
+                                //just ignore
+                            }
+                        }
+                        System.out.println("HANDLED!!!");
+                    }
+                }
+            }).start();
         }
     }
-}
-
-
-class ClientThread extends Thread {
-
-    private Socket clientSocket;
-    BufferedReader clientInput = null;
-    PrintWriter clientOutput = null;
-    volatile int playersNumber = 0;
-
-    ClientThread(Socket clientSocket) {
-        this.clientSocket = clientSocket;
-    }
-
-    public void run() {
-        try {
-            clientInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            clientOutput = new PrintWriter(clientSocket.getOutputStream(), true);
-            clientOutput.println("Players");
-            playersNumber = Integer.parseInt(clientInput.readLine());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
 }
+

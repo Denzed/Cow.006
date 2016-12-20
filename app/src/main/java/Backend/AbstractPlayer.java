@@ -48,6 +48,8 @@ public abstract class AbstractPlayer {
         this.playersNumber = remoteNumber + botsNumber;
         this.remoteNumber = remoteNumber;
         this.botsNumber = botsNumber;
+        System.out.println(playersNumber + "; " + remoteNumber + "; " + botsNumber);
+
         scores = new ArrayList<>(Collections.nCopies(playersNumber, 0));
         queue = new  ArrayDeque<>();
         board = new ArrayList<>();

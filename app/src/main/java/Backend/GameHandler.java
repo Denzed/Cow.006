@@ -5,14 +5,13 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import static Backend.AbstractPlayer.*;
-import static java.lang.Boolean.TRUE;
 
 class GameHandler {
     private int playersNumber;
-    private List<ClientThread> connections;
+    private ArrayList<ClientConnection> connections;
     private boolean stop = false;
 
-    GameHandler(List<ClientThread> connections) {
+    GameHandler(ArrayList<ClientConnection> connections) {
         playersNumber = connections.size();
         this.connections = connections;
     }
@@ -24,40 +23,41 @@ class GameHandler {
                 playRound();
             }
 
-            for (int i = 0; i < playersNumber; i++){
-                ClientThread currentConnection = connections.get(i);
-                currentConnection.clientOutput.println("Score");
-                stop |= Integer.parseInt(currentConnection.clientInput.readLine()) >= STOP_POINTS;
+            for (int i = 0; i < playersNumber; i++) {
+                ClientConnection currentConnection = connections.get(i);
+                currentConnection.getClientOutput().println("Score");
+                stop |= Integer.parseInt(currentConnection.getClientInput().readLine()) >= STOP_POINTS;
             }
 
             boolean canDealOnceMore = false;
             while (!canDealOnceMore) {
                 boolean isQueueEmpty = true;
                 for (int i = 0; i < playersNumber; i++) {
-                    ClientThread currentConnection = connections.get(i);
-                    currentConnection.clientOutput.println("Type");
-                    String type = currentConnection.clientInput.readLine();
+                    ClientConnection currentConnection = connections.get(i);
+                    currentConnection.getClientOutput().println("Type");
+                    String type = currentConnection.getClientInput().readLine();
                     System.out.println(type);
-                    if (!type.equals("LocalPlayer")){
+                    if (!type.equals("LocalPlayer")) {
                         continue;
                     }
-                    currentConnection.clientOutput.println("Queue");
-                    isQueueEmpty &= Boolean.parseBoolean(currentConnection.clientInput.readLine());
+                    currentConnection.getClientOutput().println("Queue");
+                    isQueueEmpty &= Boolean.parseBoolean(currentConnection.getClientInput().readLine());
                 }
                 canDealOnceMore = isQueueEmpty;
             }
 
-            for (int i = 0; i < playersNumber; i++){
-                connections.get(i).clientOutput.println("Clear");
+            for (int i = 0; i < playersNumber; i++) {
+                connections.get(i).getClientOutput().println("Clear");
             }
 
         }
-        for (int i = 0; i < playersNumber; i++){
-            connections.get(i).clientOutput.println("Game over");
+
+        for (int i = 0; i < playersNumber; i++) {
+            connections.get(i).getClientOutput().println("Game over");
         }
     }
 
-    private void dealCards(){
+    private void dealCards() {
         System.out.println("DEALING");
         ArrayList<Integer> deck = new ArrayList<>();
         for (int i = 0; i < DECK_SIZE; i++){
@@ -65,35 +65,36 @@ class GameHandler {
         }
         Collections.shuffle(deck);
 
-        for (ClientThread currentConnection : connections){
+        for (ClientConnection currentConnection : connections) {
             int i = connections.indexOf(currentConnection);
-            currentConnection.clientOutput.println("Cards");
-            for (int j = i * ROUNDS; j < (i + 1) * ROUNDS; j++){
-                currentConnection.clientOutput.println(deck.get(j));
+            currentConnection.getClientOutput().println("Cards");
+            for (int j = i * ROUNDS; j < (i + 1) * ROUNDS; j++) {
+                currentConnection.getClientOutput().println(deck.get(j));
             }
-            for (int j = ROUNDS * playersNumber; j < ROUNDS * playersNumber + ROWS; j++){
-                currentConnection.clientOutput.println(deck.get(j));
+            for (int j = ROUNDS * playersNumber; j < ROUNDS * playersNumber + ROWS; j++) {
+                currentConnection.getClientOutput().println(deck.get(j));
             }
-            currentConnection.clientOutput.println(i);}
+            currentConnection.getClientOutput().println(i);}
     }
 
-    private void playRound() throws Exception {
-        ExecutorService es = Executors.newFixedThreadPool(playersNumber);
-        ArrayList<Future<Map.Entry<Integer, Integer>>> futureMoves = new ArrayList<>();
-        for (final ClientThread currentConnection: connections) {
-            futureMoves.add(es.submit(new Callable<Map.Entry<Integer, Integer>>() {
+    private void playRound() throws IOException, InterruptedException, ExecutionException {
+        ExecutorService threadPool = Executors.newFixedThreadPool(playersNumber);
+        ArrayList<Callable<Map.Entry<Integer, Integer>>> tasksForMoves = new ArrayList<>();
+        for (final ClientConnection currentConnection: connections) {
+            tasksForMoves.add(new Callable<Map.Entry<Integer, Integer>>() {
                 @Override
                 public Map.Entry<Integer, Integer> call() throws IOException{
-                    currentConnection.clientOutput.println("Move");
-                    int value = Integer.parseInt(currentConnection.clientInput.readLine());
+                    currentConnection.getClientOutput().println("Move");
+                    int value = Integer.parseInt(currentConnection.getClientInput().readLine());
                     return new AbstractMap.SimpleEntry<>(connections.indexOf(currentConnection), value);
                 }
-            }));
+            });
         }
         final ArrayList<Map.Entry<Integer, Integer>> moves = new ArrayList<>();
-        for (Future<Map.Entry<Integer, Integer>> f : futureMoves){
-            moves.add(f.get());
+        for (Future<Map.Entry<Integer, Integer>> taskForMove : threadPool.invokeAll(tasksForMoves)){
+            moves.add(taskForMove.get());
         }
+
         Collections.sort(moves, new Comparator<Map.Entry<Integer, Integer>>() {
             @Override
             public int compare(Map.Entry<Integer, Integer> o1, Map.Entry<Integer, Integer> o2) {
@@ -108,63 +109,59 @@ class GameHandler {
         });
 
 
-        es = Executors.newFixedThreadPool(playersNumber);
-        ArrayList<Future<Boolean>> futureMovesSequence = new ArrayList<>();
-        for (final ClientThread currentConnection : connections) {
-            futureMovesSequence.add(es.submit(new Callable<Boolean>() {
+        threadPool = Executors.newFixedThreadPool(playersNumber);
+        ArrayList<Callable<Void>> tasksForMovesSequence = new ArrayList<>();
+        for (final ClientConnection currentConnection : connections) {
+            tasksForMovesSequence.add(new Callable<Void>() {
                 @Override
-                public Boolean call(){
-                currentConnection.clientOutput.println("Moves");
-                    for (int j = 0; j < playersNumber; j++) {
-                        currentConnection.clientOutput.println(moves.get(j).getKey() + "\n" + moves.get(j).getValue());
+                public Void call(){
+                    currentConnection.getClientOutput().println("Moves");
+                    for (Map.Entry<Integer, Integer> move : moves) {
+                        currentConnection.getClientOutput().println(move.getKey());
+                        currentConnection.getClientOutput().println(move.getValue());
                     }
-                    return TRUE;
+                    return null;
                 }
-            }));
+            });
         }
+        threadPool.invokeAll(tasksForMovesSequence);
 
-        for (Future <Boolean> f : futureMovesSequence){
-            f.get();
-        }
-
-        connections.get(0).clientOutput.println("Min");
-        int minOnBoard = Integer.parseInt(connections.get(0).clientInput.readLine());
+        connections.get(0).getClientOutput().println("Min");
+        int minOnBoard = Integer.parseInt(connections.get(0).getClientInput().readLine());
         int smallestCard = moves.get(0).getValue();
 
-        es = Executors.newFixedThreadPool(playersNumber);
-        ArrayList<Future<Boolean>> futureSmallestCardInfo = new ArrayList<>();
+        threadPool = Executors.newFixedThreadPool(playersNumber);
+        ArrayList<Callable<Void>> tasksForSmallestCardInfo = new ArrayList<>();
         if (minOnBoard > smallestCard) {
             int playerIndexWithSmallestCard = moves.get(0).getKey();
-            connections.get(playerIndexWithSmallestCard).clientOutput.println("Choose");
+            connections.get(playerIndexWithSmallestCard).getClientOutput().println("Choose");
             final boolean smallestTook = true;
-            final int chosenRowIndex = Integer.parseInt(connections.get(playerIndexWithSmallestCard).clientInput.readLine());
-            for (final ClientThread currentConnection : connections) {
-                futureSmallestCardInfo.add(es.submit(new Callable<Boolean>() {
+            final int chosenRowIndex = Integer.parseInt(connections.get(playerIndexWithSmallestCard).getClientInput().readLine());
+            for (final ClientConnection currentConnection : connections) {
+                tasksForSmallestCardInfo.add(new Callable<Void>() {
                     @Override
-                    public Boolean call(){
-                        currentConnection.clientOutput.println("Smallest");
-                        currentConnection.clientOutput.println(smallestTook);
-                        currentConnection.clientOutput.println(chosenRowIndex);
-                        return TRUE;
+                    public Void call(){
+                        currentConnection.getClientOutput().println("Smallest");
+                        currentConnection.getClientOutput().println(smallestTook);
+                        currentConnection.getClientOutput().println(chosenRowIndex);
+                        return null;
                     }
-                }));
+                });
             }
         } else {
-            for (final ClientThread currentConnection : connections) {
-                futureSmallestCardInfo.add(es.submit(new Callable<Boolean>() {
+            for (final ClientConnection currentConnection : connections) {
+                tasksForSmallestCardInfo.add(new Callable<Void>() {
                     @Override
-                    public Boolean call(){
-                        currentConnection.clientOutput.println("Smallest");
-                        currentConnection.clientOutput.println(false);
-                        currentConnection.clientOutput.println(-1);
-                        return TRUE;
+                    public Void call(){
+                        currentConnection.getClientOutput().println("Smallest");
+                        currentConnection.getClientOutput().println(false);
+                        currentConnection.getClientOutput().println(-1);
+                        return null;
                     }
-                }));
+                });
             }
         }
-
-        for (Future <Boolean> f : futureSmallestCardInfo){
-            f.get();
-        }
+        threadPool.invokeAll(tasksForSmallestCardInfo);
     }
+
 }

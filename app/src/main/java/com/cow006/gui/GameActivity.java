@@ -34,6 +34,7 @@ public class GameActivity extends AppCompatActivity {
         if (players == 0){
             new Thread(() -> {
                     try {
+                        System.out.println("SERVER CREATED");
                         Server.main(new String[0]);
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -68,7 +69,7 @@ public class GameActivity extends AppCompatActivity {
         } else {
             new Thread(() -> {
                     try {
-                        new Client(lp).connectToServer(Client.gameTypes.MULTIPLAYER);
+                        localClient.connectToServer(Client.gameTypes.MULTIPLAYER);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

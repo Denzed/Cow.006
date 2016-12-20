@@ -16,25 +16,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
-        android:layout_marginTop="13dp"
+        android:layout_marginTop="16dp"
         android:id="@+id/startGame"
         android:onClick="startGame"
         android:layout_below="@+id/playerNumberSeekBar" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/botNumber"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="22dp"
-        android:layout_marginLeft="22dp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toEndOf="@+id/botNumber"
-        android:id="@+id/botLevel"
-        android:layout_toRightOf="@+id/botNumber" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -51,10 +36,10 @@
         android:layout_height="wrap_content"
         android:id="@+id/playerNumberSeekBar"
         android:max="9"
-        android:layout_below="@+id/botNumber"
+        android:layout_below="@+id/playerNumber"
         android:layout_alignParentStart="true"
         android:indeterminate="false"
-        android:layout_marginTop="13dp"
+        android:layout_marginTop="16dp"
         android:layout_alignParentLeft="true" />
 
 </RelativeLayout>

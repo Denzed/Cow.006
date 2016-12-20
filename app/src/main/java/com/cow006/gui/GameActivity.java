@@ -16,6 +16,7 @@ public class GameActivity extends AppCompatActivity {
     private int bots;
     private int botLevel;
     private Client localClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,16 +32,13 @@ public class GameActivity extends AppCompatActivity {
         System.out.println("PLAYERS = " + players + " BOTS = " + bots);
         botLevel = intent.getIntExtra("Bot level", 5);
         if (players == 0){
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
+            new Thread(() -> {
                     try {
                         Server.main(new String[0]);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                }
-            }).start();
+                }).start();
         }
     }
 
@@ -48,39 +46,33 @@ public class GameActivity extends AppCompatActivity {
         super.onPostCreate(bundle);
 
         GameView gw = (GameView) findViewById(R.id.game_view);
-        GameView.LocalPlayer lp = gw.new LocalPlayer(players + 1, bots);
+        final GameView.LocalPlayer lp = gw.new LocalPlayer(players + 1, bots);
         localClient = new Client(lp);
         if (players == 0) {
-            new Thread(new Runnable() {
-                public void run() {
+            new Thread(() -> {
                     try {
                         localClient.connectToServer(Client.gameTypes.SINGLEPLAYER);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                }
-            }).start();
+                }).start();
             for (int i = 0; i < bots; i++) {
-                new Thread(new Runnable() {
-                    public void run() {
+                new Thread(() -> {
                         try {
                             new Client(new Bot(1, bots)).connectToServer(Client.gameTypes.SINGLEPLAYER);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                    }
-                }).start();
+                    }).start();
             }
         } else {
-            new Thread(new Runnable() {
-                public void run() {
+            new Thread(() -> {
                     try {
                         new Client(lp).connectToServer(Client.gameTypes.MULTIPLAYER);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                }
-            }).start();
+                }).start();
         }
         gw.setPlayer(lp);
     }

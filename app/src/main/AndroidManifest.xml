@@ -13,16 +13,15 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainMenuActivity">
-            android:screenOrientation="portrait"
+            android:name=".MainMenuActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".RulesActivity">
+            android:name=".RulesActivity"
             android:screenOrientation="portrait"
             android:label="@string/title_activity_rules"
             android:parentActivityName=".MainMenuActivity">

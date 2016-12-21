@@ -7,13 +7,14 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
-        android:screenOrientation="portrait"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainMenuActivity">
+        <activity
+            android:name=".MainMenuActivity">
+            android:screenOrientation="portrait"
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -21,7 +22,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".RulesActivity"
+            android:name=".RulesActivity">
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_rules"
             android:parentActivityName=".MainMenuActivity">
             <meta-data
@@ -30,17 +32,23 @@
         </activity>
         <activity
             android:name=".SetupSoloGameActivity"
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_setup_solo_game"
             android:parentActivityName=".MainMenuActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.cow006.gui.MainMenuActivity" />
         </activity>
-        <activity android:name=".GameActivity" />
-        <activity android:name=".SetupMultiActivity" />
+        <activity
+            android:name=".GameActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".SetupMultiActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".LeaderboardActivity"
-            android:label="@string/title_activity_leaderboard"></activity>
+            android:screenOrientation="portrait"
+            android:label="@string/title_activity_leaderboard" />
     </application>
 
 </manifest>

@@ -7,6 +7,7 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
+import java.util.PriorityQueue;
 
 import static Backend.AbstractPlayer.ROUNDS;
 import static Backend.AbstractPlayer.ROWS;
@@ -107,11 +108,14 @@ public class Client {
                 }
                 case "Moves":
                     moves = new ArrayList<>();
+                    PriorityQueue<Integer> cardsQueue = new PriorityQueue<>();
                     for (int i = 0; i < playersNumber; i++) {
                         int index = Integer.parseInt(clientInput.readLine());
                         int card = Integer.parseInt(clientInput.readLine());
                         moves.add(new AbstractMap.SimpleEntry<>(index, card));
+                        cardsQueue.add(card);
                     }
+                    connectedPlayer.setCardsQueue(cardsQueue);
                     break;
                 case "Smallest":
                     boolean smallestTook = Boolean.parseBoolean(clientInput.readLine());

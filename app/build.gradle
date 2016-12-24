@@ -4,7 +4,7 @@ android {
     compileSdkVersion 25
     buildToolsVersion "24.0.3"
     defaultConfig {
-        applicationId "com.cow006.gui"
+        applicationId 'com.cow006'
         minSdkVersion 15
         targetSdkVersion 25
         versionCode 1
@@ -38,3 +38,5 @@ dependencies {
     compile 'com.android.support:support-v4:25.1.0'
     compile 'com.google.android.gms:play-services-auth:10.0.1'
 }
+
+apply plugin: 'com.google.gms.google-services'

@@ -1,7 +1,6 @@
 package com.cow006.gui;
 
 import android.os.Bundle;
-import android.app.Activity;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 

@@ -4,9 +4,11 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.AbstractMap;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
+import java.util.PriorityQueue;
 
 import static Backend.AbstractPlayer.ROUNDS;
 import static Backend.AbstractPlayer.ROWS;
@@ -107,11 +109,14 @@ public class Client {
                 }
                 case "Moves":
                     moves = new ArrayList<>();
+                    ArrayDeque<Integer> cardsQueue = new ArrayDeque<>();
                     for (int i = 0; i < playersNumber; i++) {
                         int index = Integer.parseInt(clientInput.readLine());
                         int card = Integer.parseInt(clientInput.readLine());
                         moves.add(new AbstractMap.SimpleEntry<>(index, card));
+                        cardsQueue.add(card);
                     }
+                    connectedPlayer.setCardsQueue(cardsQueue);
                     break;
                 case "Smallest":
                     boolean smallestTook = Boolean.parseBoolean(clientInput.readLine());

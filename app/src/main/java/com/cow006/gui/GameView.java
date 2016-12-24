@@ -39,14 +39,14 @@ public class GameView extends View {
     private Bitmap cardBitmaps[];
     private float strokeWidth = 2;
     private Paint strokePaint,
-                  cardPaints[],
-                  bitmapPaint;
+            cardPaints[],
+            bitmapPaint;
 
     private float cardCoefficient = 0.16f,
-                  fieldsOffsetInCards = 0.5f - cardCoefficient * 11 / 4,
-                  cardWidth,
-                  cardHeight,
-                  focusedZoom = 2 * fieldsOffsetInCards / cardCoefficient + 1;
+            fieldsOffsetInCards = 0.5f - cardCoefficient * 11 / 4,
+            cardWidth,
+            cardHeight,
+            focusedZoom = 2 * fieldsOffsetInCards / cardCoefficient + 1;
 
     private long recoil = 400;
     private GestureDetectorCompat gestureDetector;
@@ -79,8 +79,8 @@ public class GameView extends View {
 
         @Override
         protected synchronized void playRound(boolean smallestTook,
-                                    int chosenRowIndex,
-                                    ArrayList<Map.Entry<Integer,Integer>> moves) {
+                                              int chosenRowIndex,
+                                              ArrayList<Map.Entry<Integer,Integer>> moves) {
             super.playRound(smallestTook, chosenRowIndex, moves);
             postInvalidate();
         }
@@ -90,15 +90,15 @@ public class GameView extends View {
         @Override
         public boolean onDown(MotionEvent event) {
             float x = event.getX(),
-                  y = event.getY();
+                    y = event.getY();
             if (player.isChoosingRowToTake()) {
                 float paddingTop = cardHeight * fieldsOffsetInCards / 2;
                 for (int i = 0; i < 4; ++i) {
                     float paddingLeft = cardWidth * fieldsOffsetInCards / 2,
-                          paddingRight = paddingLeft +
-                                  4 * cardWidth * (1 + fieldsOffsetInCards / 2) -
-                                  cardWidth * fieldsOffsetInCards / 4,
-                          paddingBottom = paddingTop + cardHeight * (1 + fieldsOffsetInCards / 4);
+                            paddingRight = paddingLeft +
+                                    4 * cardWidth * (1 + fieldsOffsetInCards / 2) -
+                                    cardWidth * fieldsOffsetInCards / 4,
+                            paddingBottom = paddingTop + cardHeight * (1 + fieldsOffsetInCards / 4);
                     if (insideRect(x, y, paddingLeft, paddingTop, paddingRight, paddingBottom)) {
                         player.tellRow(i);
                         invalidate();
@@ -121,7 +121,7 @@ public class GameView extends View {
         public void onLongPress(MotionEvent event) {
             if (player.isChoosingCardToTake()) {
                 float x = event.getX(),
-                      y = event.getY();
+                        y = event.getY();
                 if (player.isChoosingCardToTake()) {
                     int card = getCardFromCoordinates(x, y);
                     if (card == NOT_A_CARD) {
@@ -235,16 +235,16 @@ public class GameView extends View {
         cardBitmaps = new Bitmap[104];
         for (int i = 1; i <= 104; ++i) {
             cardBitmaps[i - 1] = Bitmap.createBitmap(Math.round(cardWidth),
-                                                     Math.round(cardHeight),
-                                                     Bitmap.Config.RGB_565);
+                    Math.round(cardHeight),
+                    Bitmap.Config.RGB_565);
             Canvas tempCanvas = new Canvas(cardBitmaps[i - 1]);
             tempCanvas.drawRect(0, 0, cardWidth, cardHeight, getCardPaint(i));
             tempCanvas.drawRect(0, 0, cardWidth, cardHeight, strokePaint);
             String text = Integer.toString(i);
             tempCanvas.drawText(text,
-                                cardWidth / 2f,
-                                cardHeight / 2f + mTextHeight,
-                                mTextPaint);
+                    cardWidth / 2f,
+                    cardHeight / 2f + mTextHeight,
+                    mTextPaint);
         }
 
         // Generate ImageViews with cards inside
@@ -253,9 +253,9 @@ public class GameView extends View {
             cardViews[card - 1] = new ImageView(context, attrs);
             cardViews[card - 1].setImageBitmap(cardBitmaps[card - 1]);
             cardViews[card - 1].layout(0,
-                                       0,
-                                       Math.round(cardWidth * focusedZoom),
-                                       Math.round(cardHeight * focusedZoom));
+                    0,
+                    Math.round(cardWidth * focusedZoom),
+                    Math.round(cardHeight * focusedZoom));
         }
 
         // Set up player
@@ -284,8 +284,8 @@ public class GameView extends View {
     protected float calcTextSize(float width, float height, String text) {
         TextPaint tp = new TextPaint();
         float l = 0,
-              r = width,
-              eps = 1e-5f;
+                r = width,
+                eps = 1e-5f;
         while (l + eps < r) {
             float m = (l + r) / 2;
             tp.setTextSize(m);
@@ -316,7 +316,7 @@ public class GameView extends View {
     protected void drawScores() {
         int id = player.getId();
         ArrayList<Integer> scoresList = new ArrayList<>(player.getScores()),
-                           playerList = new ArrayList<>();
+                playerList = new ArrayList<>();
         for (int i = 0; i < player.getPlayersNumber(); ++i) {
             playerList.add(i);
         }
@@ -352,14 +352,14 @@ public class GameView extends View {
                             float paddingTop,
                             int number) {
         float zoom = (number == focusedCard ? focusedZoom : 1),
-              zoomedWidth = zoom * cardWidth,
-              zoomedHeight = zoom * cardHeight;
+                zoomedWidth = zoom * cardWidth,
+                zoomedHeight = zoom * cardHeight;
         paddingLeft -= zoomedWidth - cardWidth;
         paddingTop -= zoomedHeight - cardHeight;
         RectF position = new RectF(paddingLeft,
-                                   paddingTop,
-                                   paddingLeft + zoomedWidth,
-                                   paddingTop + zoomedHeight);
+                paddingTop,
+                paddingLeft + zoomedWidth,
+                paddingTop + zoomedHeight);
         canvas.drawBitmap(cardBitmaps[number - 1], null, position, bitmapPaint);
     }
 
@@ -369,7 +369,7 @@ public class GameView extends View {
         }
         int n = player.getHand().size();
         float paddingLeft = (getWidth() - cardWidth * (n + 1) / 2) / 2,
-              paddingTop = getHeight() - cardHeight * (1 + fieldsOffsetInCards);
+                paddingTop = getHeight() - cardHeight * (1 + fieldsOffsetInCards);
         for (int card: player.getHand()) {
             drawCard(canvas, paddingLeft, paddingTop, card);
             paddingLeft += cardWidth / 2;
@@ -378,11 +378,14 @@ public class GameView extends View {
 
     protected void drawQueue(Canvas canvas) {
         float paddingLeft = getWidth() - cardWidth * (1 + fieldsOffsetInCards / 2),
-              paddingTop = cardHeight * fieldsOffsetInCards / 2;
-        for (int card: player.getCardsFromQueue()) {
+                paddingTop = cardHeight * fieldsOffsetInCards / 2;
+        System.out.println("QUEUE: ");
+        for (int card: player.getCardsQueue()) {
+            System.out.print(card + " ");
             drawCard(canvas, paddingLeft, paddingTop, card);
             paddingTop += cardHeight * (1 + fieldsOffsetInCards / 2);
         }
+        System.out.println();
     }
 
     protected void drawBoard(Canvas canvas) {
@@ -391,12 +394,12 @@ public class GameView extends View {
             float paddingLeft = cardWidth * fieldsOffsetInCards / 2;
             if (player.isChoosingRowToTake()) {
                 canvas.drawRect(paddingLeft / 2,
-                                paddingTop,
-                                paddingLeft +
-                                        5 * cardWidth * (1 + fieldsOffsetInCards / 2) -
-                                        cardWidth * fieldsOffsetInCards / 4,
-                                 paddingTop + cardHeight * (1 + fieldsOffsetInCards / 4),
-                                strokePaint);
+                        paddingTop,
+                        paddingLeft +
+                                5 * cardWidth * (1 + fieldsOffsetInCards / 2) -
+                                cardWidth * fieldsOffsetInCards / 4,
+                        paddingTop + cardHeight * (1 + fieldsOffsetInCards / 4),
+                        strokePaint);
 
             }
             for (int card: row) {
@@ -417,7 +420,7 @@ public class GameView extends View {
         drawQueue(canvas);
         drawBoard(canvas);
         drawHand(canvas);
-        if (!player.getCardsFromQueue().isEmpty() && !player.isChoosingRowToTake()) {
+        if (!player.getQueue().isEmpty() && !player.isChoosingRowToTake()) {
             player.updateOneMove();
             try {
                 Thread.sleep(recoil);

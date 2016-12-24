@@ -42,7 +42,7 @@ public abstract class AbstractPlayer {
     private volatile boolean choosingCardToTake;
 
     private Queue<Move> queue;
-    private PriorityQueue<Integer> cardsQueue;
+    private ArrayDeque<Integer> cardsQueue;
 
     AbstractPlayer(int remoteNumber, int botsNumber) {
         this.playersNumber = remoteNumber + botsNumber;
@@ -52,7 +52,7 @@ public abstract class AbstractPlayer {
 
         scores = new ArrayList<>(Collections.nCopies(playersNumber, 0));
         queue = new ArrayDeque<>();
-        cardsQueue = new PriorityQueue<>();
+        cardsQueue = new ArrayDeque<>();
         board = new ArrayList<>();
         currentBoard = new ArrayList<>();
         for (int i = 0; i < ROWS; ++i) {
@@ -77,8 +77,8 @@ public abstract class AbstractPlayer {
 
         if (id == 0)
             System.out.println("BEFORE UPDATING " + board);
-        Move move = queue.poll();
         cardsQueue.poll();
+        Move move = queue.poll();
         if (id == 0)
             System.out.println(move.type + " " + move.player + " " + move.rowIndex + " " + move.card);
 
@@ -87,11 +87,11 @@ public abstract class AbstractPlayer {
             System.out.println("AFTER UPDATING " + board);
     }
 
-    public PriorityQueue<Integer> getCardsQueue() {
+    public ArrayDeque<Integer> getCardsQueue() {
         return cardsQueue;
     }
 
-    protected void setCardsQueue(PriorityQueue<Integer> cardsQueue) {
+    protected void setCardsQueue(ArrayDeque<Integer> cardsQueue) {
         this.cardsQueue = cardsQueue;
     }
 

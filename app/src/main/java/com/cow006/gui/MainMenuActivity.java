@@ -79,6 +79,7 @@ public class MainMenuActivity extends AppCompatActivity implements GoogleApiClie
 
     private void handleSignInResult(@NonNull GoogleSignInResult result) {
         System.out.println("handleSignInResult:" + result.isSuccess());
+        System.out.println(result.getStatus());
         if (result.isSuccess() && result.getSignInAccount() != null) {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
@@ -115,6 +116,7 @@ public class MainMenuActivity extends AppCompatActivity implements GoogleApiClie
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+       System.out.println("HERE");
         super.onActivityResult(requestCode, resultCode, data);
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {

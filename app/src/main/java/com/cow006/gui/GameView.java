@@ -379,10 +379,13 @@ public class GameView extends View {
     protected void drawQueue(Canvas canvas) {
         float paddingLeft = getWidth() - cardWidth * (1 + fieldsOffsetInCards / 2),
                 paddingTop = cardHeight * fieldsOffsetInCards / 2;
+        System.out.println("QUEUE: ");
         for (int card: player.getCardsQueue()) {
+            System.out.print(card + " ");
             drawCard(canvas, paddingLeft, paddingTop, card);
             paddingTop += cardHeight * (1 + fieldsOffsetInCards / 2);
         }
+        System.out.println();
     }
 
     protected void drawBoard(Canvas canvas) {

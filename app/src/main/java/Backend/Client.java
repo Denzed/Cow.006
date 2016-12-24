@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.AbstractMap;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
@@ -108,7 +109,7 @@ public class Client {
                 }
                 case "Moves":
                     moves = new ArrayList<>();
-                    PriorityQueue<Integer> cardsQueue = new PriorityQueue<>();
+                    ArrayDeque<Integer> cardsQueue = new ArrayDeque<>();
                     for (int i = 0; i < playersNumber; i++) {
                         int index = Integer.parseInt(clientInput.readLine());
                         int card = Integer.parseInt(clientInput.readLine());

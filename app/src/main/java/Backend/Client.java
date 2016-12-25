@@ -47,8 +47,8 @@ public class Client {
         clientSocket.close();
     }
 
-    public void run() throws IOException {
-        String messageFromServer = "";
+    private void run() throws IOException {
+        String messageFromServer;
         ArrayList<Map.Entry<Integer, Integer>> moves = new ArrayList<>();
         while (!isClosed) {
             messageFromServer = clientInput.readLine();
@@ -128,6 +128,7 @@ public class Client {
                     break;
                 case "Game over":
                     isClosed = true;
+                    connectedPlayer.setGameFinished(true);
                     break;
             }
         }

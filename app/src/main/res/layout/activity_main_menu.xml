@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.percent.PercentRelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main_menu"
     android:layout_width="match_parent"
@@ -13,28 +15,30 @@
     <TextView
         android:text="@string/play"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:id="@+id/play_section"
         android:layout_alignParentTop="true"
-        android:layout_height="wrap_content"
-        android:textSize="20sp"
+        android:textSize="@dimen/header_text_size"
         android:layout_alignParentLeft="true" />
 
     <Button
         android:text="@string/solo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        app:layout_heightPercent="10%"
         android:id="@+id/solo_play_button"
         android:layout_marginTop="14dp"
+        android:textSize="@dimen/medium_text_size"
         android:layout_below="@+id/play_section"
         android:layout_alignParentStart="true"
         android:onClick="goToSoloSetup"
-        android:layout_alignParentLeft="true" />
+        android:layout_alignParentLeft="true"
+        app:layout_widthPercent="50%" />
 
     <Button
         android:text="@string/multiplayer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        app:layout_widthPercent="50%"
+        app:layout_heightPercent="10%"
+        android:textSize="@dimen/medium_text_size"
         android:id="@+id/multi_button"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/solo_play_button"
@@ -43,64 +47,71 @@
 
     <TextView
         android:text="@string/miscellaneous"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/multi_button"
         android:layout_alignParentStart="true"
         android:layout_marginTop="14dp"
         android:id="@+id/misc_section"
-        android:textSize="20sp"
+        android:textSize="@dimen/header_text_size"
         android:layout_alignParentLeft="true" />
 
     <Button
         android:text="@string/game_rules_button_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        app:layout_widthPercent="50%"
+        app:layout_heightPercent="10%"
         android:layout_below="@+id/misc_section"
         android:layout_alignParentStart="true"
         android:layout_marginTop="12dp"
+        android:textSize="@dimen/medium_text_size"
         android:id="@+id/rules_button"
         android:onClick="goToRules"
         android:layout_alignParentLeft="true" />
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        app:layout_widthPercent="50%"
+        app:layout_heightPercent="10%"
         android:id="@+id/leaderboard_button"
         android:text="@string/global_leaderboard_button_text"
         android:layout_below="@+id/rules_button"
         android:layout_alignParentStart="true"
         android:onClick="goToLeaderboard"
-        android:layout_alignParentLeft="true" />
+        android:layout_alignParentLeft="true"
+        android:textSize="@dimen/medium_text_size" />
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="@string/sign_in_information_text_view_default_text"
         android:id="@+id/sign_in_information_text_view"
+        android:textSize="@dimen/header_text_size"
         android:layout_below="@+id/leaderboard_button"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="12dp" />
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        app:layout_widthPercent="50%"
+        app:layout_heightPercent="10%"
         android:text="@string/sign_out_button_text"
         android:id="@+id/sign_out_button"
         android:visibility="gone"
         android:layout_below="@+id/sign_in_information_text_view"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:onClick="onSignOut" />
+        android:onClick="onSignOut"
+        android:textSize="@dimen/medium_text_size" />
 
     <com.google.android.gms.common.SignInButton
         android:id="@+id/sign_in_button"
         android:onClick="onSignIn"
         android:visibility="gone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        app:layout_widthPercent="50%"
+        app:layout_heightPercent="10%"
         android:layout_below="@+id/sign_out_button"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-</RelativeLayout>
+        android:layout_alignParentStart="true"
+        android:textSize="@dimen/medium_text_size" />
+
+</android.support.percent.PercentRelativeLayout>

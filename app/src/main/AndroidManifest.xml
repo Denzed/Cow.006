@@ -14,26 +14,38 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainMenuActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".RulesActivity"
-            android:screenOrientation="portrait"
             android:label="@string/title_activity_rules"
-            android:parentActivityName=".MainMenuActivity">
+            android:parentActivityName=".MainMenuActivity"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.cow006.gui.MainMenuActivity" />
         </activity>
         <activity
             android:name=".SetupSoloGameActivity"
-            android:screenOrientation="portrait"
             android:label="@string/title_activity_setup_solo_game"
-            android:parentActivityName=".MainMenuActivity">
+            android:parentActivityName=".MainMenuActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.cow006.gui.MainMenuActivity" />
+        </activity>
+        <activity
+            android:name=".SetupMultiActivity"
+            android:label="@string/title_activity_setup_multi_game"
+            android:parentActivityName=".MainMenuActivity"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.cow006.gui.MainMenuActivity" />
@@ -42,12 +54,15 @@
             android:name=".GameActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".SetupMultiActivity"
+            android:name=".LeaderboardActivity"
+            android:label="@string/title_activity_leaderboard"
+            android:parentActivityName=".MainMenuActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".LeaderboardActivity"
-            android:screenOrientation="portrait"
-            android:label="@string/title_activity_leaderboard" />
+            android:name=".FinalScoresActivity"
+            android:label="@string/final_scores_activity_label"
+            android:parentActivityName=".MainMenuActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

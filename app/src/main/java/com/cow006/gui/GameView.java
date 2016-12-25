@@ -2,6 +2,7 @@ package com.cow006.gui;
 
 import android.content.ClipData;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -67,6 +68,14 @@ public class GameView extends View {
         @Override
         protected void setChoosingCardToTake(boolean value) {
             super.setChoosingCardToTake(value);
+            if (value) {
+                postInvalidate();
+            }
+        }
+
+        @Override
+        protected void setGameFinished(boolean value) {
+            super.setGameFinished(value);
             if (value) {
                 postInvalidate();
             }
@@ -308,14 +317,14 @@ public class GameView extends View {
         }
     }
 
-    protected void drawScores() {
+    protected String parseScores(String sep) {
         int id = player.getId();
         ArrayList<Integer> scoresList = new ArrayList<>(player.getScores()),
                 playerList = new ArrayList<>();
         for (int i = 0; i < player.getPlayersNumber(); ++i) {
             playerList.add(i);
         }
-        StringBuilder stringBuilder = new StringBuilder("SCORES: ");
+        StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < player.getPlayersNumber(); ++i) {
             Integer topScore = Collections.max(scoresList);
             int index = scoresList.indexOf(topScore);
@@ -333,13 +342,17 @@ public class GameView extends View {
             }
             stringBuilder.append(" - ");
             stringBuilder.append(scoresList.get(index));
-            stringBuilder.append("; ");
+            stringBuilder.append(sep);
             scoresList.remove(index);
             playerList.remove(index);
         }
+        return stringBuilder.toString();
+    }
 
+    protected void drawScores() {
         TextView scoresView = (TextView) parentActivity.findViewById(R.id.game_scores);
-        scoresView.setText(stringBuilder.toString());
+        String scores = "SCORES: " + parseScores("; ");
+        scoresView.setText(scores);
     }
 
     protected void drawCard(Canvas canvas,
@@ -423,6 +436,8 @@ public class GameView extends View {
                 // Ignore
             }
             invalidate();
+        } else if (player.isGameFinished()) {
+            parentActivity.goToResults(parseScores("\n"));
         }
     }
 

@@ -10,6 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/text_margin"
         android:text=""
-        android:id="@+id/leaderboard_text_view" />
+        android:id="@+id/leaderboard_text_view"
+        android:textSize="@dimen/medium_text_size" />
 
 </android.support.v4.widget.NestedScrollView>

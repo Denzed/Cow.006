@@ -90,4 +90,11 @@ public class GameActivity extends AppCompatActivity {
         }
         super.onBackPressed();
     }
+
+    public void goToResults(String finalScores) {
+        Intent intent = new Intent(this, FinalScoresActivity.class);
+        intent.putExtra("finalScores", finalScores);
+        startActivity(intent);
+        finish();
+    }
 }

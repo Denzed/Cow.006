@@ -28,7 +28,7 @@ public abstract class AbstractPlayer {
     volatile int chosenRowIndex;
     volatile int chosenCardIndex;
 
-    public boolean isConnected() {
+    boolean isConnected() {
         return true;
     }
 
@@ -36,10 +36,12 @@ public abstract class AbstractPlayer {
     ArrayList<Integer> scores;
     protected ArrayList<Integer> hand;
     ArrayList<ArrayList<Integer>> board;
-    protected ArrayList<ArrayList<Integer>> currentBoard;
+    private ArrayList<ArrayList<Integer>> currentBoard;
 
     private volatile boolean choosingRowToTake;
     private volatile boolean choosingCardToTake;
+    private volatile boolean gameStarted, gameFinished;
+    private volatile boolean roundFinished;
 
     private Queue<Move> queue;
     private ArrayDeque<Integer> cardsQueue;
@@ -56,8 +58,8 @@ public abstract class AbstractPlayer {
         board = new ArrayList<>();
         currentBoard = new ArrayList<>();
         for (int i = 0; i < ROWS; ++i) {
-            board.add(new ArrayList<Integer>());
-            currentBoard.add(new ArrayList<Integer>());
+            board.add(new ArrayList<>());
+            currentBoard.add(new ArrayList<>());
         }
         hand = new ArrayList<>();
     }
@@ -91,7 +93,7 @@ public abstract class AbstractPlayer {
         return cardsQueue;
     }
 
-    protected void setCardsQueue(ArrayDeque<Integer> cardsQueue) {
+    void setCardsQueue(ArrayDeque<Integer> cardsQueue) {
         this.cardsQueue = cardsQueue;
     }
 
@@ -189,7 +191,7 @@ public abstract class AbstractPlayer {
         }
     }
 
-    protected int getUpdatingRowIndex(ArrayList<ArrayList<Integer>> board, int card) {
+    private int getUpdatingRowIndex(ArrayList<ArrayList<Integer>> board, int card) {
         int maxCard = 0;
         int index = 0;
         for (int i = 0; i < ROWS; i++){
@@ -204,7 +206,7 @@ public abstract class AbstractPlayer {
     }
 
 
-    protected void updateState(ArrayList<ArrayList<Integer>> board, updateStateTypes type, int choosingPlayer, int rowIndex, int card) {
+    private void updateState(ArrayList<ArrayList<Integer>> board, updateStateTypes type, int choosingPlayer, int rowIndex, int card) {
         ArrayList<Integer> row = board.get(rowIndex);
         if (type == CLEAR_ROW) {
             if (board == this.board) {
@@ -253,5 +255,29 @@ public abstract class AbstractPlayer {
 
     public ArrayList<Integer> getScores(){
         return scores;
+    }
+
+    public boolean isRoundFinished() {
+        return roundFinished;
+    }
+
+    protected void setRoundFinished(boolean roundFinished) {
+        this.roundFinished = roundFinished;
+    }
+
+    public boolean isGameStarted() {
+        return gameStarted;
+    }
+
+    protected void setGameStarted(boolean gameStarted) {
+        this.gameStarted = gameStarted;
+    }
+
+    public boolean isGameFinished() {
+        return gameFinished;
+    }
+
+    protected void setGameFinished(boolean gameFinished) {
+        this.gameFinished = gameFinished;
     }
 }

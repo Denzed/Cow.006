@@ -14,6 +14,7 @@ public class Server {
     private static ArrayList<ArrayList<ClientConnection>> connections =
             new ArrayList<>(Collections.nCopies(DECK_SIZE / ROUNDS + 1, new ArrayList<ClientConnection>()));
     private static final int PORT_NUMBER = 8080;
+    enum GameTypes { SINGLEPLAYER, MULTIPLAYER};
 
     public static void main(String[] Args) throws IOException {
         serverSocket = new ServerSocket(PORT_NUMBER);
@@ -32,7 +33,7 @@ public class Server {
         System.out.println("CONNECTED");
 
         ClientConnection connection = new ClientConnection(clientSocket);
-        int playersNumber = connection.getPlayersNumber();
+        final int playersNumber = connection.getPlayersNumber();
         connections.get(playersNumber).add(connection);
         if (connections.get(playersNumber).size() >= playersNumber) {
             boolean haveEnoughConnectedPlayers = true;
@@ -62,21 +63,28 @@ public class Server {
                 @Override
                 public void run() {
                     try {
-                        new GameHandler(players).playGame();
+                        new GameHandler(players, playersNumber == 1 ? GameTypes.SINGLEPLAYER : GameTypes.MULTIPLAYER).playGame();
+                        System.out.println("GAME PLAYED");
                     } catch (Exception e) {
                         System.out.println("EXCEPTION!!!");
                         for (ClientConnection currentConnection : players) {
                             try {
-                                currentConnection.getClientOutput().println("Game over");
+                                currentConnection.getClientOutput().println("Disconnected");
                             } catch (Exception e2) {
                                 //just ignore
                             }
                         }
                         System.out.println("HANDLED!!!");
                     }
+                    System.out.println("PLAYED");
+                    return;
+
                 }
             }).start();
+            System.out.println("GAME GAME PLAYED");
         }
+        System.out.println("GAME GAME GAME PLAYED");
+
     }
 
 }

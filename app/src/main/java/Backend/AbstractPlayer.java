@@ -24,6 +24,7 @@ public abstract class AbstractPlayer {
     protected int id;
     protected String username;
     protected String userID;
+    protected ArrayList<String> finalResults;
     int playersNumber;
     int remoteNumber;
     int botsNumber;
@@ -32,6 +33,10 @@ public abstract class AbstractPlayer {
 
     boolean isConnected() {
         return true;
+    }
+
+    public void setFinalResults(ArrayList<String> finalResults){
+        this.finalResults = finalResults;
     }
 
     enum updateStateTypes { ADD_CARD, CLEAR_ROW }

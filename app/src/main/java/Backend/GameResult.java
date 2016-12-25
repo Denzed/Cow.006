@@ -13,8 +13,10 @@ public class GameResult {
     private static final int DEFAULT_K_FACTOR = 20;
     private static final int TOP_PLAYER_K_FACTOR = 10;
     private String userID;
+    private String username;
     private int rating;
     private int points;
+    private int delta;
 
     public int getGamesPlayed() {
         return gamesPlayed;
@@ -22,8 +24,9 @@ public class GameResult {
 
     private int gamesPlayed;
 
-    public GameResult(String userID, int points, int rating, int gamesPlayed){
+    public GameResult(String userID, String username, int points, int rating, int gamesPlayed){
         this.userID = userID;
+        this.username = username;
         this.points = points;
         this.rating = rating;
         this.gamesPlayed = gamesPlayed;
@@ -47,6 +50,7 @@ public class GameResult {
     }
 
     public void updateRating(double delta) {
+        this.delta = (int)delta;
         rating += delta;
     }
 
@@ -92,5 +96,13 @@ public class GameResult {
 
     public String getUserID() {
         return userID;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public int getDelta() {
+        return delta;
     }
 }

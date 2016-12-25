@@ -139,6 +139,12 @@ public class Client {
                 case "Score":
                     clientOutput.println(connectedPlayer.getScore());
                     break;
+                case "Results":
+                    ArrayList<String> finalResults = new ArrayList<>();
+                    for (int i = 0; i < playersNumber; i++){
+                        finalResults.add(clientInput.readLine());
+                    }
+                    connectedPlayer.setFinalResults(finalResults);
                 case "Disconnected":
                     isClosed = true;
                     connectedPlayer.setGameInterrupted(true);

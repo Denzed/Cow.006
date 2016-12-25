@@ -14,7 +14,9 @@ import Backend.Server.GameTypes;
 import static Backend.AbstractPlayer.*;
 import static Backend.GameResult.recalc;
 
-class GameHandler {
+public class GameHandler {
+    public static String SECRET_PASSWORD = "";
+
     private int playersNumber;
     private ArrayList<ClientConnection> connections;
     private boolean stop = false;
@@ -63,13 +65,8 @@ class GameHandler {
 
         }
         if (gameType == GameTypes.MULTIPLAYER) {
-            System.out.println("1");
             threadPool = Executors.newFixedThreadPool(playersNumber);
-            System.out.println("12");
             ArrayList<Callable<GameResult>> tasksForGameResults = new ArrayList<>();
-            System.out.println("123");
-            System.out.println("1234");
-            System.out.println("12345");
             System.out.println("CONNECTED TO DATABASE");
 
             for (final ClientConnection currentConnection : connections) {
@@ -102,7 +99,7 @@ class GameHandler {
                         System.out.println(userID + " " + score + " " + rating + " " + gamesPlayed);
                         statement.close();
                         dataBaseConnection.close();
-                        return new GameResult(userID, score, rating, gamesPlayed);
+                        return new GameResult(userID, username, score, rating, gamesPlayed);
                     }
                 });
             }
@@ -116,7 +113,10 @@ class GameHandler {
                 }
 
             }
+            ArrayList<Integer> oldRatings = new ArrayList<>();
             for (GameResult gameResult : gameResults){
+
+                oldRatings.add(gameResult.getRating());
                 System.out.println(gameResult.getUserID() + " " + gameResult.getRating() + " " + gameResult.getPoints() + gameResult.getGamesPlayed());
             }
             System.out.println();
@@ -140,6 +140,21 @@ class GameHandler {
             }
             System.out.println();
 
+            for (int i = 0; i < playersNumber; i++){
+                connections.get(i).getClientOutput().println("Results");
+                for (int j = 0; j < playersNumber; j++){
+                    String finalResult = "";
+                    finalResult += gameResults.get(j).getUsername();
+                    finalResult += "\t" + gameResults.get(j).getRating();
+                    finalResult += "\t(";
+                    if (gameResults.get(j).getDelta() > 0){
+                        finalResult += "+";
+                    }
+                    finalResult += gameResults.get(j).getDelta();
+                    finalResult += ")";
+                    connections.get(i).getClientOutput().println(finalResult);
+                }
+            }
         }
 
         System.out.println("BEFORE GAME OVER");

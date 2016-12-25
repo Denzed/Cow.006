@@ -42,8 +42,7 @@ public abstract class AbstractPlayer {
 
     private volatile boolean choosingRowToTake;
     private volatile boolean choosingCardToTake;
-    private volatile boolean gameStarted, gameFinished;
-    private volatile boolean roundFinished;
+    private volatile boolean gameStarted, gameInterrupted, gameFinished;
 
     private Queue<Move> queue;
     private ArrayDeque<Integer> cardsQueue;
@@ -265,14 +264,6 @@ public abstract class AbstractPlayer {
         return scores;
     }
 
-    public boolean isRoundFinished() {
-        return roundFinished;
-    }
-
-    protected void setRoundFinished(boolean roundFinished) {
-        this.roundFinished = roundFinished;
-    }
-
     public boolean isGameStarted() {
         return gameStarted;
     }
@@ -287,5 +278,13 @@ public abstract class AbstractPlayer {
 
     protected void setGameFinished(boolean gameFinished) {
         this.gameFinished = gameFinished;
+    }
+
+    public boolean isGameInterrupted() {
+        return gameInterrupted;
+    }
+
+    protected void setGameInterrupted(boolean gameInterrupted) {
+        this.gameInterrupted = gameInterrupted;
     }
 }

@@ -2,7 +2,6 @@ package com.cow006.gui;
 
 import android.content.ClipData;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -10,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.RectF;
 import android.support.v4.view.GestureDetectorCompat;
+import android.support.v7.app.AlertDialog;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.Display;
@@ -28,23 +28,23 @@ import Backend.Player;
 
 public class GameView extends View {
     private static final int NOT_A_CARD = 0;
-
+    private static long TIMER = 400;
+    
     GameActivity parentActivity;
     private float mTextHeight;
     private TextPaint mTextPaint;
     private Bitmap cardBitmaps[];
     private float strokeWidth = 2;
     private Paint strokePaint,
-            cardPaints[],
+    cardPaints[],
+
             bitmapPaint;
-
     private float cardCoefficient = 0.16f,
-            fieldsOffsetInCards = 0.5f - cardCoefficient * 11 / 4,
-            cardWidth,
-            cardHeight,
-            focusedZoom = 2 * fieldsOffsetInCards / cardCoefficient + 1;
+    fieldsOffsetInCards = 0.5f - cardCoefficient * 11 / 4,
+    cardWidth,
+    cardHeight,
 
-    private long recoil = 400;
+            focusedZoom = 2 * fieldsOffsetInCards / cardCoefficient + 1;
     private GestureDetectorCompat gestureDetector;
 
     private ImageView cardViews[]; // To use in default DragShadowBuilder
@@ -70,6 +70,22 @@ public class GameView extends View {
         @Override
         protected void setChoosingCardToTake(boolean value) {
             super.setChoosingCardToTake(value);
+            if (value) {
+                postInvalidate();
+            }
+        }
+
+        @Override
+        protected void setGameStarted(boolean value) {
+            super.setGameStarted(value);
+            if (value) {
+                postInvalidate();
+            }
+        }
+
+        @Override
+        protected void setGameInterrupted(boolean value) {
+            super.setGameInterrupted(value);
             if (value) {
                 postInvalidate();
             }
@@ -420,11 +436,29 @@ public class GameView extends View {
         }
     }
 
+    protected void drawMessage(String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setMessage(message)
+               .setNeutralButton("OK", (dialogInterface, i) -> {/* do nothing */})
+               .create()
+               .show();
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if (player == null) {
+        if (player == null || !player.isGameStarted()) {
+            canvas.drawText("Waiting for other players!",
+                            getWidth() / 2f,
+                            getHeight() / 2,
+                            mTextPaint);
             return;
+        }
+        if (player.isGameStarted() && player.getQueue().isEmpty() && player.getHand().isEmpty()) {
+            drawMessage("Prepare for the next round!");
+        } else if (player.isGameInterrupted()) {
+            drawMessage("Someone has disconnected! The game will be interrupted, " +
+                    "the leaver will be assessed with a loss.");
         }
         drawScores();
         drawQueue(canvas);
@@ -433,12 +467,12 @@ public class GameView extends View {
         if (!player.getQueue().isEmpty() && !player.isChoosingRowToTake()) {
             player.updateOneMove();
             try {
-                Thread.sleep(recoil);
+                Thread.sleep(TIMER);
             } catch (InterruptedException e) {
                 // Ignore
             }
             invalidate();
-        } else if (player.isGameFinished()) {
+        } else if (player.isGameFinished() || player.isGameInterrupted()) {
             parentActivity.goToResults(parseScores("\n"));
         }
     }

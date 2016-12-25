@@ -47,11 +47,18 @@ public class Client {
         clientSocket.close();
     }
 
+    public void setGameStarted() {
+        if (!connectedPlayer.isGameStarted()) {
+            connectedPlayer.setGameStarted(true);
+        }
+    }
+
     private void run() throws IOException {
         String messageFromServer;
         ArrayList<Map.Entry<Integer, Integer>> moves = new ArrayList<>();
         while (!isClosed) {
             messageFromServer = clientInput.readLine();
+            setGameStarted();
             System.out.println("messageFromServer: " + messageFromServer);
             switch (messageFromServer) {
                 case "IsConnected":
@@ -133,8 +140,8 @@ public class Client {
                     clientOutput.println(connectedPlayer.getScore());
                     break;
                 case "Disconnected":
-                    //somebody has disconnected from server; handling this situation...
                     isClosed = true;
+                    connectedPlayer.setGameInterrupted(true);
                     break;
                 case "Game over":
                     isClosed = true;

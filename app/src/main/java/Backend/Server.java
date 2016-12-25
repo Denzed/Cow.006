@@ -69,7 +69,7 @@ public class Server {
                         System.out.println("EXCEPTION!!!");
                         for (ClientConnection currentConnection : players) {
                             try {
-                                currentConnection.getClientOutput().println("Game over");
+                                currentConnection.getClientOutput().println("Disconnected");
                             } catch (Exception e2) {
                                 //just ignore
                             }

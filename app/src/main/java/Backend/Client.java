@@ -132,6 +132,10 @@ public class Client {
                 case "Score":
                     clientOutput.println(connectedPlayer.getScore());
                     break;
+                case "Disconnected":
+                    //somebody has disconnected from server; handling this situation...
+                    isClosed = true;
+                    break;
                 case "Game over":
                     isClosed = true;
                     break;

@@ -4,9 +4,7 @@ import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-
 import java.io.IOException;
-
 import Backend.Bot;
 import Backend.Client;
 import Backend.Server;
@@ -16,8 +14,12 @@ public class GameActivity extends AppCompatActivity {
     private int bots;
     private int botLevel;
     private Client localClient;
+<<<<<<< HEAD
     private String username;
     private String userID;
+=======
+    String userID, username;
+>>>>>>> aade388a9426f7446889a8ca404279ee3ec12100
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +35,12 @@ public class GameActivity extends AppCompatActivity {
         bots = intent.getIntExtra("Bot count", 0);
         System.out.println("PLAYERS = " + players + " BOTS = " + bots);
         botLevel = intent.getIntExtra("Bot level", 5);
+<<<<<<< HEAD
 
+=======
+        username = intent.getStringExtra("username");
+        userID = intent.getStringExtra("userID");
+>>>>>>> aade388a9426f7446889a8ca404279ee3ec12100
         if (players == 0){
             new Thread(() -> {
                     try {

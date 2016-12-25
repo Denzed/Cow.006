@@ -22,6 +22,8 @@ public abstract class AbstractPlayer {
     private static final int COLUMNS = 5;
     static final int STOP_POINTS = 66;
     protected int id;
+    protected String username;
+    protected String userID;
     int playersNumber;
     int remoteNumber;
     int botsNumber;
@@ -56,10 +58,16 @@ public abstract class AbstractPlayer {
         board = new ArrayList<>();
         currentBoard = new ArrayList<>();
         for (int i = 0; i < ROWS; ++i) {
-            board.add(new ArrayList<Integer>());
-            currentBoard.add(new ArrayList<Integer>());
+            board.add(new ArrayList<>());
+            currentBoard.add(new ArrayList<>());
         }
         hand = new ArrayList<>();
+    }
+
+    AbstractPlayer(int remoteNumber, int botsNumber, String username, String userID){
+        this(remoteNumber, botsNumber);
+        this.username = username;
+        this.userID = userID;
     }
 
     private class Move {

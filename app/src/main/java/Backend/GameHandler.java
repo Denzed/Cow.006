@@ -1,19 +1,30 @@
 package Backend;
 
 import java.io.IOException;
-import java.util.*;
+import java.sql.*;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Map;
 import java.util.concurrent.*;
+import Backend.Server.GameTypes;
+
 
 import static Backend.AbstractPlayer.*;
+import static Backend.GameResult.recalc;
 
 class GameHandler {
     private int playersNumber;
     private ArrayList<ClientConnection> connections;
     private boolean stop = false;
+    private GameTypes gameType;
+    private ExecutorService threadPool;
 
-    GameHandler(ArrayList<ClientConnection> connections) {
+    GameHandler(ArrayList<ClientConnection> connections, GameTypes gameType) {
         playersNumber = connections.size();
         this.connections = connections;
+        this.gameType = gameType;
     }
 
     void playGame() throws Exception {
@@ -37,7 +48,7 @@ class GameHandler {
                     currentConnection.getClientOutput().println("Type");
                     String type = currentConnection.getClientInput().readLine();
                     System.out.println(type);
-                    if (!type.equals("LocalPlayer")) {
+                    if (type.equals("Bot")) {
                         continue;
                     }
                     currentConnection.getClientOutput().println("Queue");
@@ -51,10 +62,91 @@ class GameHandler {
             }
 
         }
+        if (gameType == GameTypes.MULTIPLAYER) {
+            System.out.println("1");
+            threadPool = Executors.newFixedThreadPool(playersNumber);
+            System.out.println("12");
+            ArrayList<Callable<GameResult>> tasksForGameResults = new ArrayList<>();
+            System.out.println("123");
+            System.out.println("1234");
+            System.out.println("12345");
+            System.out.println("CONNECTED TO DATABASE");
 
+            for (final ClientConnection currentConnection : connections) {
+                tasksForGameResults.add(new Callable<GameResult>() {
+                    @Override
+                    public GameResult call() throws Exception {
+                        currentConnection.getClientOutput().println("UserID");
+                        String userID = currentConnection.getClientInput().readLine();
+                        currentConnection.getClientOutput().println("Username");
+                        String username = currentConnection.getClientInput().readLine();
+                        currentConnection.getClientOutput().println("Score");
+                        int score = Integer.parseInt(currentConnection.getClientInput().readLine());
+                        System.out.println(userID + " " + score);
+                        final Connection dataBaseConnection = DriverManager.getConnection(
+                                "jdbc:mysql://sql7.freemysqlhosting.net:3306/sql7150701", "sql7150701", SECRET_PASSWORD);
+                        String query = "INSERT IGNORE INTO sql7150701.Information (userID, username) "
+                        + "VALUES ('" + userID + "', '" + username + "');";
+                        System.out.println("query = " + query);
+                        final Statement statement = dataBaseConnection.createStatement();
+                        statement.execute(query);
+                        query = "SELECT rating, played FROM sql7150701.Information WHERE userID='" + userID + "';";
+                        System.out.println("query = " + query);
+                        ResultSet resultSet = statement.executeQuery(query);
+                        int rating = 0;
+                        int gamesPlayed = 0;
+                        while (resultSet.next()){
+                            rating = resultSet.getInt("rating");
+                            gamesPlayed = resultSet.getInt("played");
+                        }
+                        System.out.println(userID + " " + score + " " + rating + " " + gamesPlayed);
+                        statement.close();
+                        dataBaseConnection.close();
+                        return new GameResult(userID, score, rating, gamesPlayed);
+                    }
+                });
+            }
+            System.out.println("DONE");
+            final ArrayList<GameResult> gameResults = new ArrayList<>();
+            for (Future<GameResult> taskForGameResult : threadPool.invokeAll(tasksForGameResults)){
+                try{
+                    gameResults.add(taskForGameResult.get());
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+
+            }
+            for (GameResult gameResult : gameResults){
+                System.out.println(gameResult.getUserID() + " " + gameResult.getRating() + " " + gameResult.getPoints() + gameResult.getGamesPlayed());
+            }
+            System.out.println();
+            recalc(gameResults);
+
+
+            for (GameResult gameResult : gameResults){
+                final Connection dataBaseConnection = DriverManager.getConnection(
+                        "jdbc:mysql://sql7.freemysqlhosting.net:3306/sql7150701", "sql7150701", SECRET_PASSWORD);
+                final Statement statement = dataBaseConnection.createStatement();
+                String query = "UPDATE Information SET rating='"
+                        + gameResult.getRating()
+                        + "', played='"
+                        + gameResult.getGamesPlayed()
+                        + "' WHERE userID='" + gameResult.getUserID() + "'";
+                statement.execute(query);
+                statement.close();
+                dataBaseConnection.close();
+
+                System.out.println(gameResult.getUserID() + " " + gameResult.getRating() + " " + gameResult.getPoints() + gameResult.getGamesPlayed());
+            }
+            System.out.println();
+
+        }
+
+        System.out.println("BEFORE GAME OVER");
         for (int i = 0; i < playersNumber; i++) {
             connections.get(i).getClientOutput().println("Game over");
         }
+        System.out.println("AFTER GAME OVER");
     }
 
     private void dealCards() {
@@ -78,7 +170,7 @@ class GameHandler {
     }
 
     private void playRound() throws IOException, InterruptedException, ExecutionException {
-        ExecutorService threadPool = Executors.newFixedThreadPool(playersNumber);
+        threadPool = Executors.newFixedThreadPool(playersNumber);
         ArrayList<Callable<Map.Entry<Integer, Integer>>> tasksForMoves = new ArrayList<>();
         for (final ClientConnection currentConnection: connections) {
             tasksForMoves.add(new Callable<Map.Entry<Integer, Integer>>() {

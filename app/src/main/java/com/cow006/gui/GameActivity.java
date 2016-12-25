@@ -16,6 +16,8 @@ public class GameActivity extends AppCompatActivity {
     private int bots;
     private int botLevel;
     private Client localClient;
+    private String username;
+    private String userID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +33,7 @@ public class GameActivity extends AppCompatActivity {
         bots = intent.getIntExtra("Bot count", 0);
         System.out.println("PLAYERS = " + players + " BOTS = " + bots);
         botLevel = intent.getIntExtra("Bot level", 5);
+
         if (players == 0){
             new Thread(() -> {
                     try {
@@ -41,18 +44,29 @@ public class GameActivity extends AppCompatActivity {
                     }
                 }).start();
         }
+        else{
+            username = intent.getStringExtra("username");
+            userID = intent.getStringExtra("userID");
+            System.out.println("username = " + username + ";userID = " + userID);
+        }
     }
 
     public void onPostCreate(Bundle bundle) {
         super.onPostCreate(bundle);
 
         GameView gw = (GameView) findViewById(R.id.game_view);
-        final GameView.LocalPlayer lp = gw.new LocalPlayer(players + 1, bots);
+        final GameView.LocalPlayer lp;
+        if (players == 0){
+            lp = gw.new LocalPlayer(players + 1, bots);
+        }
+        else{
+            lp = gw.new LocalPlayer(players + 1, bots, username, userID);
+        }
         localClient = new Client(lp);
         if (players == 0) {
             new Thread(() -> {
                     try {
-                        localClient.connectToServer(Client.gameTypes.SINGLEPLAYER);
+                        localClient.connectToServer(Client.GameTypes.SINGLEPLAYER);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -60,7 +74,7 @@ public class GameActivity extends AppCompatActivity {
             for (int i = 0; i < bots; i++) {
                 new Thread(() -> {
                         try {
-                            new Client(new Bot(1, bots)).connectToServer(Client.gameTypes.SINGLEPLAYER);
+                            new Client(new Bot(1, bots)).connectToServer(Client.GameTypes.SINGLEPLAYER);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -69,12 +83,14 @@ public class GameActivity extends AppCompatActivity {
         } else {
             new Thread(() -> {
                     try {
-                        localClient.connectToServer(Client.gameTypes.MULTIPLAYER);
+                        System.out.println("username = " + username + ";userID = " + userID);
+                        localClient.connectToServer(Client.GameTypes.MULTIPLAYER);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }).start();
         }
+
         gw.setPlayer(lp);
     }
 

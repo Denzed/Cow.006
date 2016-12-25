@@ -11,6 +11,11 @@ public class Player extends AbstractPlayer {
         super(remoteNumber, botsNumber);
     }
 
+    public Player(int remoteNumber, int botsNumber, String username, String userID) {
+        super(remoteNumber, botsNumber, username, userID);
+    }
+
+
     public int tellMove() {
 //        askForAMove();
         setChoosingCardToTake(true);

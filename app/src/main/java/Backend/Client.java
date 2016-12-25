@@ -26,14 +26,14 @@ public class Client {
     private final int playersNumber;
     private volatile boolean isClosed = false;
     private Socket clientSocket;
-    public enum gameTypes { SINGLEPLAYER, MULTIPLAYER }
+    public enum GameTypes { SINGLEPLAYER, MULTIPLAYER }
     public Client(AbstractPlayer connectedPlayer){
         this.connectedPlayer = connectedPlayer;
         playersNumber = this.connectedPlayer.playersNumber;
     }
 
-    public void connectToServer(gameTypes gameType) throws IOException {
-        clientSocket = new Socket(gameType == gameTypes.SINGLEPLAYER ? LOCALHOST : MY_LAPTOP_HOST, PORT_NUMBER);
+    public void connectToServer(GameTypes gameType) throws IOException {
+        clientSocket = new Socket(gameType == GameTypes.SINGLEPLAYER ? LOCALHOST : MY_LAPTOP_HOST, PORT_NUMBER);
         clientInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         clientOutput = new PrintWriter(clientSocket.getOutputStream(), true);
         run();
@@ -65,6 +65,12 @@ public class Client {
                     break;
                 case "Bots":
                     clientOutput.println(connectedPlayer.botsNumber);
+                    break;
+                case "Username":
+                    clientOutput.println(connectedPlayer.username);
+                    break;
+                case "UserID":
+                    clientOutput.println(connectedPlayer.userID);
                     break;
                 case "Type":
                     clientOutput.println(connectedPlayer.getClass().getSimpleName());

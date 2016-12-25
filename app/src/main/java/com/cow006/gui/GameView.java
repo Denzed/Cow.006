@@ -60,7 +60,9 @@ public class GameView extends View {
         LocalPlayer(int remoteNumber, int botsNumber) {
             super(remoteNumber, botsNumber);
         }
-
+        LocalPlayer(int remoteNumber, int botsNumber, String username, String usedID){
+            super(remoteNumber, botsNumber, username, usedID);
+        }
         @Override
         protected void setChoosingRowToTake(boolean value) {
             super.setChoosingRowToTake(value);

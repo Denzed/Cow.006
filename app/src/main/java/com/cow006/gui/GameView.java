@@ -28,7 +28,9 @@ import Backend.Player;
 
 public class GameView extends View {
     private static final int NOT_A_CARD = 0;
-    private static long TIMER = 400;
+    private static final long TIMER = 400;
+
+    private boolean isGameStartedMessageDisplayed = false;
     
     GameActivity parentActivity;
     private float mTextHeight;
@@ -36,15 +38,13 @@ public class GameView extends View {
     private Bitmap cardBitmaps[];
     private float strokeWidth = 2;
     private Paint strokePaint,
-    cardPaints[],
-
-            bitmapPaint;
+                  cardPaints[],
+                  bitmapPaint;
     private float cardCoefficient = 0.16f,
-    fieldsOffsetInCards = 0.5f - cardCoefficient * 11 / 4,
-    cardWidth,
-    cardHeight,
-
-            focusedZoom = 2 * fieldsOffsetInCards / cardCoefficient + 1;
+                  fieldsOffsetInCards = 0.5f - cardCoefficient * 11 / 4,
+                  cardWidth,
+                  cardHeight,
+                  focusedZoom = 2 * fieldsOffsetInCards / cardCoefficient + 1;
     private GestureDetectorCompat gestureDetector;
 
     private ImageView cardViews[]; // To use in default DragShadowBuilder
@@ -458,14 +458,6 @@ public class GameView extends View {
                             mTextPaint);
             return;
         }
-        if (player.isGameStarted() &&
-                player.getQueue().isEmpty() &&
-                player.getHand().isEmpty() &&
-                !player.isChoosingRowToTake()) {
-            drawMessage("Prepare for the next round!");
-        } else if (player.isGameInterrupted()) {
-            drawMessage("Someone has disconnected! The game will be interrupted.");
-        }
         drawScores();
         drawQueue(canvas);
         drawBoard(canvas);
@@ -480,6 +472,19 @@ public class GameView extends View {
             invalidate();
         } else if (player.isGameFinished() || player.isGameInterrupted()) {
             parentActivity.goToResults(parseScores(true));
+            return;
+        }
+        if (player.isGameInterrupted()) {
+            drawMessage("Someone has disconnected! The game will be interrupted.");
+        } else if (!player.isGameFinished() &&
+                player.isGameStarted() &&
+                player.getQueue().isEmpty() &&
+                player.getHand().isEmpty() &&
+                !player.isChoosingRowToTake()) {
+            drawMessage(isGameStartedMessageDisplayed ?
+                    "Prepare for the next round!" :
+                    "The game is starting!");
+            invalidate();
         }
     }
 

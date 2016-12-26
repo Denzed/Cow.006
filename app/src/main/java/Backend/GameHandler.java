@@ -166,6 +166,7 @@ public class GameHandler {
                 }
                 int index = connections.indexOf(currentConnection);
                 currentConnection.getClientOutput().println("Results");
+                ArrayList<Map.Entry<String, Integer>> finalResults = new ArrayList<>();
                 for (int i = 0; i < playersNumber; i++){
                     String finalResult = "";
                     if (i == index){
@@ -177,8 +178,25 @@ public class GameHandler {
                         finalResult += " - ";
                     }
                     connections.get(i).getClientOutput().println("Score");
-                    finalResult += connections.get(i).getClientInput().readLine();
-                    currentConnection.getClientOutput().println(finalResult);
+                    int score = Integer.parseInt(connections.get(i).getClientInput().readLine());
+                    finalResult += score;
+                    finalResults.add(new AbstractMap.SimpleEntry<>(finalResult, score));
+                }
+
+                Collections.sort(finalResults, new Comparator<Map.Entry<String, Integer>>() {
+                    @Override
+                    public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
+                        if (o1.getValue() > o2.getValue()) {
+                            return 1;
+                        }
+                        if (o1.getValue() < o2.getValue()) {
+                            return -1;
+                        }
+                        return 0;
+                    }
+                });
+                for (Map.Entry<String, Integer> s : finalResults){
+                    currentConnection.getClientOutput().println(s.getKey());
                 }
             }
 

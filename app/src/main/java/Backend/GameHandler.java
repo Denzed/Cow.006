@@ -145,6 +145,7 @@ public class GameHandler {
                 for (int j = 0; j < playersNumber; j++){
                     String finalResult = "";
                     finalResult += gameResults.get(j).getUsername();
+                    finalResult += "\t" + gameResults.get(j).getPoints();
                     finalResult += "\t" + gameResults.get(j).getRating();
                     finalResult += "\t(";
                     if (gameResults.get(j).getDelta() > 0){
@@ -155,6 +156,31 @@ public class GameHandler {
                     connections.get(i).getClientOutput().println(finalResult);
                 }
             }
+        }
+        else{
+            for (ClientConnection currentConnection : connections){
+                currentConnection.getClientOutput().println("Type");
+                String type = currentConnection.getClientInput().readLine();
+                if (type.equals("Bot")){
+                    continue;
+                }
+                int index = connections.indexOf(currentConnection);
+                for (int i = 0; i < playersNumber; i++){
+                    String finalResult = "";
+                    if (i == index){
+                        finalResult += "YOU - ";
+                    }
+                    else {
+                        connections.get(i).getClientOutput().println("Id");
+                        finalResult += "Opponent #" + connections.get(i).getClientInput().readLine();
+                        finalResult += " - ";
+                    }
+                    connections.get(i).getClientOutput().println("Score");
+                    finalResult += connections.get(i).getClientInput().readLine();
+                    connections.get(i).getClientOutput().println(finalResult);
+                }
+            }
+
         }
 
         System.out.println("BEFORE GAME OVER");

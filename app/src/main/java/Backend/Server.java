@@ -63,7 +63,7 @@ public class Server {
                 @Override
                 public void run() {
                     try {
-                        new GameHandler(players, playersNumber == 1 ? GameTypes.SINGLEPLAYER : GameTypes.MULTIPLAYER).playGame();
+                        new GameHandler(players, GameTypes.SINGLEPLAYER).playGame();
                         System.out.println("GAME PLAYED");
                     } catch (Exception e) {
                         System.out.println("EXCEPTION!!!");

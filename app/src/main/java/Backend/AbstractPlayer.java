@@ -39,6 +39,10 @@ public abstract class AbstractPlayer {
         this.finalResults = finalResults;
     }
 
+    public ArrayList<String> getFinalResults() {
+        return finalResults;
+    }
+
     enum updateStateTypes { ADD_CARD, CLEAR_ROW }
     ArrayList<Integer> scores;
     protected ArrayList<Integer> hand;

@@ -335,10 +335,14 @@ public class GameView extends View {
         }
     }
 
-    protected String parseScores(String sep) {
+    protected String parseScores(boolean isFinal) {
         int id = player.getId();
         ArrayList<Integer> scoresList = new ArrayList<>(player.getScores()),
                 playerList = new ArrayList<>();
+        ArrayList<String> finalScoresList = null;
+        if (isFinal) {
+            finalScoresList = new ArrayList<>(player.getFinalResults());
+        }
         for (int i = 0; i < player.getPlayersNumber(); ++i) {
             playerList.add(i);
         }
@@ -346,21 +350,21 @@ public class GameView extends View {
         for (int i = 0; i < player.getPlayersNumber(); ++i) {
             Integer topScore = Collections.max(scoresList);
             int index = scoresList.indexOf(topScore);
-            if (playerList.get(index) == id) {
-                stringBuilder.append("YOU ");
-            }
-/*            for (char c : ("" + playerList.get(index)).toCharArray()) {
-                    stringBuilder.append(c);
-                    stringBuilder.append("\u0332");
+            if (isFinal) {
+                stringBuilder.append(finalScoresList.get(index));
+                finalScoresList.remove(index);
+                stringBuilder.append("\n");
+            } else {
+                if (playerList.get(index) == id) {
+                    stringBuilder.append("YOU ");
+                } else {
+                    stringBuilder.append("Opponent #");
+                    stringBuilder.append(playerList.get(index));
                 }
-*/
-            else {
-                stringBuilder.append("Opponent #");
-                stringBuilder.append(playerList.get(index));
+                stringBuilder.append(" - ");
+                stringBuilder.append(scoresList.get(index));
+                stringBuilder.append("; ");
             }
-            stringBuilder.append(" - ");
-            stringBuilder.append(scoresList.get(index));
-            stringBuilder.append(sep);
             scoresList.remove(index);
             playerList.remove(index);
         }
@@ -369,7 +373,7 @@ public class GameView extends View {
 
     protected void drawScores() {
         TextView scoresView = (TextView) parentActivity.findViewById(R.id.game_scores);
-        String scores = "SCORES: " + parseScores("; ");
+        String scores = "SCORES: " + parseScores(false);
         scoresView.setText(scores);
     }
 
@@ -454,11 +458,13 @@ public class GameView extends View {
                             mTextPaint);
             return;
         }
-        if (player.isGameStarted() && player.getQueue().isEmpty() && player.getHand().isEmpty()) {
+        if (player.isGameStarted() &&
+                player.getQueue().isEmpty() &&
+                player.getHand().isEmpty() &&
+                !player.isChoosingRowToTake()) {
             drawMessage("Prepare for the next round!");
         } else if (player.isGameInterrupted()) {
-            drawMessage("Someone has disconnected! The game will be interrupted, " +
-                    "the leaver will be assessed with a loss.");
+            drawMessage("Someone has disconnected! The game will be interrupted.");
         }
         drawScores();
         drawQueue(canvas);
@@ -473,7 +479,7 @@ public class GameView extends View {
             }
             invalidate();
         } else if (player.isGameFinished() || player.isGameInterrupted()) {
-            parentActivity.goToResults(parseScores("\n"));
+            parentActivity.goToResults(parseScores(true));
         }
     }
 

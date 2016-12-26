@@ -484,7 +484,6 @@ public class GameView extends View {
             drawMessage(isGameStartedMessageDisplayed ?
                     "Prepare for the next round!" :
                     "The game is starting!");
-            invalidate();
         }
     }
 

@@ -5,7 +5,6 @@ import java.sql.*;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.concurrent.*;
 import Backend.Server.GameTypes;
@@ -15,7 +14,7 @@ import static Backend.AbstractPlayer.*;
 import static Backend.GameResult.recalc;
 
 public class GameHandler {
-    public static String SECRET_PASSWORD = "";
+    public static String SECRET_PASSWORD = "QKgqukMgp6";
 
     private int playersNumber;
     private ArrayList<ClientConnection> connections;

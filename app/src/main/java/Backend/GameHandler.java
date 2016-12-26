@@ -165,6 +165,7 @@ public class GameHandler {
                     continue;
                 }
                 int index = connections.indexOf(currentConnection);
+                currentConnection.getClientOutput().println("Results");
                 for (int i = 0; i < playersNumber; i++){
                     String finalResult = "";
                     if (i == index){
@@ -177,7 +178,7 @@ public class GameHandler {
                     }
                     connections.get(i).getClientOutput().println("Score");
                     finalResult += connections.get(i).getClientInput().readLine();
-                    connections.get(i).getClientOutput().println(finalResult);
+                    currentConnection.getClientOutput().println(finalResult);
                 }
             }
 

@@ -18,6 +18,26 @@ public class SetupMultiActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onPostCreate(Bundle bundle) {
+        SeekBar seekBar = (SeekBar) findViewById(R.id.playerNumberSeekBar);
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                seekBar.setProgress(Math.max(seekBar.getProgress(), 1));
+            }
+        });
+        super.onPostCreate(bundle);
+    }
+
     private int getProgressById(int id) {
         return ((SeekBar) findViewById(id)).getProgress();
     }

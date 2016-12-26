@@ -59,27 +59,22 @@ public class Server {
                 candidates.remove(0);
             }
 
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        new GameHandler(players, GameTypes.SINGLEPLAYER).playGame();
-                        System.out.println("GAME PLAYED");
-                    } catch (Exception e) {
-                        System.out.println("EXCEPTION!!!");
-                        for (ClientConnection currentConnection : players) {
-                            try {
-                                currentConnection.getClientOutput().println("Disconnected");
-                            } catch (Exception e2) {
-                                //just ignore
-                            }
+            new Thread(() -> {
+                try {
+                    new GameHandler(players, GameTypes.SINGLEPLAYER).playGame();
+                    System.out.println("GAME PLAYED");
+                } catch (Exception e) {
+                    System.out.println("EXCEPTION!!!");
+                    for (ClientConnection currentConnection : players) {
+                        try {
+                            currentConnection.getClientOutput().println("Disconnected");
+                        } catch (Exception e2) {
+                            //just ignore
                         }
-                        System.out.println("HANDLED!!!");
                     }
-                    System.out.println("PLAYED");
-                    return;
-
+                    System.out.println("HANDLED!!!");
                 }
+                System.out.println("PLAYED");
             }).start();
             System.out.println("GAME GAME PLAYED");
         }

@@ -145,6 +145,7 @@ public class Client {
                     ArrayList<String> finalResults = new ArrayList<>();
                     for (int i = 0; i < playersNumber; i++){
                         finalResults.add(clientInput.readLine());
+                        System.out.println("Current line: " + finalResults.get(finalResults.size() - 1));
                     }
                     connectedPlayer.setFinalResults(finalResults);
                 case "Disconnected":

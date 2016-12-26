@@ -20,7 +20,7 @@ public abstract class AbstractPlayer {
     static final int ROUNDS = 10;
     static final int ROWS = 4;
     private static final int COLUMNS = 5;
-    static final int STOP_POINTS = 66;
+    static final int STOP_POINTS = 1;
     protected int id;
     protected String username;
     protected String userID;

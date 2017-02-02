@@ -5,8 +5,7 @@ import java.net.Socket;
 import java.net.ServerSocket;
 import java.util.*;
 
-import static Backend.AbstractPlayer.DECK_SIZE;
-import static Backend.AbstractPlayer.ROUNDS;
+import static Backend.GameConstants.*;
 
 public class Server {
 

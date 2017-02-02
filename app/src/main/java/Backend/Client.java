@@ -1,17 +1,15 @@
 package Backend;
 
+import android.util.Pair;
+
 import java.io.*;
-import java.net.InetAddress;
 import java.net.Socket;
-import java.util.AbstractMap;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
-import java.util.PriorityQueue;
 
-import static Backend.AbstractPlayer.ROUNDS;
-import static Backend.AbstractPlayer.ROWS;
+import static Backend.GameConstants.*;
 
 public class Client {
 
@@ -55,7 +53,7 @@ public class Client {
 
     private void run() throws IOException {
         String messageFromServer;
-        ArrayList<Map.Entry<Integer, Integer>> moves = new ArrayList<>();
+        ArrayList<Pair<Integer, Integer>> moves = new ArrayList<>();
         while (!isClosed) {
             messageFromServer = clientInput.readLine();
             setGameStarted();
@@ -86,7 +84,7 @@ public class Client {
                     clientOutput.println(connectedPlayer.getQueue().isEmpty());
                     break;
                 case "Clear":
-                    connectedPlayer.board.clear();
+                    connectedPlayer.setBoard(new Board(), new Board());
                     break;
                 case "Cards":
                     ArrayList<Integer> hand = new ArrayList<>();
@@ -95,8 +93,8 @@ public class Client {
                     }
                     connectedPlayer.setHand(hand);
 
-                    ArrayList<ArrayList<Integer>> board = new ArrayList<>();
-                    ArrayList<ArrayList<Integer>> currentBoard = new ArrayList<>();
+                    Board board = new Board();
+                    Board currentBoard = new Board();
 
                     for (int i = 0; i < ROWS; i++) {
                         int card = Integer.parseInt(clientInput.readLine());
@@ -109,7 +107,7 @@ public class Client {
                     connectedPlayer.setId(id);
                     break;
                 case "Move": {
-                    clientOutput.println(connectedPlayer.tellMove());
+                    clientOutput.println(connectedPlayer.move());
                     break;
                 }
                 case "Min": {
@@ -117,7 +115,7 @@ public class Client {
                     break;
                 }
                 case "Choose": {
-                    clientOutput.println(connectedPlayer.tellChosenRow());
+                    clientOutput.println(connectedPlayer.setChosenRow());
                     break;
                 }
                 case "Moves":
@@ -126,18 +124,23 @@ public class Client {
                     for (int i = 0; i < playersNumber; i++) {
                         int index = Integer.parseInt(clientInput.readLine());
                         int card = Integer.parseInt(clientInput.readLine());
-                        moves.add(new AbstractMap.SimpleEntry<>(index, card));
+                        moves.add(new Pair<>(index, card));
                         cardsQueue.add(card);
                     }
                     connectedPlayer.setCardsQueue(cardsQueue);
                     break;
                 case "Smallest":
-                    boolean smallestTook = Boolean.parseBoolean(clientInput.readLine());
+                    SmallestTakeTypes smallestTakeType = SmallestTakeTypes.valueOf(clientInput.readLine());
                     int chosenRowIndex = Integer.parseInt(clientInput.readLine());
-                    connectedPlayer.playRound(smallestTook, chosenRowIndex, moves);
+                    connectedPlayer.playRound(smallestTakeType, chosenRowIndex, moves);
                     break;
                 case "Score":
                     clientOutput.println(connectedPlayer.getScore());
+                    break;
+                case "Scores":
+                    for (Integer score : connectedPlayer.getScores()){
+                        clientOutput.println(score);
+                    }
                     break;
                 case "Id":
                     clientOutput.println(connectedPlayer.getId());

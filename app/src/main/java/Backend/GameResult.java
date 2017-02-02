@@ -57,6 +57,7 @@ public class GameResult {
     public void updateGamesPlayed(){
         gamesPlayed++;
     }
+
     public static void recalc(ArrayList<GameResult> gameResults){
         ArrayList<Double> deltas = new ArrayList<>(Collections.nCopies(gameResults.size(), 0.));
         System.out.println("recalc");

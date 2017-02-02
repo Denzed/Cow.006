@@ -1,8 +1,8 @@
 package Backend;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Scanner;
+
+import static Backend.GameConstants.*;
 
 
 public class Player extends AbstractPlayer {
@@ -16,7 +16,8 @@ public class Player extends AbstractPlayer {
     }
 
 
-    public int tellMove() {
+    public int move() {
+//      "TODO: Fix -старайтесь делать так, чтобы метод или менял состояние объекта или возвращал значение (но не одновременно) !!!"
 //        askForAMove();
         setChoosingCardToTake(true);
         while (isChoosingCardToTake()){}
@@ -32,7 +33,7 @@ public class Player extends AbstractPlayer {
         return value;
     }
 
-    public int tellChosenRow() {
+    public int setChosenRow() {
 //        askForAChoice();
         setChoosingRowToTake(true);
         while (isChoosingRowToTake()){}
@@ -68,7 +69,7 @@ public class Player extends AbstractPlayer {
 
     private void showBoard(){
         System.out.println("BOARD:");
-        for (ArrayList<Integer> row : board){
+        for (ArrayList<Integer> row : getBoard()){
             for (Integer card : row) {
                 System.out.print(card + " ");
             }
@@ -81,8 +82,7 @@ public class Player extends AbstractPlayer {
         for (int i = 0; i < playersNumber; i++){
             if (i == getId()){
                 System.out.print("(YOU: " + scores.get(i) + ") ");
-            }
-            else{
+            } else {
                 System.out.print(scores.get(i) + " ");
             }
         }

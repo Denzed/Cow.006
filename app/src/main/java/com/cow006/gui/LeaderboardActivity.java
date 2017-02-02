@@ -23,6 +23,7 @@ public class LeaderboardActivity extends AppCompatActivity {
     protected  void onPostCreate(Bundle bundle) {
         super.onPostCreate(bundle);
         String leaderboard = "";
+        //TODO: Fix problems with mySQL and Android
         // query to database for leaderboard
 //        String username = getIntent().getStringExtra("username");
 /*        final Connection dataBaseConnection;

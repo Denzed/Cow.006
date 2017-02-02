@@ -12,6 +12,7 @@ import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.util.Pair;
 import android.view.Display;
 import android.view.DragEvent;
 import android.view.GestureDetector;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 
+import Backend.GameConstants;
 import Backend.Player;
 
 
@@ -100,10 +102,10 @@ public class GameView extends View {
         }
 
         @Override
-        protected synchronized void playRound(boolean smallestTook,
+        protected synchronized void playRound(GameConstants.SmallestTakeTypes smallestTakeType,
                                               int chosenRowIndex,
-                                              ArrayList<Map.Entry<Integer,Integer>> moves) {
-            super.playRound(smallestTook, chosenRowIndex, moves);
+                                              ArrayList<Pair<Integer,Integer>> moves) {
+            super.playRound(smallestTakeType, chosenRowIndex, moves);
             postInvalidate();
         }
     }
@@ -347,14 +349,14 @@ public class GameView extends View {
             playerList.add(i);
         }
         StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < player.getPlayersNumber(); ++i) {
-            Integer topScore = Collections.max(scoresList);
-            int index = scoresList.indexOf(topScore);
-            if (isFinal) {
-                stringBuilder.append(finalScoresList.get(index));
-                finalScoresList.remove(index);
-                stringBuilder.append("\n");
-            } else {
+        if (isFinal) {
+            for (int i = 0; i < player.getPlayersNumber(); i++){
+                stringBuilder.append(finalScoresList.get(i) + "\n");
+            }
+        } else {
+            for (int i = 0; i < player.getPlayersNumber(); ++i) {
+                Integer topScore = Collections.max(scoresList);
+                int index = scoresList.indexOf(topScore);
                 if (playerList.get(index) == id) {
                     stringBuilder.append("YOU ");
                 } else {
@@ -364,9 +366,9 @@ public class GameView extends View {
                 stringBuilder.append(" - ");
                 stringBuilder.append(scoresList.get(index));
                 stringBuilder.append("; ");
+                scoresList.remove(index);
+                playerList.remove(index);
             }
-            scoresList.remove(index);
-            playerList.remove(index);
         }
         return stringBuilder.toString();
     }
@@ -458,6 +460,8 @@ public class GameView extends View {
                             mTextPaint);
             return;
         }
+
+        //TODO: Why lots of red logs ???!!!
         if (player.isGameStarted() &&
                 player.getQueue().isEmpty() &&
                 player.getHand().isEmpty() &&
@@ -466,6 +470,7 @@ public class GameView extends View {
         } else if (player.isGameInterrupted()) {
             drawMessage("Someone has disconnected! The game will be interrupted.");
         }
+
         drawScores();
         drawQueue(canvas);
         drawBoard(canvas);

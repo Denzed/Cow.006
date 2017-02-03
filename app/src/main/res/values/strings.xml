@@ -49,4 +49,21 @@
         player who has collected the fewest cattle heads.\n\n
     </string>
     <string name="title_activity_setup_solo_game">Setup solo game</string>
+    <string name="title_activity_leaderboard">Leaderboard</string>
+    <string name="player_count">Player count</string>
+    <string name="start_game">Start game</string>
+    <string name="bot_level">Bot level</string>
+    <string name="bot_number">Bot number</string>
+    <string name="play">Play</string>
+    <string name="solo">Solo</string>
+    <string name="multiplayer">Multiplayer</string>
+    <string name="miscellaneous">Miscellaneous</string>
+    <string name="game_rules_button_text">Game rules</string>
+    <string name="global_leaderboard_button_text">Global leaderboard</string>
+    <string name="sign_in_information_text_view_default_text">Signing in&#8230;</string>
+    <string name="sign_out_button_text">Sign out</string>
+    <string name="title_activity_setup_multi_game">Setup mulltiplayer game</string>
+    <string name="final_scores">Final scores</string>
+    <string name="back_to_main_menu">Back to main menu</string>
+    <string name="final_scores_activity_label">Final scores</string>
 </resources>

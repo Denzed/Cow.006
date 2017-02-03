@@ -3,88 +3,83 @@ package Backend;
 import java.io.*;
 import java.net.Socket;
 import java.net.ServerSocket;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
-import static Backend.Server.CONNECTIONS_NUMBER;
-
+import static Backend.GameConstants.*;
 
 public class Server {
 
     private static ServerSocket serverSocket = null;
-    static volatile int CONNECTIONS_NUMBER = 1;
-//    static volatile int CONNECTIONS_NUMBER = 4;
-
-    static List<ClientThread> connections = Collections.synchronizedList(new ArrayList<ClientThread>());
-    private static final int REMOTE_NUMBER = 1;
+    private static ArrayList<ArrayList<ClientConnection>> connections =
+            new ArrayList<>(Collections.nCopies(DECK_SIZE / ROUNDS + 1, new ArrayList<ClientConnection>()));
     private static final int PORT_NUMBER = 8080;
+    enum GameTypes { SINGLEPLAYER, MULTIPLAYER};
 
     public static void main(String[] Args) throws IOException {
+        serverSocket = new ServerSocket(PORT_NUMBER);
+
+        //I think it's OK to have infinite loop here because it's a server
         while (true) {
-            getConnections();
-            connections.clear();
+            System.out.println("BEFORE WAIT");
+            waitForConnections();
+            System.out.println("AFTER WAIT");
         }
     }
-    private static void getConnections() throws IOException{
-        try {
-            serverSocket = new ServerSocket(PORT_NUMBER);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
+    private static synchronized void waitForConnections() throws IOException {
+        System.out.print("TRYING...");
         Socket clientSocket = serverSocket.accept();
-        ClientThread connection = new ClientThread(clientSocket);
-        connections.add(connection);
-        connection.start();
-        while (CONNECTIONS_NUMBER == 1){}
+        System.out.println("CONNECTED");
 
-        while (connections.size() < CONNECTIONS_NUMBER) {
-            try {
-                /*Socket*/ clientSocket = serverSocket.accept();
-                /*ClientThread*/ connection = new ClientThread(clientSocket);
-                connections.add(connection);
-                connection.start();
-            } catch (IOException e) {
-                e.printStackTrace();
+        ClientConnection connection = new ClientConnection(clientSocket);
+        final int playersNumber = connection.getPlayersNumber();
+        connections.get(playersNumber).add(connection);
+        if (connections.get(playersNumber).size() >= playersNumber) {
+            boolean haveEnoughConnectedPlayers = true;
+            ArrayList<ClientConnection> candidates = connections.get(playersNumber);
+
+            for (int i = 0; i < playersNumber; i++) {
+                try {
+                    candidates.get(i).getClientOutput().println("IsConnected");
+                    candidates.get(i).getClientInput().readLine();
+                } catch (IOException e) {
+                    candidates.remove(i);
+                    haveEnoughConnectedPlayers = false;
+                    break;
+                }
             }
-        }
-
-        boolean canCreateHandler = false;
-        while (!canCreateHandler){
-            boolean ok = (connections.size() == CONNECTIONS_NUMBER);
-            for (ClientThread currentConnection : connections){
-                ok &= currentConnection.clientInput != null && currentConnection.clientOutput != null;
+            if (!haveEnoughConnectedPlayers) {
+                return;
             }
-            canCreateHandler = ok;
-        }
 
-        new GameHandler(connections).playGame();
-        serverSocket.close();
+            final ArrayList<ClientConnection> players = new ArrayList<>();
+            while (players.size() < playersNumber) {
+                players.add(candidates.get(0));
+                candidates.remove(0);
+            }
+
+            new Thread(() -> {
+                try {
+                    new GameHandler(players, GameTypes.SINGLEPLAYER).playGame();
+                    System.out.println("GAME PLAYED");
+                } catch (Exception e) {
+                    System.out.println("EXCEPTION!!!");
+                    for (ClientConnection currentConnection : players) {
+                        try {
+                            currentConnection.getClientOutput().println("Disconnected");
+                        } catch (Exception e2) {
+                            //just ignore
+                        }
+                    }
+                    System.out.println("HANDLED!!!");
+                }
+                System.out.println("PLAYED");
+            }).start();
+            System.out.println("GAME GAME PLAYED");
+        }
+        System.out.println("GAME GAME GAME PLAYED");
+
     }
+
 }
 
-
-class ClientThread extends Thread {
-
-    private Socket clientSocket;
-    BufferedReader clientInput = null;
-    PrintWriter clientOutput = null;
-
-    ClientThread(Socket clientSocket) {
-        this.clientSocket = clientSocket;
-    }
-
-    public void run() {
-        try {
-            clientInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            clientOutput = new PrintWriter(clientSocket.getOutputStream(), true);
-            clientOutput.println("Players");
-            CONNECTIONS_NUMBER = Integer.parseInt(clientInput.readLine());
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-}

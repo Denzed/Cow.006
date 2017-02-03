@@ -3,13 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.cow006.gui.RulesActivity">
+    tools:context="com.cow006.gui.LeaderboardActivity">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/text_margin"
-        android:textSize="@dimen/medium_text_size"
-        android:text="@string/game_rules" />
+        android:text=""
+        android:id="@+id/leaderboard_text_view"
+        android:textSize="@dimen/medium_text_size" />
 
 </android.support.v4.widget.NestedScrollView>

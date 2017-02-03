@@ -1,34 +1,55 @@
 package Backend;
 
 import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
+
+import static Backend.GameConstants.*;
 
 
-public class Player  extends AbstractPlayer{
+public class Player extends AbstractPlayer {
 
-    public Player(int playersNumber) {
-        super(playersNumber);
+    public Player(int remoteNumber, int botsNumber) {
+        super(remoteNumber, botsNumber);
     }
 
-    public int tellMove() {
+    public Player(int remoteNumber, int botsNumber, String username, String userID) {
+        super(remoteNumber, botsNumber, username, userID);
+    }
+
+
+    public int move() {
+//        askForAMove();
+
+//        just wait while player is choosing card
         setChoosingCardToTake(true);
-        while (isChoosingCardToTake()){}
-        int value = chosenCardIndex;
-        if (hand.contains(value)) {
-            hand.remove(Integer.valueOf(value));
-            System.out.print("Played: " + value);
+        while (isChoosingCardToTake()){
+            try {
+                TimeUnit.MILLISECONDS.sleep(100);
+            } catch (InterruptedException e) {
+                //ignore
+            }
         }
-        else {
-            System.out.println("You don't have this card");
-        }
+
+        int value = chosenCardValue;
+//        int value = new Scanner(System.in).nextInt();
         return value;
     }
 
-    public int tellChosenRow() {
-        setChoosingRowToTake(true);
-        while (isChoosingRowToTake()){}
+    public int setChosenRow() {
+//        askForAChoice();
 
+//        just wait while player is choosing row
+        setChoosingRowToTake(true);
+        while (isChoosingRowToTake()){
+            try {
+                TimeUnit.MILLISECONDS.sleep(100);
+            } catch (InterruptedException e) {
+                //ignore
+            }
+        }
         int index = chosenRowIndex;
+//      int index = new Scanner(System.in).nextInt();
+
         if (0 <= index && index < ROWS) {
             return index;
         } else {
@@ -58,7 +79,7 @@ public class Player  extends AbstractPlayer{
 
     private void showBoard(){
         System.out.println("BOARD:");
-        for (ArrayList<Integer> row : board){
+        for (ArrayList<Integer> row : getBoard()){
             for (Integer card : row) {
                 System.out.print(card + " ");
             }
@@ -71,8 +92,7 @@ public class Player  extends AbstractPlayer{
         for (int i = 0; i < playersNumber; i++){
             if (i == getId()){
                 System.out.print("(YOU: " + scores.get(i) + ") ");
-            }
-            else{
+            } else {
                 System.out.print(scores.get(i) + " ");
             }
         }

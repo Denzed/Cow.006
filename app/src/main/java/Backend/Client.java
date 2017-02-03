@@ -1,18 +1,20 @@
 package Backend;
 
+import android.util.Pair;
+
 import java.io.*;
 import java.net.Socket;
-import java.util.AbstractMap;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Map;
 
-import static Backend.AbstractPlayer.ROUNDS;
-import static Backend.AbstractPlayer.ROWS;
+import static Backend.GameConstants.*;
 
-public class Client implements Runnable {
+public class Client {
 
     private static final String LOCALHOST = "localhost";
+    private static final String MY_LAPTOP_HOST = "192.168.210.110";
+
     private static final int PORT_NUMBER = 8080;
 
     private AbstractPlayer connectedPlayer;
@@ -20,107 +22,138 @@ public class Client implements Runnable {
     private PrintWriter clientOutput = null;
     private final int playersNumber;
     private volatile boolean isClosed = false;
-
+    private Socket clientSocket;
+    public enum GameTypes { SINGLEPLAYER, MULTIPLAYER }
     public Client(AbstractPlayer connectedPlayer){
         this.connectedPlayer = connectedPlayer;
         playersNumber = this.connectedPlayer.playersNumber;
     }
 
-    public synchronized void connectToServer() throws IOException, InterruptedException {
-        Socket clientSocket = new Socket(LOCALHOST, PORT_NUMBER);
+    public void connectToServer(GameTypes gameType) throws IOException {
+        clientSocket = new Socket(gameType == GameTypes.SINGLEPLAYER ? LOCALHOST : MY_LAPTOP_HOST, PORT_NUMBER);
         clientInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         clientOutput = new PrintWriter(clientSocket.getOutputStream(), true);
-        Thread tmp = new Thread(this);
-        tmp.start();
+        run();
+        disconnectFromServer();
+    }
 
-        while (!isClosed) {}
-
-        tmp.join();
-
+    public void disconnectFromServer() throws IOException {
+        System.out.println("DISCONNECT");
+        System.out.println(clientSocket);
+        isClosed = true;
         clientSocket.close();
     }
 
-
-
-    public void run() {
-
-        if (isClosed)
-            return;
-        String messageFromServer = "";
-
-        try {
-
-                while (!isClosed) {
-                    messageFromServer = clientInput.readLine();
-                    System.out.println("messageFromServer: " + messageFromServer);
-//                    System.out.println(connectedPlayer.getQueue().size() + "= size, id = " + connectedPlayer.getId());
-
-                    switch (messageFromServer) {
-                        case "Players":
-                            clientOutput.println(connectedPlayer.playersNumber);
-                            break;
-                        case "Type":
-                            clientOutput.println(connectedPlayer.getClass().getSimpleName());
-                            break;
-                        case "Queue":
-                            System.out.println(connectedPlayer.getQueue().size() + " id = " + connectedPlayer.getId());
-                            clientOutput.println(connectedPlayer.getQueue().isEmpty());
-                            break;
-                        case "Clear":
-                            connectedPlayer.board.clear();
-                            break;
-                        case "Cards":
-                            ArrayList<Integer> hand = new ArrayList<>();
-                            for (int i = 0; i < ROUNDS; i++) {
-                                hand.add(Integer.parseInt(clientInput.readLine()));
-                            }
-                            connectedPlayer.setHand(hand);
-
-                            ArrayList<ArrayList<Integer>> board = new ArrayList<>();
-                            for (int i = 0; i < ROWS; i++) {
-                                board.add(new ArrayList<>(Collections.singletonList(Integer.parseInt(clientInput.readLine()))));
-                            }
-                            connectedPlayer.setBoard(board);
-
-                            int id = Integer.parseInt(clientInput.readLine());
-                            connectedPlayer.setId(id);
-                            break;
-                        case "Move": {
-                            clientOutput.println(connectedPlayer.tellMove());
-                            break;
-                        }
-                        case "Min": {
-                            clientOutput.println(connectedPlayer.getMinOnBoard());
-                            break;
-                        }
-                        case "Choose": {
-                            clientOutput.println(connectedPlayer.tellChosenRow());
-                            break;
-                        }
-                        case "Moves":
-                            boolean smallestTook = Boolean.parseBoolean(clientInput.readLine());
-                            int chosenRowIndex = Integer.parseInt(clientInput.readLine());
-                            ArrayList<Map.Entry<Integer, Integer>> moves = new ArrayList<>();
-                            for (int i = 0; i < playersNumber; i++) {
-                                int index = Integer.parseInt(clientInput.readLine());
-                                int card = Integer.parseInt(clientInput.readLine());
-                                moves.add(new AbstractMap.SimpleEntry<>(index, card));
-                            }
-                            System.out.println("CLIENT MOVES " + connectedPlayer.getId());
-
-                            connectedPlayer.playRound(smallestTook, chosenRowIndex, moves);
-                            System.out.println("CLIENT MOVES DONE " + connectedPlayer.getId());
-                            break;
-                        case "Score":
-                            clientOutput.println(connectedPlayer.getScore());
-                            break;
-                        case "Game over":
-                            isClosed = true;
-                            break;
+    private void run() throws IOException {
+        String messageFromServer;
+        ArrayList<Pair<Integer, Integer>> moves = new ArrayList<>();
+        while (!isClosed) {
+            messageFromServer = clientInput.readLine();
+            System.out.println("messageFromServer: " + messageFromServer);
+            switch (messageFromServer) {
+                case "IsConnected":
+                    clientOutput.println(connectedPlayer.isConnected());
+                    break;
+                case "Players":
+                    clientOutput.println(connectedPlayer.playersNumber);
+                    break;
+                case "Remote":
+                    clientOutput.println(connectedPlayer.remoteNumber);
+                    break;
+                case "Bots":
+                    clientOutput.println(connectedPlayer.botsNumber);
+                    break;
+                case "Username":
+                    clientOutput.println(connectedPlayer.username);
+                    break;
+                case "UserID":
+                    clientOutput.println(connectedPlayer.userID);
+                    break;
+                case "Type":
+                    clientOutput.println(connectedPlayer.getClass().getSimpleName());
+                    break;
+                case "Queue":
+                    clientOutput.println(connectedPlayer.getQueue().isEmpty());
+                    break;
+                case "Clear":
+                    connectedPlayer.setBoard(new Board(), new Board());
+                    break;
+                case "Cards":
+                    ArrayList<Integer> hand = new ArrayList<>();
+                    for (int i = 0; i < ROUNDS; i++) {
+                        hand.add(Integer.parseInt(clientInput.readLine()));
                     }
+                    connectedPlayer.setHand(hand);
+
+                    Board board = new Board();
+                    Board currentBoard = new Board();
+
+                    for (int i = 0; i < ROWS; i++) {
+                        int card = Integer.parseInt(clientInput.readLine());
+                        board.add(new ArrayList<>(Collections.singletonList(card)));
+                        currentBoard.add(new ArrayList<>(Collections.singletonList(card)));
+                    }
+                    connectedPlayer.setBoard(board, currentBoard);
+                    break;
+                case "GameID":
+                    connectedPlayer.setId(Integer.parseInt(clientInput.readLine()));
+                    break;
+                case "Move": {
+                    int value = connectedPlayer.move();
+                    clientOutput.println(value);
+                    connectedPlayer.hand.remove(Integer.valueOf(value));
+                    break;
                 }
-        } catch(IOException e){
-                e.printStackTrace();
+                case "Min": {
+                    clientOutput.println(connectedPlayer.getMinOnBoard());
+                    break;
+                }
+                case "Choose": {
+                    clientOutput.println(connectedPlayer.setChosenRow());
+                    break;
+                }
+                case "Moves":
+                    moves = new ArrayList<>();
+                    ArrayDeque<Integer> cardsQueue = new ArrayDeque<>();
+                    for (int i = 0; i < playersNumber; i++) {
+                        int index = Integer.parseInt(clientInput.readLine());
+                        int card = Integer.parseInt(clientInput.readLine());
+                        moves.add(new Pair<>(index, card));
+                        cardsQueue.add(card);
+                    }
+                    connectedPlayer.setCardsQueue(cardsQueue);
+                    break;
+                case "Smallest":
+                    SmallestTakeTypes smallestTakeType = SmallestTakeTypes.valueOf(clientInput.readLine());
+                    int chosenRowIndex = Integer.parseInt(clientInput.readLine());
+                    connectedPlayer.playRound(smallestTakeType, chosenRowIndex, moves);
+                    break;
+                case "Score":
+                    clientOutput.println(connectedPlayer.getScore());
+                    break;
+                case "Scores":
+                    for (Integer score : connectedPlayer.getScores()){
+                        clientOutput.println(score);
+                    }
+                    break;
+                case "Id":
+                    clientOutput.println(connectedPlayer.getId());
+                case "Results":
+                    ArrayList<String> finalResults = new ArrayList<>();
+                    for (int i = 0; i < playersNumber; i++){
+                        finalResults.add(clientInput.readLine());
+                        System.out.println("Current line: " + finalResults.get(finalResults.size() - 1));
+                    }
+                    connectedPlayer.setFinalResults(finalResults);
+                case "Disconnected":
+                    isClosed = true;
+                    connectedPlayer.setGameInterrupted();
+                    break;
+                case "Game over":
+                    isClosed = true;
+                    connectedPlayer.setGameFinished();
+                    break;
+            }
         }
     }
 }

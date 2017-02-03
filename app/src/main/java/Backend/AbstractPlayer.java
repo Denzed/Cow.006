@@ -1,51 +1,68 @@
 package Backend;
 
+import android.util.Pair;
+
 import java.util.*;
 import static Backend.AbstractPlayer.updateStateTypes.*;
+import static Backend.GameConstants.*;
 
 public abstract class AbstractPlayer {
-    private static final int CARD_PENALTY[] = {0,
-            1, 1, 1, 1, 2, 1, 1, 1, 1, 3,
-            5, 1, 1, 1, 2, 1, 1, 1, 1, 3,
-            1, 5, 1, 1, 2, 1, 1, 1, 1, 3,
-            1, 1, 5, 1, 2, 1, 1, 1, 1, 3,
-            1, 1, 1, 5, 2, 1, 1, 1, 1, 3,
-            1, 1, 1, 1, 7, 1, 1, 1, 1, 3,
-            1, 1, 1, 1, 2, 5, 1, 1, 1, 3,
-            1, 1, 1, 1, 2, 1, 5, 1, 1, 3,
-            1, 1, 1, 1, 2, 1, 1, 5, 1, 3,
-            1, 1, 1, 1, 2, 1, 1, 1, 5, 3,
-            1, 1, 1, 1};
-    static final int DECK_SIZE = 104;
-    static final int ROUNDS = 10;
-    static final int ROWS = 4;
-    private static final int COLUMNS = 5;
-    static final int STOP_POINTS = 66;
-    protected int id;
+    protected int id; //for game
+    protected String username; //Google API
+    protected String userID; //Google API
+    protected ArrayList<String> finalResults; // 'name-result'
     int playersNumber;
-    volatile int chosenRowIndex;
-    volatile int chosenCardIndex;
-
-    enum updateStateTypes { ADD_CARD, CLEAR_ROW }
+    int remoteNumber;
+    int botsNumber;
+    volatile int chosenRowIndex; //???
+    volatile int chosenCardValue; // ???
+    protected enum updateStateTypes { ADD_CARD, CLEAR_ROW }
     ArrayList<Integer> scores;
     protected ArrayList<Integer> hand;
-    ArrayList<ArrayList<Integer>> board;
+    private Board board;
+    private Board currentBoard;
 
-    private volatile boolean choosingRowToTake;
-    private volatile boolean choosingCardToTake;
-
+    public enum GameState { NEW_GAME, NEXT_ROUND, INTERRUPTED, FINISHED }
+    private volatile GameState state;
+    private volatile boolean choosingRowToTake, choosingCardToTake;
     private Queue<Move> queue;
+    private ArrayDeque<Integer> cardsQueue;
 
+    boolean isConnected() {
+        return true;
+    }
 
-    AbstractPlayer(int playersNumber) {
-        this.playersNumber = playersNumber;
+    public void setFinalResults(ArrayList<String> finalResults){
+        this.finalResults = finalResults;
+    }
+
+    public ArrayList<String> getFinalResults() {
+        return finalResults;
+    }
+
+    AbstractPlayer(int remoteNumber, int botsNumber) {
+        this.state = GameState.NEW_GAME;
+        this.playersNumber = remoteNumber + botsNumber;
+        this.remoteNumber = remoteNumber;
+        this.botsNumber = botsNumber;
+        System.out.println(playersNumber + "; " + remoteNumber + "; " + botsNumber);
+
         scores = new ArrayList<>(Collections.nCopies(playersNumber, 0));
         queue = new ArrayDeque<>();
-        board = new ArrayList<>();
+        cardsQueue = new ArrayDeque<>();
+        board = new Board();
+        currentBoard = new Board();
         for (int i = 0; i < ROWS; ++i) {
             board.add(new ArrayList<>());
+            currentBoard.add(new ArrayList<>());
         }
         hand = new ArrayList<>();
+    }
+
+    AbstractPlayer(int remoteNumber, int botsNumber, String username, String userID){
+        this(remoteNumber, botsNumber);
+        this.username = username;
+        this.userID = userID;
     }
 
     private class Move {
@@ -59,159 +76,95 @@ public abstract class AbstractPlayer {
             this.card = card;
         }
     }
-    public synchronized void updateOneMove(){
 
-        System.out.println("BEFORE UPDATING " + board);
+    public void updateOneMove(){
+        cardsQueue.poll();
         Move move = queue.poll();
-        System.out.println(move.type + " " + move.player + " " + move.rowIndex + " " + move.card);
-
         updateState(board, move.type, move.player, move.rowIndex, move.card);
-        System.out.println("AFTER UPDATING " + board);
     }
 
-/*    private class Move {
-        updateStateTypes type;
-        int player, card;
-        ArrayList<Integer> row;
-
-        private Move(updateStateTypes type, int player, ArrayList<Integer> row, int card){
-            this.type = type;
-            this.player = player;
-            this.row = row;
-            this.card = card;
-        }
-    }
-*/
-    public synchronized PriorityQueue<Integer> getCardsFromQueue(){
-        PriorityQueue<Integer> res = new PriorityQueue<>();
-        for (Move move: queue){
-            res.add(move.card);
-        }
-//        System.out.println("Player requested move queue of length " + "<" + res.size() + ">");
-        return res;
+    public ArrayDeque<Integer> getCardsQueue() {
+        return cardsQueue;
     }
 
-    public synchronized Queue<Move> getQueue() {
+    void setCardsQueue(ArrayDeque<Integer> cardsQueue) {
+        this.cardsQueue = cardsQueue;
+    }
+
+    public Queue<Move> getQueue() {
         return queue;
     }
 
-/*    public synchronized void updateOneMove(){
-        Move move = queue.poll();
-        updateState(move.type, move.player, move.row, move.card);
-    }
-*/
-    public synchronized boolean isChoosingRowToTake(){
+    public boolean isChoosingRowToTake(){
         return choosingRowToTake;
     }
 
-    synchronized void setChoosingRowToTake(boolean value){
+    protected void setChoosingRowToTake(boolean value){
         choosingRowToTake = value;
     }
 
-    public synchronized boolean isChoosingCardToTake() {
+    public boolean isChoosingCardToTake() {
         return choosingCardToTake;
     }
 
-    synchronized void setChoosingCardToTake(boolean value) {
+    protected void setChoosingCardToTake(boolean value) {
         choosingCardToTake = value;
     }
 
-    public abstract int tellMove();
+    public abstract int move();
 
-    public abstract int tellChosenRow();
+    public abstract int setChosenRow();
 
-    public synchronized void tellRow(int index){
+    public void tellRow(int index){
         chosenRowIndex = index;
         setChoosingRowToTake(false);
     }
 
-    public synchronized void tellCard(int card){
-        chosenCardIndex = card;
+    public void tellCard(int card){
+        chosenCardValue = card;
         setChoosingCardToTake(false);
     }
 
     public void setHand(ArrayList<Integer> hand) {
         this.hand = hand;
+        if (this.state == GameState.NEW_GAME) {
+            this.state = GameState.NEXT_ROUND;
+        }
         Collections.sort(this.hand);
-//        System.out.println(hand);
-//        System.out.println("SERVER GAVE HAND");
     }
 
-    void setBoard(ArrayList<ArrayList<Integer>> board){
+    void setBoard(Board board, Board currentBoard){
         this.board = board;
+        this.currentBoard = currentBoard;
     }
 
-    synchronized int getMinOnBoard(){
+    int getMinOnBoard(){
         int minOnBoard = DECK_SIZE;
-        for (ArrayList<Integer> cur : board){
+        for (ArrayList<Integer> cur : currentBoard){
             minOnBoard = Math.min(minOnBoard, cur.get(cur.size() - 1));
         }
         return minOnBoard;
     }
 
-    protected synchronized void playRound(boolean smallestTook, int chosenRowIndex, ArrayList<Map.Entry<Integer, Integer>> moves) {
-
-        ArrayList<ArrayList<Integer>> currentBoard = new ArrayList<>();
-        for (ArrayList<Integer> row : board){
-            ArrayList<Integer> tmp = new ArrayList<>();
-            currentBoard.add(tmp);
-            for (Integer card : row) {
-                int ttmp = card;
-                tmp.add(ttmp);
-            }
-        }
-
-        int smallestCard = moves.get(0).getValue();
-        int playerIndexWithSmallestCard = moves.get(0).getKey();
-        if (smallestTook) {
-//            ArrayList<Integer> chosenRow = currentBoard.get(chosenRowIndex);
-            Move tmp = (new Move(CLEAR_ROW, playerIndexWithSmallestCard, chosenRowIndex, smallestCard));
-
+    protected void playRound(SmallestTakeTypes smallestTakeType, int chosenRowIndex, ArrayList<Pair<Integer, Integer>> moves) {
+        int playerIndexWithSmallestCard = moves.get(0).first;
+        int smallestCard = moves.get(0).second;
+        if (smallestTakeType == SmallestTakeTypes.SMALLEST_TAKE) {
             queue.add(new Move(CLEAR_ROW, playerIndexWithSmallestCard, chosenRowIndex, smallestCard));
-            if (id == 0)
-                System.out.println(tmp.type + " " + tmp.player + " " + tmp.rowIndex + " " + tmp.card);
             updateState(currentBoard, CLEAR_ROW, playerIndexWithSmallestCard, chosenRowIndex, smallestCard);
         }
-        else {
-            int updatingRowIndex = getUpdatingRowIndex(currentBoard, smallestCard);
-            Move tmp = (new Move(ADD_CARD, playerIndexWithSmallestCard, updatingRowIndex, smallestCard));
-            queue.add(new Move(ADD_CARD, playerIndexWithSmallestCard, updatingRowIndex, smallestCard));
-            if (id == 0)
-                System.out.println(tmp.type + " " + tmp.player + " " + tmp.rowIndex + " " + tmp.card);
-            updateState(currentBoard, ADD_CARD, playerIndexWithSmallestCard, updatingRowIndex, smallestCard);
-        }
-        if (id == 0)
-            System.out.println(id + "\tCURBOARD = " + currentBoard);
-        if (id == 0)
-            System.out.println(id + "\tBOARD = " + board);
 
-        //System.out
-        for (int i = 1; i < playersNumber; i++){
-            int currentCard = moves.get(i).getValue();
-            int currentPlayer = moves.get(i).getKey();
+        for (int i = smallestTakeType == SmallestTakeTypes.SMALLEST_TAKE ? 1 : 0; i < playersNumber; i++){
+            int currentPlayer = moves.get(i).first;
+            int currentCard = moves.get(i).second;
             int updatingRowIndex = getUpdatingRowIndex(currentBoard, currentCard);
-            if (currentBoard.get(updatingRowIndex).size() == COLUMNS){
-                Move tmp = new Move(ADD_CARD, currentPlayer, updatingRowIndex, currentCard);
-                queue.add(new Move(CLEAR_ROW, currentPlayer, updatingRowIndex, currentCard));
-                if (id == 0)
-                    System.out.println(tmp.type + " " + tmp.player + " " + tmp.rowIndex + " " + tmp.card);
-                updateState(currentBoard, CLEAR_ROW, currentPlayer, updatingRowIndex, currentCard);
-            }
-            else{
-                Move tmp = new Move(ADD_CARD, currentPlayer, updatingRowIndex, currentCard);
-                queue.add(new Move(ADD_CARD, currentPlayer, updatingRowIndex, currentCard));
-                if (id == 0)
-                    System.out.println(tmp.type + " " + tmp.player + " " + tmp.rowIndex + " " + tmp.card);
-                updateState(currentBoard, ADD_CARD, currentPlayer, updatingRowIndex, currentCard);
-            }
-            if (id == 0)
-                System.out.println(id + "\tCURBOARD = " + currentBoard);
-            if (id == 0)
-                System.out.println(id + "\tBOARD = " + board);
-
+            updateStateTypes updateStateType = currentBoard.get(updatingRowIndex).size() >= COLUMNS ? CLEAR_ROW : ADD_CARD;
+            queue.add(new Move(updateStateType, currentPlayer, updatingRowIndex, currentCard));
+            updateState(currentBoard, updateStateType, currentPlayer, updatingRowIndex, currentCard);
         }
     }
-    protected int getUpdatingRowIndex(ArrayList<ArrayList<Integer>> board, int card) {
+
+    private int getUpdatingRowIndex(Board board, int card) {
         int maxCard = 0;
         int index = 0;
         for (int i = 0; i < ROWS; i++){
@@ -226,73 +179,7 @@ public abstract class AbstractPlayer {
     }
 
 
-/*    protected synchronized void playRound(boolean smallestTook,
-                                          int chosenRowIndex,
-                                          ArrayList<Map.Entry<Integer,Integer>> moves) {
-        ArrayList<ArrayList<Integer>> currentBoard = new ArrayList<>();
-        for (ArrayList<Integer> row: board) {
-            currentBoard.add(new ArrayList<>(row));
-        }
-
-        int smallestCard = moves.get(0).getValue();
-        int playerIndexWithSmallestCard = moves.get(0).getKey();
-        if (smallestTook) {
-            ArrayList<Integer> chosenRow = currentBoard.get(chosenRowIndex);
-            ArrayList<Integer> chosenRowB = board.get(chosenRowIndex);
-            queue.add(new Move(CLEAR_ROW, playerIndexWithSmallestCard, chosenRowB, smallestCard));
-            updateState(CLEAR_ROW, playerIndexWithSmallestCard, chosenRow, smallestCard);
-        }
-        else {
-            ArrayList<Integer> updatingRow = getUpdatingRow(currentBoard, smallestCard);
-            ArrayList<Integer> updatingRowB = getUpdatingRow(board, smallestCard);
-            queue.add(new Move(ADD_CARD, playerIndexWithSmallestCard, updatingRowB, smallestCard));
-            updateState(ADD_CARD, playerIndexWithSmallestCard, updatingRow, smallestCard);
-        }
-        for (int i = 1; i < playersNumber; i++){
-            int currentCard = moves.get(i).getValue();
-            int currentPlayer = moves.get(i).getKey();
-            ArrayList<Integer> updatingRow = getUpdatingRow(currentBoard, currentCard);
-            ArrayList<Integer> updatingRowB = getUpdatingRow(board, currentCard);
-            if (updatingRow.size() == COLUMNS){
-                queue.add(new Move(CLEAR_ROW, currentPlayer, updatingRowB, currentCard));
-                updateState(CLEAR_ROW, currentPlayer, updatingRow, currentCard);
-            }
-            else{
-                queue.add(new Move(ADD_CARD, currentPlayer, updatingRowB, currentCard));
-                updateState(ADD_CARD, currentPlayer, updatingRow, currentCard);
-            }
-        }
-    }
-*/
-/*    private ArrayList<Integer> getUpdatingRow(ArrayList<ArrayList<Integer>> board, int card) {
-        int maxCard = 0;
-        ArrayList<Integer> row = board.get(0);
-        for (int i = 0; i < ROWS; i++){
-            ArrayList<Integer> currentRow = board.get(i);
-            int lastInRow = currentRow.get(currentRow.size() - 1);
-            if (lastInRow < card && lastInRow > maxCard){
-                maxCard = lastInRow;
-                row = board.get(i);
-            }
-        }
-        return row;
-    }
-
-    protected ArrayList<Integer> getUpdatingRow(int card) {
-        int maxCard = 0;
-        ArrayList<Integer> row = board.get(0);
-        for (int i = 0; i < ROWS; i++){
-            ArrayList<Integer> currentRow = board.get(i);
-            int lastInRow = currentRow.get(currentRow.size() - 1);
-            if (lastInRow < card && lastInRow > maxCard){
-                maxCard = lastInRow;
-                row = board.get(i);
-            }
-        }
-        return row;
-    }
-*/
-    protected void updateState(ArrayList<ArrayList<Integer>> board, updateStateTypes type, int choosingPlayer, int rowIndex, int card) {
+    private void updateState(Board board, updateStateTypes type, int choosingPlayer, int rowIndex, int card) {
         ArrayList<Integer> row = board.get(rowIndex);
         if (type == CLEAR_ROW) {
             if (board == this.board) {
@@ -303,14 +190,6 @@ public abstract class AbstractPlayer {
         row.add(card);
     }
 
-/*    private void updateState(updateStateTypes type, int choosingPlayer, ArrayList <Integer> row, int card) {
-        if (type == CLEAR_ROW) {
-            updateScore(choosingPlayer, getRowPoints(row));
-          row.clear();
-        }
-        row.add(card);
-    }
-*/
     static int getRowPoints(ArrayList<Integer> row) {
         int res = 0;
         for (Integer card : row){
@@ -327,7 +206,7 @@ public abstract class AbstractPlayer {
         return hand;
     }
 
-    public ArrayList<ArrayList<Integer>> getBoard() {
+    public Board getBoard() {
         return board;
     }
 
@@ -349,5 +228,17 @@ public abstract class AbstractPlayer {
 
     public ArrayList<Integer> getScores(){
         return scores;
+    }
+
+    protected void setGameInterrupted() {
+        this.state = GameState.INTERRUPTED;
+    }
+
+    protected void setGameFinished() {
+        this.state = GameState.FINISHED;
+    }
+
+    public GameState getState() {
+        return this.state;
     }
 }

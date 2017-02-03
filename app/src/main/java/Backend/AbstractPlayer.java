@@ -16,14 +16,15 @@ public abstract class AbstractPlayer {
     int botsNumber;
     volatile int chosenRowIndex; //???
     volatile int chosenCardValue; // ???
-    enum updateStateTypes { ADD_CARD, CLEAR_ROW }
+    protected enum updateStateTypes { ADD_CARD, CLEAR_ROW }
     ArrayList<Integer> scores;
     protected ArrayList<Integer> hand;
     private Board board;
     private Board currentBoard;
-    private volatile boolean choosingRowToTake; //???
-    private volatile boolean choosingCardToTake; //???
-    private volatile boolean gameStarted, gameInterrupted, gameFinished; //???
+
+    public enum GameState { NEW_GAME, NEXT_ROUND, INTERRUPTED, FINISHED }
+    private volatile GameState state;
+    private volatile boolean choosingRowToTake, choosingCardToTake;
     private Queue<Move> queue;
     private ArrayDeque<Integer> cardsQueue;
 
@@ -40,6 +41,7 @@ public abstract class AbstractPlayer {
     }
 
     AbstractPlayer(int remoteNumber, int botsNumber) {
+        this.state = GameState.NEW_GAME;
         this.playersNumber = remoteNumber + botsNumber;
         this.remoteNumber = remoteNumber;
         this.botsNumber = botsNumber;
@@ -125,6 +127,9 @@ public abstract class AbstractPlayer {
 
     public void setHand(ArrayList<Integer> hand) {
         this.hand = hand;
+        if (this.state == GameState.NEW_GAME) {
+            this.state = GameState.NEXT_ROUND;
+        }
         Collections.sort(this.hand);
     }
 
@@ -225,27 +230,15 @@ public abstract class AbstractPlayer {
         return scores;
     }
 
-    public boolean isGameStarted() {
-        return gameStarted;
+    protected void setGameInterrupted() {
+        this.state = GameState.INTERRUPTED;
     }
 
-    protected void setGameStarted(boolean gameStarted) {
-        this.gameStarted = gameStarted;
+    protected void setGameFinished() {
+        this.state = GameState.FINISHED;
     }
 
-    public boolean isGameFinished() {
-        return gameFinished;
-    }
-
-    protected void setGameFinished(boolean gameFinished) {
-        this.gameFinished = gameFinished;
-    }
-
-    public boolean isGameInterrupted() {
-        return gameInterrupted;
-    }
-
-    protected void setGameInterrupted(boolean gameInterrupted) {
-        this.gameInterrupted = gameInterrupted;
+    public GameState getState() {
+        return this.state;
     }
 }

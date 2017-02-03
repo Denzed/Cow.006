@@ -44,18 +44,11 @@ public class Client {
         clientSocket.close();
     }
 
-    public void setGameStarted() {
-        if (!connectedPlayer.isGameStarted()) {
-            connectedPlayer.setGameStarted(true);
-        }
-    }
-
     private void run() throws IOException {
         String messageFromServer;
         ArrayList<Pair<Integer, Integer>> moves = new ArrayList<>();
         while (!isClosed) {
             messageFromServer = clientInput.readLine();
-            setGameStarted();
             System.out.println("messageFromServer: " + messageFromServer);
             switch (messageFromServer) {
                 case "IsConnected":
@@ -154,11 +147,11 @@ public class Client {
                     connectedPlayer.setFinalResults(finalResults);
                 case "Disconnected":
                     isClosed = true;
-                    connectedPlayer.setGameInterrupted(true);
+                    connectedPlayer.setGameInterrupted();
                     break;
                 case "Game over":
                     isClosed = true;
-                    connectedPlayer.setGameFinished(true);
+                    connectedPlayer.setGameFinished();
                     break;
             }
         }

@@ -22,8 +22,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Map;
 
+import Backend.AbstractPlayer;
 import Backend.GameConstants;
 import Backend.Player;
 
@@ -32,8 +32,6 @@ public class GameView extends View {
     private static final int NOT_A_CARD = 0;
     private static final long TIMER = 400;
 
-    private boolean isGameStartedMessageDisplayed = false;
-    
     GameActivity parentActivity;
     private float mTextHeight;
     private TextPaint mTextPaint;
@@ -53,14 +51,18 @@ public class GameView extends View {
 
     private int focusedCard = 0;
     private LocalPlayer player;
+    private String messageToDisplay;
 
     public class LocalPlayer extends Player {
-        LocalPlayer(int remoteNumber, int botsNumber) {
+
+        public LocalPlayer(int remoteNumber, int botsNumber) {
             super(remoteNumber, botsNumber);
         }
-        LocalPlayer(int remoteNumber, int botsNumber, String username, String usedID){
+
+        public LocalPlayer(int remoteNumber, int botsNumber, String username, String usedID) {
             super(remoteNumber, botsNumber, username, usedID);
         }
+
         @Override
         protected void setChoosingRowToTake(boolean value) {
             super.setChoosingRowToTake(value);
@@ -78,27 +80,25 @@ public class GameView extends View {
         }
 
         @Override
-        protected void setGameStarted(boolean value) {
-            super.setGameStarted(value);
-            if (value) {
-                postInvalidate();
-            }
+        protected void setGameInterrupted() {
+            super.setGameInterrupted();
+            messageToDisplay = "Someone has disconnected! The game will be interrupted.";
+            postInvalidate();
         }
 
         @Override
-        protected void setGameInterrupted(boolean value) {
-            super.setGameInterrupted(value);
-            if (value) {
-                postInvalidate();
-            }
+        protected void setGameFinished() {
+            super.setGameFinished();
+            postInvalidate();
         }
 
         @Override
-        protected void setGameFinished(boolean value) {
-            super.setGameFinished(value);
-            if (value) {
-                postInvalidate();
-            }
+        public void setHand(ArrayList<Integer> hand) {
+            messageToDisplay = (getState() == GameState.NEW_GAME
+                    ? "The game is starting!"
+                    : "Prepare for the next round!");
+            super.setHand(hand);
+            postInvalidate();
         }
 
         @Override
@@ -351,7 +351,8 @@ public class GameView extends View {
         StringBuilder stringBuilder = new StringBuilder();
         if (isFinal) {
             for (int i = 0; i < player.getPlayersNumber(); i++){
-                stringBuilder.append(finalScoresList.get(i) + "\n");
+                stringBuilder.append(finalScoresList.get(i));
+                stringBuilder.append("\n");
             }
         } else {
             for (int i = 0; i < player.getPlayersNumber(); ++i) {
@@ -453,26 +454,17 @@ public class GameView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if (player == null || !player.isGameStarted()) {
+        if (player == null || player.getState() == AbstractPlayer.GameState.NEW_GAME) {
             canvas.drawText("Waiting for other players!",
                             getWidth() / 2f,
                             getHeight() / 2,
                             mTextPaint);
             return;
         }
-
-        //TODO: Why lots of red logs before showing scores???!!!
-        //Появляется во время того, как показывается, как раскладываются карты из очереди на доску
-        //плюс выскакивает несколько раз
-        if (player.isGameStarted() &&
-                player.getQueue().isEmpty() &&
-                player.getHand().isEmpty() &&
-                !player.isChoosingRowToTake()) {
-            drawMessage("Prepare for the next round!");
-        } else if (player.isGameInterrupted()) {
-            drawMessage("Someone has disconnected! The game will be interrupted.");
+        if (messageToDisplay != null) {
+            drawMessage(messageToDisplay);
+            messageToDisplay = null;
         }
-
         drawScores();
         drawQueue(canvas);
         drawBoard(canvas);
@@ -485,20 +477,9 @@ public class GameView extends View {
                 // Ignore
             }
             invalidate();
-        } else if (player.isGameFinished() || player.isGameInterrupted()) {
+        } else if (player.getState() == AbstractPlayer.GameState.FINISHED ||
+                   player.getState() == AbstractPlayer.GameState.INTERRUPTED) {
             parentActivity.goToResults(parseScores(true));
-            return;
-        }
-        if (player.isGameInterrupted()) {
-            drawMessage("Someone has disconnected! The game will be interrupted.");
-        } else if (!player.isGameFinished() &&
-                player.isGameStarted() &&
-                player.getQueue().isEmpty() &&
-                player.getHand().isEmpty() &&
-                !player.isChoosingRowToTake()) {
-            drawMessage(isGameStartedMessageDisplayed ?
-                    "Prepare for the next round!" :
-                    "The game is starting!");
         }
     }
 

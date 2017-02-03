@@ -461,7 +461,9 @@ public class GameView extends View {
             return;
         }
 
-        //TODO: Why lots of red logs ???!!!
+        //TODO: Why lots of red logs before showing scores???!!!
+        //Появляется во время того, как показывается, как раскладываются карты из очереди на доску
+        //плюс выскакивает несколько раз
         if (player.isGameStarted() &&
                 player.getQueue().isEmpty() &&
                 player.getHand().isEmpty() &&

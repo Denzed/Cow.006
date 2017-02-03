@@ -15,7 +15,7 @@ public abstract class AbstractPlayer {
     int remoteNumber;
     int botsNumber;
     volatile int chosenRowIndex; //???
-    volatile int chosenCardIndex; // ???
+    volatile int chosenCardValue; // ???
     enum updateStateTypes { ADD_CARD, CLEAR_ROW }
     ArrayList<Integer> scores;
     protected ArrayList<Integer> hand;
@@ -76,17 +76,9 @@ public abstract class AbstractPlayer {
     }
 
     public void updateOneMove(){
-
-        if (id == 0)
-            System.out.println("BEFORE UPDATING " + board);
         cardsQueue.poll();
         Move move = queue.poll();
-        if (id == 0)
-            System.out.println(move.type + " " + move.player + " " + move.rowIndex + " " + move.card);
-
         updateState(board, move.type, move.player, move.rowIndex, move.card);
-        if (id == 0)
-            System.out.println("AFTER UPDATING " + board);
     }
 
     public ArrayDeque<Integer> getCardsQueue() {
@@ -127,7 +119,7 @@ public abstract class AbstractPlayer {
     }
 
     public void tellCard(int card){
-        chosenCardIndex = card;
+        chosenCardValue = card;
         setChoosingCardToTake(false);
     }
 
@@ -153,40 +145,17 @@ public abstract class AbstractPlayer {
         int playerIndexWithSmallestCard = moves.get(0).first;
         int smallestCard = moves.get(0).second;
         if (smallestTakeType == SmallestTakeTypes.SMALLEST_TAKE) {
-            Move tmp = (new Move(CLEAR_ROW, playerIndexWithSmallestCard, chosenRowIndex, smallestCard));
             queue.add(new Move(CLEAR_ROW, playerIndexWithSmallestCard, chosenRowIndex, smallestCard));
-            if (id == 0)
-                System.out.println(tmp.type + " " + tmp.player + " " + tmp.rowIndex + " " + tmp.card);
             updateState(currentBoard, CLEAR_ROW, playerIndexWithSmallestCard, chosenRowIndex, smallestCard);
         }
-
-        if (id == 0)
-            System.out.println(id + "\tCURBOARD = " + currentBoard);
-        if (id == 0)
-            System.out.println(id + "\tBOARD = " + board);
 
         for (int i = smallestTakeType == SmallestTakeTypes.SMALLEST_TAKE ? 1 : 0; i < playersNumber; i++){
             int currentPlayer = moves.get(i).first;
             int currentCard = moves.get(i).second;
             int updatingRowIndex = getUpdatingRowIndex(currentBoard, currentCard);
-            if (currentBoard.get(updatingRowIndex).size() >= COLUMNS){
-                Move tmp = new Move(ADD_CARD, currentPlayer, updatingRowIndex, currentCard);
-                queue.add(new Move(CLEAR_ROW, currentPlayer, updatingRowIndex, currentCard));
-                if (id == 0)
-                    System.out.println(currentBoard.get(updatingRowIndex).size() + " " +tmp.type + " " + tmp.player + " " + tmp.rowIndex + " " + tmp.card);
-                updateState(currentBoard, CLEAR_ROW, currentPlayer, updatingRowIndex, currentCard);
-            } else {
-                Move tmp = new Move(ADD_CARD, currentPlayer, updatingRowIndex, currentCard);
-                queue.add(new Move(ADD_CARD, currentPlayer, updatingRowIndex, currentCard));
-                if (id == 0)
-                    System.out.println(currentBoard.get(updatingRowIndex).size() + " " + tmp.type + " " + tmp.player + " " + tmp.rowIndex + " " + tmp.card);
-                updateState(currentBoard, ADD_CARD, currentPlayer, updatingRowIndex, currentCard);
-            }
-            if (id == 0)
-                System.out.println(id + "\tCURBOARD = " + currentBoard);
-            if (id == 0)
-                System.out.println(id + "\tBOARD = " + board);
-
+            updateStateTypes updateStateType = currentBoard.get(updatingRowIndex).size() >= COLUMNS ? CLEAR_ROW : ADD_CARD;
+            queue.add(new Move(updateStateType, currentPlayer, updatingRowIndex, currentCard));
+            updateState(currentBoard, updateStateType, currentPlayer, updatingRowIndex, currentCard);
         }
     }
 

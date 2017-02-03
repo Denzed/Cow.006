@@ -1,6 +1,7 @@
 package Backend;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import static Backend.GameConstants.*;
 
@@ -17,26 +18,35 @@ public class Player extends AbstractPlayer {
 
 
     public int move() {
-//      "TODO: Fix -старайтесь делать так, чтобы метод или менял состояние объекта или возвращал значение (но не одновременно) !!!"
 //        askForAMove();
+
+//        just wait while player is choosing card
         setChoosingCardToTake(true);
-        while (isChoosingCardToTake()){}
-        int value = chosenCardIndex;
+        while (isChoosingCardToTake()){
+            try {
+                TimeUnit.MILLISECONDS.sleep(100);
+            } catch (InterruptedException e) {
+                //ignore
+            }
+        }
+
+        int value = chosenCardValue;
 //        int value = new Scanner(System.in).nextInt();
-        if (hand.contains(value)) {
-            hand.remove(Integer.valueOf(value));
-            System.out.print("Played: " + value);
-        }
-        else {
-            System.out.println("You don't have this card");
-        }
         return value;
     }
 
     public int setChosenRow() {
 //        askForAChoice();
+
+//        just wait while player is choosing row
         setChoosingRowToTake(true);
-        while (isChoosingRowToTake()){}
+        while (isChoosingRowToTake()){
+            try {
+                TimeUnit.MILLISECONDS.sleep(100);
+            } catch (InterruptedException e) {
+                //ignore
+            }
+        }
         int index = chosenRowIndex;
 //      int index = new Scanner(System.in).nextInt();
 

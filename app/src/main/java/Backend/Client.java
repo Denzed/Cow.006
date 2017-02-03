@@ -7,7 +7,6 @@ import java.net.Socket;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Map;
 
 import static Backend.GameConstants.*;
 
@@ -102,12 +101,14 @@ public class Client {
                         currentBoard.add(new ArrayList<>(Collections.singletonList(card)));
                     }
                     connectedPlayer.setBoard(board, currentBoard);
-
-                    int id = Integer.parseInt(clientInput.readLine());
-                    connectedPlayer.setId(id);
+                    break;
+                case "GameID":
+                    connectedPlayer.setId(Integer.parseInt(clientInput.readLine()));
                     break;
                 case "Move": {
-                    clientOutput.println(connectedPlayer.move());
+                    int value = connectedPlayer.move();
+                    clientOutput.println(value);
+                    connectedPlayer.hand.remove(Integer.valueOf(value));
                     break;
                 }
                 case "Min": {

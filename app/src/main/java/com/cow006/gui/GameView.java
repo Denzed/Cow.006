@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.RectF;
+import android.os.Build;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.TextPaint;
@@ -153,7 +154,11 @@ public class GameView extends View {
                     }
                     ClipData data = ClipData.newPlainText("", "");
                     DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(cardViews[card - 1]);
-                    startDragAndDrop(data, shadowBuilder, card, 0);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        startDragAndDrop(data, shadowBuilder, card, 0);
+                    } else {
+                        startDrag(data, shadowBuilder, card, 0);
+                    }
                 }
             }
             super.onLongPress(event);

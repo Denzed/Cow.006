@@ -346,7 +346,7 @@ public class GameView extends View {
         int id = player.getId();
         ArrayList<Integer> scoresList = new ArrayList<>(player.getScores()),
                 playerList = new ArrayList<>();
-        ArrayList<String> finalScoresList = null;
+        ArrayList<ArrayList<String>> finalScoresList = null;
         if (isFinal) {
             finalScoresList = new ArrayList<>(player.getFinalResults());
         }

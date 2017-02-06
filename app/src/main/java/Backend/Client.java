@@ -1,45 +1,55 @@
 package Backend;
 
 import android.util.Pair;
-
+//import javafx.util.Pair;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import static Backend.Client.ConnectionTypes.*;
 import static Backend.GameConstants.*;
 
 public class Client {
 
     private static final String LOCALHOST = "localhost";
     private static final String MY_LAPTOP_HOST = "192.168.210.110";
-
     private static final int PORT_NUMBER = 8080;
-
     private AbstractPlayer connectedPlayer;
     private BufferedReader clientInput = null;
     private PrintWriter clientOutput = null;
-    private final int playersNumber;
+    private int playersNumber;
+    private ConnectionTypes connectionType;
     private volatile boolean isClosed = false;
     private Socket clientSocket;
-    public enum GameTypes { SINGLEPLAYER, MULTIPLAYER }
+
+    public enum ConnectionTypes { SINGLEPLAYER, MULTIPLAYER, LEADERBOARD }
+
     public Client(AbstractPlayer connectedPlayer){
         this.connectedPlayer = connectedPlayer;
         playersNumber = this.connectedPlayer.playersNumber;
     }
 
-    public void connectToServer(GameTypes gameType) throws IOException {
-        clientSocket = new Socket(gameType == GameTypes.SINGLEPLAYER ? LOCALHOST : MY_LAPTOP_HOST, PORT_NUMBER);
+    public Client(){}
+
+    public BufferedReader getClientInput() {
+        return clientInput;
+    }
+
+
+    public void connectToServer(ConnectionTypes connectionType) throws IOException {
+        this.connectionType = connectionType;
+        clientSocket = new Socket(connectionType == SINGLEPLAYER ? LOCALHOST : MY_LAPTOP_HOST, PORT_NUMBER);
         clientInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         clientOutput = new PrintWriter(clientSocket.getOutputStream(), true);
         run();
-        disconnectFromServer();
+        if (connectionType != LEADERBOARD) {
+            disconnectFromServer();
+        }
     }
 
     public void disconnectFromServer() throws IOException {
-        System.out.println("DISCONNECT");
-        System.out.println(clientSocket);
         isClosed = true;
         clientSocket.close();
     }
@@ -51,6 +61,9 @@ public class Client {
             messageFromServer = clientInput.readLine();
             System.out.println("messageFromServer: " + messageFromServer);
             switch (messageFromServer) {
+                case "Connection type":
+                    clientOutput.println(connectionType);
+                    break;
                 case "IsConnected":
                     clientOutput.println(connectedPlayer.isConnected());
                     break;
@@ -98,20 +111,16 @@ public class Client {
                 case "GameID":
                     connectedPlayer.setId(Integer.parseInt(clientInput.readLine()));
                     break;
-                case "Move": {
+                case "Move":
                     int value = connectedPlayer.move();
                     clientOutput.println(value);
-                    connectedPlayer.hand.remove(Integer.valueOf(value));
                     break;
-                }
-                case "Min": {
+                case "Min":
                     clientOutput.println(connectedPlayer.getMinOnBoard());
                     break;
-                }
-                case "Choose": {
+                case "Choose":
                     clientOutput.println(connectedPlayer.setChosenRow());
                     break;
-                }
                 case "Moves":
                     moves = new ArrayList<>();
                     ArrayDeque<Integer> cardsQueue = new ArrayDeque<>();
@@ -138,13 +147,22 @@ public class Client {
                     break;
                 case "Id":
                     clientOutput.println(connectedPlayer.getId());
+                    break;
                 case "Results":
-                    ArrayList<String> finalResults = new ArrayList<>();
-                    for (int i = 0; i < playersNumber; i++){
-                        finalResults.add(clientInput.readLine());
-                        System.out.println("Current line: " + finalResults.get(finalResults.size() - 1));
+                    if (connectionType == SINGLEPLAYER){
+                        connectedPlayer.buildFinalResultsSinglePlayer();
+                    } else {
+                        ArrayList<String> usernames = new ArrayList<>();
+                        ArrayList<String> ratings = new ArrayList<>();
+                        ArrayList<String> ratingChanges = new ArrayList<>();
+                        for (int i = 0; i < playersNumber; i++){
+                            usernames.add(clientInput.readLine());
+                            ratings.add(clientInput.readLine());
+                            ratingChanges.add(clientInput.readLine());
+                        }
+                        connectedPlayer.buildFinalResultsMultiPlayer(usernames, ratings, ratingChanges);
                     }
-                    connectedPlayer.setFinalResults(finalResults);
+                    break;
                 case "Disconnected":
                     isClosed = true;
                     connectedPlayer.setGameInterrupted();

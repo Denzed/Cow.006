@@ -1,12 +1,11 @@
 package Backend;
 
 import android.util.Pair;
-
+//import javafx.util.Pair;
 import java.util.ArrayList;
 import java.util.Random;
 
 import static Backend.GameConstants.*;
-
 
 public class Bot extends AbstractPlayer {
 
@@ -45,4 +44,5 @@ public class Bot extends AbstractPlayer {
             updateOneMove();
         }
     }
+
 }

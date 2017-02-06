@@ -1,27 +1,28 @@
 package Backend;
 
 import android.util.Pair;
-
+//import javafx.util.Pair;
 import java.util.*;
+
 import static Backend.AbstractPlayer.updateStateTypes.*;
 import static Backend.GameConstants.*;
 
 public abstract class AbstractPlayer {
+
     protected int id; //for game
     protected String username; //Google API
     protected String userID; //Google API
-    protected ArrayList<String> finalResults; // 'name-result'
-    int playersNumber;
-    int remoteNumber;
-    int botsNumber;
+    protected ArrayList<ArrayList<String>> finalResults; // 'name-result'
+    protected int playersNumber;
+    protected int remoteNumber;
+    protected int botsNumber;
     volatile int chosenRowIndex; //???
     volatile int chosenCardValue; // ???
-    protected enum updateStateTypes { ADD_CARD, CLEAR_ROW }
     ArrayList<Integer> scores;
+    protected enum updateStateTypes { ADD_CARD, CLEAR_ROW }
     protected ArrayList<Integer> hand;
     private Board board;
     private Board currentBoard;
-
     public enum GameState { NEW_GAME, NEXT_ROUND, INTERRUPTED, FINISHED }
     private volatile GameState state;
     private volatile boolean choosingRowToTake, choosingCardToTake;
@@ -32,26 +33,18 @@ public abstract class AbstractPlayer {
         return true;
     }
 
-    public void setFinalResults(ArrayList<String> finalResults){
-        this.finalResults = finalResults;
-    }
-
-    public ArrayList<String> getFinalResults() {
-        return finalResults;
-    }
-
     AbstractPlayer(int remoteNumber, int botsNumber) {
         this.state = GameState.NEW_GAME;
         this.playersNumber = remoteNumber + botsNumber;
         this.remoteNumber = remoteNumber;
         this.botsNumber = botsNumber;
-        System.out.println(playersNumber + "; " + remoteNumber + "; " + botsNumber);
 
         scores = new ArrayList<>(Collections.nCopies(playersNumber, 0));
         queue = new ArrayDeque<>();
         cardsQueue = new ArrayDeque<>();
         board = new Board();
         currentBoard = new Board();
+        finalResults = new ArrayList<>();
         for (int i = 0; i < ROWS; ++i) {
             board.add(new ArrayList<>());
             currentBoard.add(new ArrayList<>());
@@ -125,7 +118,7 @@ public abstract class AbstractPlayer {
         setChoosingCardToTake(false);
     }
 
-    public void setHand(ArrayList<Integer> hand) {
+    protected void setHand(ArrayList<Integer> hand) {
         this.hand = hand;
         if (this.state == GameState.NEW_GAME) {
             this.state = GameState.NEXT_ROUND;
@@ -178,7 +171,6 @@ public abstract class AbstractPlayer {
         return index;
     }
 
-
     private void updateState(Board board, updateStateTypes type, int choosingPlayer, int rowIndex, int card) {
         ArrayList<Integer> row = board.get(rowIndex);
         if (type == CLEAR_ROW) {
@@ -200,6 +192,31 @@ public abstract class AbstractPlayer {
 
     private void updateScore(int playerIndex, int points){
         scores.set(playerIndex, scores.get(playerIndex) + points);
+    }
+
+    void buildFinalResultsSinglePlayer() {
+        System.out.println("    void buildFinalResultsSinglePlayer() { <- HERE I AM");
+        for (int i = 0; i < playersNumber; i++){
+            ArrayList<String> resultLine = new ArrayList<>();
+            resultLine.add((i == id) ? "YOU" : "Opponent #" + i);
+            resultLine.add(scores.get(i).toString());
+            finalResults.add(resultLine);
+        }
+    }
+
+    void buildFinalResultsMultiPlayer(ArrayList<String> usernames, ArrayList<String> ratings, ArrayList<String> ratingChanges) {
+        for (int i = 0; i < playersNumber; i++){
+            ArrayList<String> resultLine = new ArrayList<>();
+            resultLine.add(usernames.get(i) + ((i == id) ? "(YOU)" : ""));
+            resultLine.add(String.valueOf(scores.get(i)));
+            resultLine.add(ratings.get(i));
+            resultLine.add(ratingChanges.get(i));
+            finalResults.add(resultLine);
+        }
+    }
+
+    public ArrayList<ArrayList<String>> getFinalResults() {
+        return finalResults;
     }
 
     public ArrayList<Integer> getHand() {
@@ -241,4 +258,5 @@ public abstract class AbstractPlayer {
     public GameState getState() {
         return this.state;
     }
+
 }

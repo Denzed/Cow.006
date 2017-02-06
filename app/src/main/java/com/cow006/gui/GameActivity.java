@@ -9,6 +9,9 @@ import Backend.Bot;
 import Backend.Client;
 import Backend.Server;
 
+import static Backend.Client.ConnectionTypes.MULTIPLAYER;
+import static Backend.Client.ConnectionTypes.SINGLEPLAYER;
+
 public class GameActivity extends AppCompatActivity {
     private int players;
     private int bots;
@@ -64,7 +67,7 @@ public class GameActivity extends AppCompatActivity {
         if (players == 0) {
             new Thread(() -> {
                     try {
-                        localClient.connectToServer(Client.GameTypes.SINGLEPLAYER);
+                        localClient.connectToServer(SINGLEPLAYER);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -72,7 +75,7 @@ public class GameActivity extends AppCompatActivity {
             for (int i = 0; i < bots; i++) {
                 new Thread(() -> {
                         try {
-                            new Client(new Bot(1, bots)).connectToServer(Client.GameTypes.SINGLEPLAYER);
+                            new Client(new Bot(1, bots)).connectToServer(SINGLEPLAYER);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -82,7 +85,7 @@ public class GameActivity extends AppCompatActivity {
             new Thread(() -> {
                     try {
                         System.out.println("username = " + username + ";userID = " + userID);
-                        localClient.connectToServer(Client.GameTypes.MULTIPLAYER);
+                        localClient.connectToServer(MULTIPLAYER);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

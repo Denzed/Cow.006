@@ -17,6 +17,6 @@ public class GameConstants {
     static final int ROUNDS = 10;
     static final int ROWS = 4;
     static final int COLUMNS = 5;
-    static final int STOP_POINTS = 66;
+    static final int STOP_POINTS = 1;
     public enum SmallestTakeTypes {SMALLEST_TAKE, SMALLEST_NOT_TAKE}
 }

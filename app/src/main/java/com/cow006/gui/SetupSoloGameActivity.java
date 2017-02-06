@@ -23,6 +23,7 @@ public class SetupSoloGameActivity extends AppCompatActivity {
         Intent intent = new Intent(this, GameActivity.class);
         intent.putExtras(getIntent());
         intent.putExtra("Player count", 0);
+        //TODO: It's still possible to play aganist 0 bots. Why?
         intent.putExtra("Bot count", ((SeekBar) findViewById(R.id.botNumberSeekBar)).getProgress());
         intent.putExtra("Bot level", ((SeekBar) findViewById(R.id.botLevelSeekBar)).getProgress());
         startActivity(intent);

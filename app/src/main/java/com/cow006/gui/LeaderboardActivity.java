@@ -4,14 +4,21 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
-public class LeaderboardActivity extends AppCompatActivity {
+import Backend.Client;
+import Backend.Player;
+
+
+public class LeaderboardActivity extends AppCompatActivity{
+    String leaderboard = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,40 +29,31 @@ public class LeaderboardActivity extends AppCompatActivity {
     @Override
     protected  void onPostCreate(Bundle bundle) {
         super.onPostCreate(bundle);
-        String leaderboard = "";
-        //TODO: Fix problems with mySQL and Android
-        // query to database for leaderboard
-//        String username = getIntent().getStringExtra("username");
-/*        final Connection dataBaseConnection;
-        try {
-            dataBaseConnection = DriverManager.getConnection(
-                    "jdbc:mysql://sql7.freemysqlhosting.net:3306/sql7150701", "sql7150701", SECRET_PASSWORD);
-            String query = "SELECT username, rating FROM sql7150701.Information ORDER BY rating DESC LIMIT 5";
-            System.out.println("query = " + query);
-            final Statement statement = dataBaseConnection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
-
-            ArrayList<String> usernames = new ArrayList<>();
-            ArrayList<Integer> ratings = new ArrayList<>();
-            while (resultSet.next()){
-                usernames.add(resultSet.getString("username"));
-                ratings.add(resultSet.getInt("rating"));
+        Thread t = new Thread(() ->{
+            System.out.println("LEADERBOARD:\n" + leaderboard);
+            Client client = new Client();
+            try {
+                client.connectToServer(Client.ConnectionTypes.LEADERBOARD);
+                for (int i = 0; i < 10; i++) {
+                    String line = client.getClientInput().readLine();
+                    System.out.println(line);
+                    leaderboard += line + ((i % 2 == 1) ? "\n" : "\t");
+                }
+                client.disconnectFromServer();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            statement.close();
-            dataBaseConnection.close();
-            for (int i = 1; i <= usernames.size(); i++){
-                leaderboard += i;
-                leaderboard += " " + usernames.get(i);
-                leaderboard += " " + ratings.get(i);
-                leaderboard += "\n";
+        });
+        t.start();
+        while (t.getState() != Thread.State.TERMINATED){
+            try {
+                TimeUnit.MILLISECONDS.sleep(100);
+            } catch (InterruptedException e) {
+                //ignore
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
-*/
-        // update string
 
-        // post to the TextView
         ((TextView) findViewById(R.id.leaderboard_text_view)).setText(leaderboard);
     }
+
 }

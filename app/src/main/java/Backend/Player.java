@@ -1,11 +1,14 @@
 package Backend;
 
+//import javafx.util.Pair;
+
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 import static Backend.GameConstants.*;
 
-
+//some lines are commented: it's for console testing
 public class Player extends AbstractPlayer {
 
     public Player(int remoteNumber, int botsNumber) {
@@ -18,7 +21,7 @@ public class Player extends AbstractPlayer {
 
 
     public int move() {
-//        askForAMove();
+        askForAMove();
 
 //        just wait while player is choosing card
         setChoosingCardToTake(true);
@@ -32,11 +35,12 @@ public class Player extends AbstractPlayer {
 
         int value = chosenCardValue;
 //        int value = new Scanner(System.in).nextInt();
+        hand.remove(Integer.valueOf(value));
         return value;
     }
 
     public int setChosenRow() {
-//        askForAChoice();
+        askForAChoice();
 
 //        just wait while player is choosing row
         setChoosingRowToTake(true);
@@ -48,7 +52,8 @@ public class Player extends AbstractPlayer {
             }
         }
         int index = chosenRowIndex;
-//      int index = new Scanner(System.in).nextInt();
+
+//        int index = new Scanner(System.in).nextInt();
 
         if (0 <= index && index < ROWS) {
             return index;
@@ -100,4 +105,12 @@ public class Player extends AbstractPlayer {
 
     }
 
+/*    @Override
+    protected void playRound(SmallestTakeTypes smallestTakeType, int chosenRowIndex, ArrayList<Pair<Integer, Integer>> moves) {
+        super.playRound(smallestTakeType, chosenRowIndex, moves);
+        while (!getQueue().isEmpty()){
+            updateOneMove();
+        }
+    }
+*/
 }

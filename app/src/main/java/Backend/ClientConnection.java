@@ -6,29 +6,37 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-class ClientConnection {
+public class ClientConnection {
 
     private BufferedReader clientInput;
     private PrintWriter clientOutput;
+    private Client.ConnectionTypes connectionType;
     private int playersNumber;
 
     ClientConnection(Socket clientSocket) throws IOException{
         clientInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         clientOutput = new PrintWriter(clientSocket.getOutputStream(), true);
-        clientOutput.println("Players");
-        playersNumber = Integer.parseInt(clientInput.readLine());
+        clientOutput.println("Connection type");
+        connectionType = Client.ConnectionTypes.valueOf(clientInput.readLine());
+        if (connectionType != Client.ConnectionTypes.LEADERBOARD){
+            clientOutput.println("Players");
+            playersNumber = Integer.parseInt(clientInput.readLine());
+        }
     }
 
-    BufferedReader getClientInput() {
+    public BufferedReader getClientInput() {
         return clientInput;
     }
 
-    PrintWriter getClientOutput() {
+    public PrintWriter getClientOutput() {
         return clientOutput;
     }
 
-    int getPlayersNumber() {
-        return playersNumber;
+    public Client.ConnectionTypes getConnectionType() {
+        return connectionType;
     }
 
+    public int getPlayersNumber() {
+        return playersNumber;
+    }
 }

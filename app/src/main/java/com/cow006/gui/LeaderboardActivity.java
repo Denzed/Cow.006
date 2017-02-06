@@ -31,15 +31,17 @@ public class LeaderboardActivity extends AppCompatActivity{
         super.onPostCreate(bundle);
         Thread t = new Thread(() ->{
             System.out.println("LEADERBOARD:\n" + leaderboard);
-            Client client = new Client();
             try {
+                Client client = new Client();
                 client.connectToServer(Client.ConnectionTypes.LEADERBOARD);
+
                 for (int i = 0; i < 10; i++) {
                     String line = client.getClientInput().readLine();
                     System.out.println(line);
                     leaderboard += line + ((i % 2 == 1) ? "\n" : "\t");
                 }
                 client.disconnectFromServer();
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -47,6 +49,7 @@ public class LeaderboardActivity extends AppCompatActivity{
         t.start();
         while (t.getState() != Thread.State.TERMINATED){
             try {
+                System.out.println(t.getState());
                 TimeUnit.MILLISECONDS.sleep(100);
             } catch (InterruptedException e) {
                 //ignore

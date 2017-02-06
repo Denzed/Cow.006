@@ -63,6 +63,9 @@ public class Client {
             switch (messageFromServer) {
                 case "Connection type":
                     clientOutput.println(connectionType);
+                    if (connectionType == LEADERBOARD){
+                        isClosed = true;
+                    }
                     break;
                 case "IsConnected":
                     clientOutput.println(connectedPlayer.isConnected());

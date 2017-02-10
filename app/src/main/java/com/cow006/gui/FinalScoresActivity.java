@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
-import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Arrays;
 

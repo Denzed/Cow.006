@@ -2,6 +2,7 @@ package com.cow006.gui;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.ClipData;
@@ -23,11 +24,15 @@ import android.view.DragEvent;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 
 import Backend.AbstractPlayer;
 import Backend.GameConstants;
@@ -36,7 +41,7 @@ import Backend.Player;
 
 public class GameView extends View {
     private static final int NOT_A_CARD = 0;
-    private static final long TIMER = 0; // animation length
+    private static final long TIMER = 200; // animation length
 
     GameActivity parentActivity;
     private float mTextHeight;
@@ -59,12 +64,7 @@ public class GameView extends View {
     private LocalPlayer player;
     private String messageToDisplay;
 
-    private int animatedCard = NOT_A_CARD;
-    private float[] animatedCardPosition;
-
-    public void setAnimatedCardPosition(float[] animatedCardPosition) {
-        this.animatedCardPosition = animatedCardPosition;
-    }
+    private LinkedHashMap<Integer,Pair<Float,Float>> animatedCards = new LinkedHashMap<>();
 
     public class LocalPlayer extends Player {
 
@@ -127,15 +127,15 @@ public class GameView extends View {
         @Override
         public boolean onDown(MotionEvent event) {
             float x = event.getX(),
-                    y = event.getY();
+                  y = event.getY();
             if (player.isChoosingRowToTake() && player.getQueue().isEmpty()) {
                 float paddingTop = cardHeight * fieldsOffsetInCards / 2;
                 for (int i = 0; i < 4; ++i) {
                     float paddingLeft = cardWidth * fieldsOffsetInCards / 2,
-                            paddingRight = paddingLeft +
+                          paddingRight = paddingLeft +
                                     4 * cardWidth * (1 + fieldsOffsetInCards / 2) -
                                     cardWidth * fieldsOffsetInCards / 4,
-                            paddingBottom = paddingTop + cardHeight * (1 + fieldsOffsetInCards / 4);
+                          paddingBottom = paddingTop + cardHeight * (1 + fieldsOffsetInCards / 4);
                     if (Misc.insideRect(x, y,
                                         paddingLeft, paddingTop,
                                         paddingRight, paddingBottom)) {
@@ -159,7 +159,7 @@ public class GameView extends View {
         @Override
         public void onLongPress(MotionEvent event) {
             float x = event.getX(),
-                    y = event.getY();
+                  y = event.getY();
             if (player.getQueue().isEmpty() && player.isChoosingCardToTake()) {
                 int card = getCardFromCoordinates(x, y);
                 if (card == NOT_A_CARD) {
@@ -172,6 +172,8 @@ public class GameView extends View {
                 } else {
                     startDrag(data, shadowBuilder, card, 0);
                 }
+                player.getHand().remove(Integer.valueOf(card));
+                invalidate();
             }
             super.onLongPress(event);
         }
@@ -182,9 +184,10 @@ public class GameView extends View {
         public boolean onDrag(View v, DragEvent event) {
             if (v == findViewById(R.id.game_view)) {
                 int action = event.getAction();
+                int card = (Integer) event.getLocalState();
                 if (action == DragEvent.ACTION_DROP) {
                     float x = event.getX(),
-                            y = event.getY();
+                          y = event.getY();
                     // Check that the card is dragged inside the field box, otherwise reject
                     float paddingTop = cardHeight * fieldsOffsetInCards / 2,
                             paddingLeft = cardWidth * fieldsOffsetInCards / 2,
@@ -193,10 +196,17 @@ public class GameView extends View {
                     if (Misc.insideRect(x, y,
                                         paddingLeft, paddingTop,
                                         paddingRight, paddingBottom)) {
-                        focusedCard = 0;
-                        player.tellCard((Integer) event.getLocalState());
-                        invalidate();
+                        player.tellCard(card);
+                    } else {
+                        ArrayList<Integer> hand = player.getHand();
+                        int index = 0;
+                        while (index < hand.size() && hand.get(index) < card) {
+                            index++;
+                        }
+                        player.getHand().add(index, card);
                     }
+                    focusedCard = 0;
+                    invalidate();
                 }
                 return true;
             }
@@ -456,7 +466,31 @@ public class GameView extends View {
                .show();
     }
 
+    private Animator animateCard(int card, float[] p1, float[] p2,
+                                            AnimatorListenerAdapter listenerAdapter) {
+        ObjectAnimator animator = ObjectAnimator.ofMultiFloat(this, "", new float[][] {p1, p2});
+        if (listenerAdapter != null) {
+            animator.addListener(listenerAdapter);
+        }
+        animator.addUpdateListener((ValueAnimator animation) -> {
+            float[] animatedValue = (float[]) animation.getAnimatedValue();
+            animatedCards.put(card, new Pair<>(animatedValue[0], animatedValue[1]));
+            invalidate();
+        });
+        return animator;
+    }
 
+    private float[] getQueueTopPosition() {
+        return new float[] {getWidth() - cardWidth * (1 + fieldsOffsetInCards / 2),
+                cardHeight * fieldsOffsetInCards / 2};
+    }
+
+    private float[] getFieldCellPosition(int row, int column) {
+        return new float[] {cardWidth * fieldsOffsetInCards / 2 +
+                                column * cardWidth * (1 + fieldsOffsetInCards / 2),
+                            cardHeight * fieldsOffsetInCards / 2 +
+                                row * cardHeight * (1 + fieldsOffsetInCards / 2)};
+    }
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -477,48 +511,65 @@ public class GameView extends View {
         drawBoard(canvas);
         drawHand(canvas);
         if (!player.getQueue().isEmpty() && !player.isChoosingRowToTake()) {
-            if (animatedCard == NOT_A_CARD) {
-                AbstractPlayer.Move move = player.getQueue().peek();
-                int row = move.rowIndex,
-                    column = (move.type == AbstractPlayer.updateStateTypes.CLEAR_ROW
-                            ? 0
-                            : player.getBoard().get(row).size());
-                float x1 = getWidth() - cardWidth * (1 + fieldsOffsetInCards / 2),
-                      y1 = cardHeight * fieldsOffsetInCards / 2,
-                      x2 = cardWidth * fieldsOffsetInCards / 2 +
-                              column * cardWidth * (1 + fieldsOffsetInCards / 2),
-                      y2 = cardHeight * fieldsOffsetInCards / 2 +
-                              row * cardHeight * (1 + fieldsOffsetInCards / 2);
-                float[][] path = {{x1, y1}, {x2, y2}};
-                animatedCard = move.card;
-                player.getCardsQueue().poll();
-                ObjectAnimator animator = ObjectAnimator.ofMultiFloat(this,
-                                                                      "animatedCardPosition",
-                                                                      path);
-                animator.setDuration(TIMER);
-                animator.addListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        animatedCard = NOT_A_CARD;
-                        animatedCardPosition = null;
-                        player.getCardsQueue().addFirst(NOT_A_CARD);
-                        player.updateOneMove();
-                        super.onAnimationEnd(animation);
-                    }
-                });
-                animator.addUpdateListener((ValueAnimator animation) -> {
-                    setAnimatedCardPosition((float[]) animation.getAnimatedValue());
-                    invalidate();
-                });
-                animator.setInterpolator(new LinearInterpolator());
-                animator.start();
-            } else if (animatedCardPosition != null) {
-                drawCard(canvas, animatedCardPosition[0], animatedCardPosition[1], animatedCard);
+            if (animatedCards.isEmpty()) {
+                setupAnimations();
+            } else if (!animatedCards.isEmpty()) {
+                for (int card: animatedCards.keySet()) {
+                    drawCard(canvas,
+                            animatedCards.get(card).first,
+                            animatedCards.get(card).second,
+                            card);
+                }
             }
         } else if (player.getState() == AbstractPlayer.GameState.FINISHED ||
                    player.getState() == AbstractPlayer.GameState.INTERRUPTED) {
             parentActivity.goToResults(parseScores(true));
         }
+    }
+
+    private void setupAnimations() {
+        AbstractPlayer.Move move = player.getQueue().peek();
+        int row = move.rowIndex,
+                column = (move.type == AbstractPlayer.updateStateTypes.CLEAR_ROW
+                        ? 0
+                        : player.getBoard().get(row).size());
+        float[] p2 = getFieldCellPosition(row, column);
+        LinkedList<Animator> animators = new LinkedList<>();
+        if (move.type == AbstractPlayer.updateStateTypes.CLEAR_ROW) {
+            int col = 0;
+            float[] p2Outside = {-cardWidth, p2[1]};
+            for (int card: player.getBoard().get(row)) {
+                animators.add(animateCard(card,
+                                          getFieldCellPosition(row, col),
+                                          p2Outside,
+                                          new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        animatedCards.remove(card);
+                        super.onAnimationEnd(animation);
+                    }
+                }));
+                col++;
+            }
+        }
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.setDuration(TIMER);
+        animatorSet.setInterpolator(new AccelerateDecelerateInterpolator());
+        player.getCardsQueue().poll();
+        animators.add(animateCard(move.card,
+                                  getQueueTopPosition(),
+                                  p2,
+                                  new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                animatedCards.remove(move.card);
+                player.getCardsQueue().addFirst(NOT_A_CARD);
+                player.updateOneMove();
+                super.onAnimationEnd(animation);
+            }
+        }));
+        animatorSet.playTogether(animators);
+        animatorSet.start();
     }
 
     @Override

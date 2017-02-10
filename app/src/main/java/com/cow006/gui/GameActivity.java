@@ -19,6 +19,7 @@ public class GameActivity extends AppCompatActivity {
     private Client localClient;
     private String username;
     private String userID;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

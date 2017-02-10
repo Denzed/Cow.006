@@ -12,20 +12,17 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.cow006.gui.FinalScoresActivity">
 
-    <TextView
-        android:text=""
-        android:textSize="@dimen/large_text_size"
+    <GridView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:id="@+id/final_scores_text_view" />
+        android:textSize="@dimen/large_text_size"
+        android:id="@+id/final_scores_table"/>
 
     <Button
         android:text="@string/back_to_main_menu"
         android:textSize="@dimen/medium_text_size"
         app:layout_widthPercent="50%"
-        android:layout_height="wrap_content"
+        app:layout_heightPercent="10%"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"

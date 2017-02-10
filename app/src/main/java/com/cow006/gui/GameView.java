@@ -1,5 +1,9 @@
 package com.cow006.gui;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.ClipData;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -19,6 +23,7 @@ import android.view.DragEvent;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 import java.util.ArrayList;
@@ -31,7 +36,7 @@ import Backend.Player;
 
 public class GameView extends View {
     private static final int NOT_A_CARD = 0;
-    private static final long TIMER = 400;
+    private static final long TIMER = 400; // animation length
 
     GameActivity parentActivity;
     private float mTextHeight;
@@ -53,6 +58,13 @@ public class GameView extends View {
     private int focusedCard = 0;
     private LocalPlayer player;
     private String messageToDisplay;
+
+    private int animatedCard = NOT_A_CARD;
+    private float[] animatedCardPosition;
+
+    public void setAnimatedCardPosition(float[] animatedCardPosition) {
+        this.animatedCardPosition = animatedCardPosition;
+    }
 
     public class LocalPlayer extends Player {
 
@@ -116,7 +128,7 @@ public class GameView extends View {
         public boolean onDown(MotionEvent event) {
             float x = event.getX(),
                     y = event.getY();
-            if (player.isChoosingRowToTake()) {
+            if (player.isChoosingRowToTake() && player.getQueue().isEmpty()) {
                 float paddingTop = cardHeight * fieldsOffsetInCards / 2;
                 for (int i = 0; i < 4; ++i) {
                     float paddingLeft = cardWidth * fieldsOffsetInCards / 2,
@@ -124,7 +136,9 @@ public class GameView extends View {
                                     4 * cardWidth * (1 + fieldsOffsetInCards / 2) -
                                     cardWidth * fieldsOffsetInCards / 4,
                             paddingBottom = paddingTop + cardHeight * (1 + fieldsOffsetInCards / 4);
-                    if (insideRect(x, y, paddingLeft, paddingTop, paddingRight, paddingBottom)) {
+                    if (Misc.insideRect(x, y,
+                                        paddingLeft, paddingTop,
+                                        paddingRight, paddingBottom)) {
                         player.tellRow(i);
                         invalidate();
                         return true;
@@ -144,21 +158,19 @@ public class GameView extends View {
 
         @Override
         public void onLongPress(MotionEvent event) {
-            if (player.isChoosingCardToTake()) {
-                float x = event.getX(),
-                        y = event.getY();
-                if (player.isChoosingCardToTake()) {
-                    int card = getCardFromCoordinates(x, y);
-                    if (card == NOT_A_CARD) {
-                        return;
-                    }
-                    ClipData data = ClipData.newPlainText("", "");
-                    DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(cardViews[card - 1]);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        startDragAndDrop(data, shadowBuilder, card, 0);
-                    } else {
-                        startDrag(data, shadowBuilder, card, 0);
-                    }
+            float x = event.getX(),
+                    y = event.getY();
+            if (player.getQueue().isEmpty() && player.isChoosingCardToTake()) {
+                int card = getCardFromCoordinates(x, y);
+                if (card == NOT_A_CARD) {
+                    return;
+                }
+                ClipData data = ClipData.newPlainText("", "");
+                DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(cardViews[card - 1]);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    startDragAndDrop(data, shadowBuilder, card, 0);
+                } else {
+                    startDrag(data, shadowBuilder, card, 0);
                 }
             }
             super.onLongPress(event);
@@ -178,7 +190,9 @@ public class GameView extends View {
                             paddingLeft = cardWidth * fieldsOffsetInCards / 2,
                             paddingRight = cardWidth * (5 + fieldsOffsetInCards),
                             paddingBottom = cardHeight * (4 + fieldsOffsetInCards);
-                    if (insideRect(x, y, paddingLeft, paddingTop, paddingRight, paddingBottom)) {
+                    if (Misc.insideRect(x, y,
+                                        paddingLeft, paddingTop,
+                                        paddingRight, paddingBottom)) {
                         focusedCard = 0;
                         player.tellCard((Integer) event.getLocalState());
                         invalidate();
@@ -203,8 +217,9 @@ public class GameView extends View {
                     zoomedHeight = zoom * cardHeight,
                     zoomedPaddingLeft = paddingLeft - zoomedWidth + cardWidth,
                     zoomedPaddingTop = paddingTop - zoomedHeight + cardHeight;
-            if (insideRect(x, y, zoomedPaddingLeft, zoomedPaddingTop,
-                    zoomedPaddingLeft + zoomedWidth, zoomedPaddingTop + zoomedHeight)) {
+            if (Misc.insideRect(x, y,
+                                zoomedPaddingLeft, zoomedPaddingTop,
+                                zoomedPaddingLeft + zoomedWidth, zoomedPaddingTop + zoomedHeight)) {
                 return card;
             }
             paddingLeft -= cardWidth / 2;
@@ -257,7 +272,7 @@ public class GameView extends View {
         cardHeight = size.y * cardCoefficient;
 
         // Adjust text size to fit cards
-        mTextPaint.setTextSize(calcTextSize(cardWidth * 0.95f, cardHeight * 0.95f, "100"));
+        mTextPaint.setTextSize(Misc.calcTextSize(cardWidth * 0.95f, cardHeight * 0.95f, "100"));
         mTextHeight = mTextPaint.getFontMetrics().bottom;
 
         // Draw card bitmaps
@@ -304,28 +319,10 @@ public class GameView extends View {
             cardWidth = cardCoefficient * (right - left);
             cardHeight = cardCoefficient * (bottom - top);
 
-            mTextPaint.setTextSize(calcTextSize(cardWidth * 0.95f, cardHeight * 0.95f, "100"));
+            mTextPaint.setTextSize(Misc.calcTextSize(cardWidth * 0.95f, cardHeight * 0.95f, "100"));
             mTextHeight = mTextPaint.getFontMetrics().bottom;
             invalidate();
         }
-    }
-
-    protected float calcTextSize(float width, float height, String text) {
-        TextPaint tp = new TextPaint();
-        float l = 0,
-                r = width,
-                eps = 1e-5f;
-        while (l + eps < r) {
-            float m = (l + r) / 2;
-            tp.setTextSize(m);
-            if (tp.getFontMetrics().bottom > height ||
-                    tp.measureText(text) > width) {
-                r = m;
-            } else {
-                l = m;
-            }
-        }
-        return l;
     }
 
     protected Paint getCardPaint(int number) {
@@ -417,13 +414,13 @@ public class GameView extends View {
     protected void drawQueue(Canvas canvas) {
         float paddingLeft = getWidth() - cardWidth * (1 + fieldsOffsetInCards / 2),
                 paddingTop = cardHeight * fieldsOffsetInCards / 2;
-        System.out.println("QUEUE: ");
+//        System.out.println("QUEUE: ");
         for (int card: player.getCardsQueue()) {
-            System.out.print(card + " ");
+//            System.out.print(card + " ");
             drawCard(canvas, paddingLeft, paddingTop, card);
             paddingTop += cardHeight * (1 + fieldsOffsetInCards / 2);
         }
-        System.out.println();
+//        System.out.println();
     }
 
     protected void drawBoard(Canvas canvas) {
@@ -456,6 +453,8 @@ public class GameView extends View {
                .show();
     }
 
+
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -475,24 +474,48 @@ public class GameView extends View {
         drawBoard(canvas);
         drawHand(canvas);
         if (!player.getQueue().isEmpty() && !player.isChoosingRowToTake()) {
-            player.updateOneMove();
-            try {
-                Thread.sleep(TIMER);
-            } catch (InterruptedException e) {
-                // Ignore
+            if (animatedCard == NOT_A_CARD) {
+                AbstractPlayer.Move move = player.getQueue().peek();
+                int row = move.rowIndex,
+                    column = (move.type == AbstractPlayer.updateStateTypes.CLEAR_ROW
+                            ? 0
+                            : player.getBoard().get(row).size());
+                float x1 = getWidth() - cardWidth * (1 + fieldsOffsetInCards / 2),
+                      y1 = cardHeight * fieldsOffsetInCards / 2,
+                      x2 = cardWidth * fieldsOffsetInCards / 2 +
+                              column * cardWidth * (1 + fieldsOffsetInCards / 2),
+                      y2 = cardHeight * fieldsOffsetInCards / 2 +
+                              row * cardHeight * (1 + fieldsOffsetInCards / 2);
+                float[][] path = {{x1, y1}, {x2, y2}};
+                animatedCard = move.card;
+                player.getCardsQueue().poll();
+                ObjectAnimator animator = ObjectAnimator.ofMultiFloat(this,
+                                                                      "animatedCardPosition",
+                                                                      path);
+                animator.setDuration(TIMER);
+                animator.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        animatedCard = NOT_A_CARD;
+                        animatedCardPosition = null;
+                        player.getCardsQueue().addFirst(NOT_A_CARD);
+                        player.updateOneMove();
+                        super.onAnimationEnd(animation);
+                    }
+                });
+                animator.addUpdateListener((ValueAnimator animation) -> {
+                    setAnimatedCardPosition((float[]) animation.getAnimatedValue());
+                    invalidate();
+                });
+                animator.setInterpolator(new LinearInterpolator());
+                animator.start();
+            } else if (animatedCardPosition != null) {
+                drawCard(canvas, animatedCardPosition[0], animatedCardPosition[1], animatedCard);
             }
-            invalidate();
         } else if (player.getState() == AbstractPlayer.GameState.FINISHED ||
                    player.getState() == AbstractPlayer.GameState.INTERRUPTED) {
             parentActivity.goToResults(parseScores(true));
         }
-    }
-
-    private boolean insideRect(float x, float y,
-                               float xLeft, float yTop,
-                               float xRight, float yBottom) {
-        return xLeft <= x && x < xRight &&
-                yTop <= y && y < yBottom;
     }
 
     @Override

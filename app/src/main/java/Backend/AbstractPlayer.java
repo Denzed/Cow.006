@@ -19,7 +19,7 @@ public abstract class AbstractPlayer {
     volatile int chosenRowIndex; //???
     volatile int chosenCardValue; // ???
     ArrayList<Integer> scores;
-    protected enum updateStateTypes { ADD_CARD, CLEAR_ROW }
+    public enum updateStateTypes { ADD_CARD, CLEAR_ROW }
     protected ArrayList<Integer> hand;
     private Board board;
     private Board currentBoard;
@@ -58,9 +58,9 @@ public abstract class AbstractPlayer {
         this.userID = userID;
     }
 
-    private class Move {
-        updateStateTypes type;
-        int player, rowIndex, card;
+    public class Move {
+        public updateStateTypes type;
+        public int player, rowIndex, card;
 
         private Move(updateStateTypes type, int player, int rowIndex, int card){
             this.type = type;
@@ -171,7 +171,8 @@ public abstract class AbstractPlayer {
         return index;
     }
 
-    private void updateState(Board board, updateStateTypes type, int choosingPlayer, int rowIndex, int card) {
+    protected void updateState(Board board, updateStateTypes type, int choosingPlayer, int
+            rowIndex, int card) {
         ArrayList<Integer> row = board.get(rowIndex);
         if (type == CLEAR_ROW) {
             if (board == this.board) {
@@ -182,7 +183,7 @@ public abstract class AbstractPlayer {
         row.add(card);
     }
 
-    static int getRowPoints(ArrayList<Integer> row) {
+    protected static int getRowPoints(ArrayList<Integer> row) {
         int res = 0;
         for (Integer card : row){
             res += CARD_PENALTY[card];
@@ -190,12 +191,15 @@ public abstract class AbstractPlayer {
         return res;
     }
 
-    private void updateScore(int playerIndex, int points){
+    protected void updateScore(int playerIndex, int points){
         scores.set(playerIndex, scores.get(playerIndex) + points);
     }
 
     void buildFinalResultsSinglePlayer() {
         System.out.println("    void buildFinalResultsSinglePlayer() { <- HERE I AM");
+        ArrayList<String> legend = new ArrayList<>();
+        legend.addAll(Arrays.asList("Player", "Score"));
+        finalResults.add(legend);
         for (int i = 0; i < playersNumber; i++){
             ArrayList<String> resultLine = new ArrayList<>();
             resultLine.add((i == id) ? "YOU" : "Opponent #" + i);
@@ -205,6 +209,9 @@ public abstract class AbstractPlayer {
     }
 
     void buildFinalResultsMultiPlayer(ArrayList<String> usernames, ArrayList<String> ratings, ArrayList<String> ratingChanges) {
+        ArrayList<String> legend = new ArrayList<>();
+        legend.addAll(Arrays.asList("Player", "Score", "Rating", "Delta"));
+        finalResults.add(legend);
         for (int i = 0; i < playersNumber; i++){
             ArrayList<String> resultLine = new ArrayList<>();
             resultLine.add(usernames.get(i) + ((i == id) ? "(YOU)" : ""));

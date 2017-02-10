@@ -13,7 +13,7 @@ public class GameConstants {
         1, 1, 1, 1, 2, 1, 1, 5, 1, 3,
         1, 1, 1, 1, 2, 1, 1, 1, 5, 3,
         1, 1, 1, 1};
-    static final int DECK_SIZE = 104;
+    public static final int DECK_SIZE = 104;
     static final int ROUNDS = 10;
     static final int ROWS = 4;
     static final int COLUMNS = 5;

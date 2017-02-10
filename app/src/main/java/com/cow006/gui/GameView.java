@@ -36,7 +36,7 @@ import Backend.Player;
 
 public class GameView extends View {
     private static final int NOT_A_CARD = 0;
-    private static final long TIMER = 400; // animation length
+    private static final long TIMER = 0; // animation length
 
     GameActivity parentActivity;
     private float mTextHeight;
@@ -148,7 +148,7 @@ public class GameView extends View {
                 return false;
             }
             int card = getCardFromCoordinates(x, y);
-            if (card != focusedCard) {
+            if (player.isChoosingCardToTake() && card != focusedCard) {
                 focusedCard = card;
                 invalidate();
                 return true;
@@ -352,8 +352,11 @@ public class GameView extends View {
         }
         StringBuilder stringBuilder = new StringBuilder();
         if (isFinal) {
-            for (int i = 0; i < player.getPlayersNumber(); i++){
-                stringBuilder.append(finalScoresList.get(i));
+            for (ArrayList<String> line: finalScoresList) {
+                for (String element: line) {
+                    stringBuilder.append(element);
+                    stringBuilder.append("\n");
+                }
                 stringBuilder.append("\n");
             }
         } else {

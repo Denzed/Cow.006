@@ -25,7 +25,6 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -121,6 +120,13 @@ public class GameView extends View {
             super.playRound(smallestTakeType, chosenRowIndex, moves);
             postInvalidate();
         }
+
+        @Override
+        public void tellCard(int card) {
+            focusedCard = NOT_A_CARD;
+            postInvalidate();
+            super.tellCard(card);
+        }
     }
 
     private class GestureListener extends GestureDetector.SimpleOnGestureListener {
@@ -145,15 +151,24 @@ public class GameView extends View {
                     }
                     paddingTop += cardHeight * (1 + fieldsOffsetInCards / 2);
                 }
-                return false;
+                return true;
             }
             int card = getCardFromCoordinates(x, y);
             if (player.isChoosingCardToTake() && card != focusedCard) {
                 focusedCard = card;
                 invalidate();
+            }
+            return true;
+        }
+
+        @Override
+        public boolean onDoubleTap(MotionEvent event) {
+            int card = getCardFromCoordinates(event.getX(), event.getY());
+            if (card != NOT_A_CARD) {
+                player.tellCard(card);
                 return true;
             }
-            return super.onDown(event);
+            return super.onDoubleTap(event);
         }
 
         @Override
@@ -182,35 +197,38 @@ public class GameView extends View {
     private class CardDragListener implements View.OnDragListener {
         @Override
         public boolean onDrag(View v, DragEvent event) {
-            if (v == findViewById(R.id.game_view)) {
-                int action = event.getAction();
-                int card = (Integer) event.getLocalState();
-                if (action == DragEvent.ACTION_DROP) {
+            int action = event.getAction();
+            int card = (Integer) event.getLocalState();
+            switch (action) {
+                case DragEvent.ACTION_DROP:
                     float x = event.getX(),
-                          y = event.getY();
+                            y = event.getY();
                     // Check that the card is dragged inside the field box, otherwise reject
                     float paddingTop = cardHeight * fieldsOffsetInCards / 2,
                             paddingLeft = cardWidth * fieldsOffsetInCards / 2,
                             paddingRight = cardWidth * (5 + fieldsOffsetInCards),
                             paddingBottom = cardHeight * (4 + fieldsOffsetInCards);
                     if (Misc.insideRect(x, y,
-                                        paddingLeft, paddingTop,
-                                        paddingRight, paddingBottom)) {
+                            paddingLeft, paddingTop,
+                            paddingRight, paddingBottom)) {
                         player.tellCard(card);
-                    } else {
+                        break;
+                    }
+                case DragEvent.ACTION_DRAG_ENDED:
+                    if (!event.getResult()) {
                         ArrayList<Integer> hand = player.getHand();
                         int index = 0;
                         while (index < hand.size() && hand.get(index) < card) {
                             index++;
                         }
                         player.getHand().add(index, card);
+                        focusedCard = NOT_A_CARD;
+                        invalidate();
                     }
-                    focusedCard = 0;
-                    invalidate();
-                }
-                return true;
+                default:
+                    return false;
             }
-            return false;
+            return true;
         }
     }
 
@@ -218,7 +236,7 @@ public class GameView extends View {
     private int getCardFromCoordinates(float x, float y) {
         int n = player.getHand().size();
         float paddingLeft = (getWidth() + cardWidth * (n - 3) / 2) / 2,
-                paddingTop = getHeight() - cardHeight * (1 + fieldsOffsetInCards);
+              paddingTop = getHeight() - cardHeight * (1 + fieldsOffsetInCards);
         ArrayList<Integer> handReversed = new ArrayList<>(player.getHand());
         Collections.reverse(handReversed);
         for (int card: handReversed) {
@@ -289,16 +307,16 @@ public class GameView extends View {
         cardBitmaps = new Bitmap[104];
         for (int i = 1; i <= 104; ++i) {
             cardBitmaps[i - 1] = Bitmap.createBitmap(Math.round(cardWidth),
-                    Math.round(cardHeight),
-                    Bitmap.Config.RGB_565);
+                                                     Math.round(cardHeight),
+                                                     Bitmap.Config.RGB_565);
             Canvas tempCanvas = new Canvas(cardBitmaps[i - 1]);
             tempCanvas.drawRect(0, 0, cardWidth, cardHeight, getCardPaint(i));
             tempCanvas.drawRect(0, 0, cardWidth, cardHeight, strokePaint);
             String text = Integer.toString(i);
             tempCanvas.drawText(text,
-                    cardWidth / 2f,
-                    cardHeight / 2f + mTextHeight,
-                    mTextPaint);
+                                cardWidth / 2f,
+                                cardHeight / 2f + mTextHeight,
+                                mTextPaint);
         }
 
         // Generate ImageViews with cards inside

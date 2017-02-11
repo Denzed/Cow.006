@@ -5,16 +5,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import Backend.Client;
-import Backend.Player;
 
 
 public class LeaderboardActivity extends AppCompatActivity{
@@ -29,7 +22,7 @@ public class LeaderboardActivity extends AppCompatActivity{
     @Override
     protected  void onPostCreate(Bundle bundle) {
         super.onPostCreate(bundle);
-        Thread t = new Thread(() ->{
+        Thread t = new Thread(() -> {
             System.out.println("LEADERBOARD:\n" + leaderboard);
             try {
                 Client client = new Client();
@@ -47,7 +40,7 @@ public class LeaderboardActivity extends AppCompatActivity{
             }
         });
         t.start();
-        while (t.getState() != Thread.State.TERMINATED){
+        while (t.getState() != Thread.State.TERMINATED) {
             try {
                 System.out.println(t.getState());
                 TimeUnit.MILLISECONDS.sleep(100);

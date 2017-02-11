@@ -9,6 +9,7 @@ import android.widget.GridView;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+
 public class FinalScoresActivity extends AppCompatActivity {
 
     @Override

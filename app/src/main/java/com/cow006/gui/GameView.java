@@ -194,39 +194,41 @@ public class GameView extends View {
         }
     }
 
+    private void returnCardToHand(int card) {
+        ArrayList<Integer> hand = player.getHand();
+        int index = 0;
+        while (index < hand.size() && hand.get(index) < card) {
+            index++;
+        }
+        player.getHand().add(index, card);
+        focusedCard = NOT_A_CARD;
+        invalidate();
+    }
+
     private class CardDragListener implements View.OnDragListener {
         @Override
         public boolean onDrag(View v, DragEvent event) {
             int action = event.getAction();
             int card = (Integer) event.getLocalState();
-            switch (action) {
-                case DragEvent.ACTION_DROP:
-                    float x = event.getX(),
-                            y = event.getY();
-                    // Check that the card is dragged inside the field box, otherwise reject
-                    float paddingTop = cardHeight * fieldsOffsetInCards / 2,
-                            paddingLeft = cardWidth * fieldsOffsetInCards / 2,
-                            paddingRight = cardWidth * (5 + fieldsOffsetInCards),
-                            paddingBottom = cardHeight * (4 + fieldsOffsetInCards);
-                    if (Misc.insideRect(x, y,
-                            paddingLeft, paddingTop,
-                            paddingRight, paddingBottom)) {
-                        player.tellCard(card);
-                        break;
-                    }
-                case DragEvent.ACTION_DRAG_ENDED:
-                    if (!event.getResult()) {
-                        ArrayList<Integer> hand = player.getHand();
-                        int index = 0;
-                        while (index < hand.size() && hand.get(index) < card) {
-                            index++;
-                        }
-                        player.getHand().add(index, card);
-                        focusedCard = NOT_A_CARD;
-                        invalidate();
-                    }
-                default:
-                    return false;
+            if (action == DragEvent.ACTION_DROP) {
+                float x = event.getX(),
+                        y = event.getY();
+                // Check that the card is dragged inside the field box, otherwise reject
+                float paddingTop = cardHeight * fieldsOffsetInCards / 2,
+                      paddingLeft = cardWidth * fieldsOffsetInCards / 2,
+                      paddingRight = cardWidth * (5 + fieldsOffsetInCards),
+                      paddingBottom = cardHeight * (4 + fieldsOffsetInCards);
+                if (Misc.insideRect(x, y,
+                                    paddingLeft, paddingTop,
+                                    paddingRight, paddingBottom)) {
+                    player.tellCard(card);
+                } else {
+                    returnCardToHand(card);
+                }
+            } else if (action == DragEvent.ACTION_DRAG_ENDED) {
+                if (!event.getResult()) {
+                    returnCardToHand(card);
+                }
             }
             return true;
         }

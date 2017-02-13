@@ -134,7 +134,7 @@ public class GameView extends View {
         public boolean onDown(MotionEvent event) {
             float x = event.getX(),
                   y = event.getY();
-            if (player.isChoosingRowToTake() && player.getQueue().isEmpty()) {
+            if (player.isChoosingRowToTake()) {
                 float paddingTop = cardHeight * fieldsOffsetInCards / 2;
                 for (int i = 0; i < 4; ++i) {
                     float paddingLeft = cardWidth * fieldsOffsetInCards / 2,
@@ -154,7 +154,9 @@ public class GameView extends View {
                 return true;
             }
             int card = getCardFromCoordinates(x, y);
-            if (player.isChoosingCardToTake() && card != focusedCard) {
+            if (player.getQueue().isEmpty() &&
+                    player.isChoosingCardToTake() &&
+                    card != focusedCard) {
                 focusedCard = card;
                 invalidate();
             }
@@ -164,11 +166,12 @@ public class GameView extends View {
         @Override
         public boolean onDoubleTap(MotionEvent event) {
             int card = getCardFromCoordinates(event.getX(), event.getY());
-            if (card != NOT_A_CARD) {
+            if (player.getQueue().isEmpty() &&
+                    player.isChoosingCardToTake() &&
+                    card != NOT_A_CARD) {
                 player.tellCard(card);
-                return true;
             }
-            return super.onDoubleTap(event);
+            return true;
         }
 
         @Override

@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.SeekBar;
 
+import com.cow006.gui.game.GameActivity;
+
 public class SetupSoloGameActivity extends AppCompatActivity {
 
     @Override

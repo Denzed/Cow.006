@@ -1,4 +1,4 @@
-package com.cow006.gui;
+package com.cow006.gui.game;
 
 import android.text.TextPaint;
 

@@ -8,7 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.cow006.gui.GameActivity">
+    tools:context=".game.GameActivity">
 
     <TextView
         android:layout_width="match_parent"
@@ -16,7 +16,7 @@
         android:id="@+id/game_scores"
         android:textSize="@dimen/medium_text_size" />
 
-    <com.cow006.gui.GameView
+    <com.cow006.gui.game.GameView
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
         android:id="@+id/game_view"

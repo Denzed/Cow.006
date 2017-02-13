@@ -134,6 +134,9 @@ public abstract class AbstractPlayer {
     int getMinOnBoard(){
         int minOnBoard = DECK_SIZE;
         for (ArrayList<Integer> cur : currentBoard){
+            if (cur.isEmpty()) {
+                return NOT_A_CARD;
+            }
             minOnBoard = Math.min(minOnBoard, cur.get(cur.size() - 1));
         }
         return minOnBoard;
@@ -143,8 +146,13 @@ public abstract class AbstractPlayer {
         int playerIndexWithSmallestCard = moves.get(0).first;
         int smallestCard = moves.get(0).second;
         if (smallestTakeType == SmallestTakeTypes.SMALLEST_TAKE) {
-            queue.add(new Move(CLEAR_ROW, playerIndexWithSmallestCard, chosenRowIndex, smallestCard));
-            updateState(currentBoard, CLEAR_ROW, playerIndexWithSmallestCard, chosenRowIndex, smallestCard);
+            queue.add(new Move(CLEAR_ROW, playerIndexWithSmallestCard, chosenRowIndex, NOT_A_CARD));
+            updateState(currentBoard, CLEAR_ROW, playerIndexWithSmallestCard, chosenRowIndex,
+                    NOT_A_CARD);
+            queue.add(new Move(ADD_CARD, playerIndexWithSmallestCard, chosenRowIndex, smallestCard));
+            updateState(currentBoard, ADD_CARD, playerIndexWithSmallestCard, chosenRowIndex,
+                    smallestCard);
+
         }
 
         for (int i = smallestTakeType == SmallestTakeTypes.SMALLEST_TAKE ? 1 : 0; i < playersNumber; i++){
@@ -152,8 +160,12 @@ public abstract class AbstractPlayer {
             int currentCard = moves.get(i).second;
             int updatingRowIndex = getUpdatingRowIndex(currentBoard, currentCard);
             updateStateTypes updateStateType = currentBoard.get(updatingRowIndex).size() >= COLUMNS ? CLEAR_ROW : ADD_CARD;
-            queue.add(new Move(updateStateType, currentPlayer, updatingRowIndex, currentCard));
-            updateState(currentBoard, updateStateType, currentPlayer, updatingRowIndex, currentCard);
+            if (updateStateType == CLEAR_ROW) {
+                queue.add(new Move(CLEAR_ROW, currentPlayer, updatingRowIndex, currentCard));
+                updateState(currentBoard, CLEAR_ROW, currentPlayer, updatingRowIndex, NOT_A_CARD);
+            }
+            queue.add(new Move(ADD_CARD, currentPlayer, updatingRowIndex, currentCard));
+            updateState(currentBoard, ADD_CARD, currentPlayer, updatingRowIndex, currentCard);
         }
     }
 
@@ -162,6 +174,10 @@ public abstract class AbstractPlayer {
         int index = 0;
         for (int i = 0; i < ROWS; i++){
             ArrayList<Integer> currentRow = board.get(i);
+            if (currentRow.isEmpty()) {
+                index = i;
+                break;
+            }
             int lastInRow = currentRow.get(currentRow.size() - 1);
             if (lastInRow < card && lastInRow > maxCard){
                 maxCard = lastInRow;
@@ -179,8 +195,9 @@ public abstract class AbstractPlayer {
                 updateScore(choosingPlayer, getRowPoints(row));
             }
             row.clear();
+        } else {
+            row.add(card);
         }
-        row.add(card);
     }
 
     protected static int getRowPoints(ArrayList<Integer> row) {

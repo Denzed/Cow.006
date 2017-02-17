@@ -33,15 +33,12 @@ class LocalPlayer extends Player {
     @Override
     protected void setChoosingCardToTake(boolean value) {
         super.setChoosingCardToTake(value);
-        if (value) {
-            gameView.postInvalidate();
-        }
     }
 
     @Override
     protected void setGameInterrupted() {
         super.setGameInterrupted();
-        gameView.setMessageToDisplay("Someone has disconnected! The game will be interrupted.");
+        gameView.drawMessage("Someone has disconnected! The game will be interrupted.");
         gameView.postInvalidate();
     }
 
@@ -53,7 +50,7 @@ class LocalPlayer extends Player {
 
     @Override
     public void setHand(ArrayList<Integer> hand) {
-        gameView.setMessageToDisplay(getState() == GameState.NEW_GAME
+        gameView.drawMessage(getState() == GameState.NEW_GAME
                 ? "The game is starting!"
                 : "Prepare for the next round!");
         super.setHand(hand);
@@ -71,6 +68,7 @@ class LocalPlayer extends Player {
     @Override
     public void tellCard(int card) {
         super.tellCard(card);
+        gameView.focusedCard = GameConstants.NOT_A_CARD;
         gameView.postInvalidate();
     }
 

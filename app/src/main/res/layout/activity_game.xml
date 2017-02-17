@@ -17,6 +17,7 @@
         android:textSize="@dimen/medium_text_size" />
 
     <com.cow006.gui.game.GameView
+        android:focusable="false"
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
         android:id="@+id/game_view"

@@ -20,14 +20,14 @@ public abstract class AbstractPlayer {
     volatile int chosenCardValue; // ???
     ArrayList<Integer> scores;
     public enum updateStateTypes { ADD_CARD, CLEAR_ROW }
-    protected ArrayList<Integer> hand;
-    private Board board;
-    private Board currentBoard;
+    protected volatile ArrayList<Integer> hand;
+    private volatile Board board;
+    private volatile Board currentBoard;
     public enum GameState { NEW_GAME, NEXT_ROUND, INTERRUPTED, FINISHED }
     private volatile GameState state;
     private volatile boolean choosingRowToTake, choosingCardToTake;
-    private Queue<Move> queue;
-    private ArrayDeque<Integer> cardsQueue;
+    private volatile Queue<Move> queue;
+    private volatile ArrayDeque<Integer> cardsQueue;
 
     boolean isConnected() {
         return true;

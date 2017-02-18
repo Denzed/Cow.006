@@ -14,29 +14,16 @@ public class SetupMultiActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setup_multi);
-        ActionBar ab = getSupportActionBar();
-        if (ab != null) {
-            ab.setDisplayHomeAsUpEnabled(true);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
 
     @Override
     public void onPostCreate(Bundle bundle) {
         SeekBar seekBar = (SeekBar) findViewById(R.id.playerNumberSeekBar);
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                seekBar.setProgress(Math.max(seekBar.getProgress(), 1));
-            }
-        });
+        seekBar.setOnSeekBarChangeListener(new DisallowZeroSeekBarChangeListener());
         super.onPostCreate(bundle);
     }
 

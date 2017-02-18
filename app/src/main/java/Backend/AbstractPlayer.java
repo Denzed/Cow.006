@@ -1,11 +1,23 @@
 package Backend;
 
 import android.util.Pair;
-//import javafx.util.Pair;
-import java.util.*;
 
-import static Backend.AbstractPlayer.updateStateTypes.*;
-import static Backend.GameConstants.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Queue;
+
+import static Backend.AbstractPlayer.updateStateTypes.ADD_CARD;
+import static Backend.AbstractPlayer.updateStateTypes.CLEAR_ROW;
+import static Backend.GameConstants.CARD_PENALTY;
+import static Backend.GameConstants.COLUMNS;
+import static Backend.GameConstants.DECK_SIZE;
+import static Backend.GameConstants.NOT_A_CARD;
+import static Backend.GameConstants.ROWS;
+import static Backend.GameConstants.SmallestTakeTypes;
+
+//import javafx.util.Pair;
 
 public abstract class AbstractPlayer {
 
@@ -16,23 +28,16 @@ public abstract class AbstractPlayer {
     protected int playersNumber;
     protected int remoteNumber;
     protected int botsNumber;
+    protected volatile ArrayList<Integer> hand;
     volatile int chosenRowIndex; //???
     volatile int chosenCardValue; // ???
     ArrayList<Integer> scores;
-    public enum updateStateTypes { ADD_CARD, CLEAR_ROW }
-    protected volatile ArrayList<Integer> hand;
     private volatile Board board;
     private volatile Board currentBoard;
-    public enum GameState { NEW_GAME, NEXT_ROUND, INTERRUPTED, FINISHED }
     private volatile GameState state;
     private volatile boolean choosingRowToTake, choosingCardToTake;
     private volatile Queue<Move> queue;
     private volatile ArrayDeque<Integer> cardsQueue;
-
-    boolean isConnected() {
-        return true;
-    }
-
     AbstractPlayer(int remoteNumber, int botsNumber) {
         this.state = GameState.NEW_GAME;
         this.playersNumber = remoteNumber + botsNumber;
@@ -51,23 +56,22 @@ public abstract class AbstractPlayer {
         }
         hand = new ArrayList<>();
     }
-
     AbstractPlayer(int remoteNumber, int botsNumber, String username, String userID){
         this(remoteNumber, botsNumber);
         this.username = username;
         this.userID = userID;
     }
 
-    public class Move {
-        public updateStateTypes type;
-        public int player, rowIndex, card;
-
-        private Move(updateStateTypes type, int player, int rowIndex, int card){
-            this.type = type;
-            this.player = player;
-            this.rowIndex = rowIndex;
-            this.card = card;
+    protected static int getRowPoints(ArrayList<Integer> row) {
+        int res = 0;
+        for (Integer card : row) {
+            res += CARD_PENALTY[card];
         }
+        return res;
+    }
+
+    boolean isConnected() {
+        return true;
     }
 
     public void updateOneMove(){
@@ -80,7 +84,7 @@ public abstract class AbstractPlayer {
         return cardsQueue;
     }
 
-    void setCardsQueue(ArrayDeque<Integer> cardsQueue) {
+    protected void setCardsQueue(ArrayDeque<Integer> cardsQueue) {
         this.cardsQueue = cardsQueue;
     }
 
@@ -118,16 +122,8 @@ public abstract class AbstractPlayer {
         setChoosingCardToTake(false);
     }
 
-    protected void setHand(ArrayList<Integer> hand) {
-        this.hand = hand;
-        if (this.state == GameState.NEW_GAME) {
-            this.state = GameState.NEXT_ROUND;
-        }
-        Collections.sort(this.hand);
-    }
-
-    void setBoard(Board board, Board currentBoard){
-        this.board = board;
+    void setBoard(Board board, Board currentBoard) {
+        setBoard(board);
         this.currentBoard = currentBoard;
     }
 
@@ -200,15 +196,7 @@ public abstract class AbstractPlayer {
         }
     }
 
-    protected static int getRowPoints(ArrayList<Integer> row) {
-        int res = 0;
-        for (Integer card : row){
-            res += CARD_PENALTY[card];
-        }
-        return res;
-    }
-
-    protected void updateScore(int playerIndex, int points){
+    protected void updateScore(int playerIndex, int points) {
         scores.set(playerIndex, scores.get(playerIndex) + points);
     }
 
@@ -247,16 +235,28 @@ public abstract class AbstractPlayer {
         return hand;
     }
 
+    protected void setHand(ArrayList<Integer> hand) {
+        this.hand = hand;
+        if (this.state == GameState.NEW_GAME) {
+            this.state = GameState.NEXT_ROUND;
+        }
+        Collections.sort(this.hand);
+    }
+
     public Board getBoard() {
         return board;
     }
 
-    void setId(int id) {
-        this.id = id;
+    protected void setBoard(Board board) {
+        this.board = board;
     }
 
     public int getId(){
         return id;
+    }
+
+    void setId(int id) {
+        this.id = id;
     }
 
     int getScore() {
@@ -272,15 +272,29 @@ public abstract class AbstractPlayer {
     }
 
     protected void setGameInterrupted() {
-        this.state = GameState.INTERRUPTED;
     }
 
     protected void setGameFinished() {
-        this.state = GameState.FINISHED;
     }
 
     public GameState getState() {
         return this.state;
+    }
+
+    public enum updateStateTypes {ADD_CARD, CLEAR_ROW}
+
+    public enum GameState {NEW_GAME, NEXT_ROUND}
+
+    public class Move {
+        public updateStateTypes type;
+        public int player, rowIndex, card;
+
+        private Move(updateStateTypes type, int player, int rowIndex, int card) {
+            this.type = type;
+            this.player = player;
+            this.rowIndex = rowIndex;
+            this.card = card;
+        }
     }
 
 }

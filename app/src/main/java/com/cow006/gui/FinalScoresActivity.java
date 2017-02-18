@@ -1,11 +1,12 @@
 package com.cow006.gui;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -32,10 +33,8 @@ public class FinalScoresActivity extends AppCompatActivity {
         for (ArrayList<String> row: data) {
             joinedData.addAll(row);
         }
-        final ArrayAdapter<String> gridViewArrayAdapter = new ArrayAdapter<>
-                (this, android.R.layout.simple_list_item_1, joinedData);
-
-        // Data bind GridView with ArrayAdapter (String Array elements)
+        final ArrayAdapter<String> gridViewArrayAdapter =
+                new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, joinedData);
         table.setAdapter(gridViewArrayAdapter);
     }
 

@@ -20,6 +20,7 @@ public class CardAnimatorListenerAdapter extends AnimatorListenerAdapter {
     @Override
     public void onAnimationStart(Animator animator) {
         gameView.animatedCards.add(cardView.getCard());
+        gameView.drawQueue();
         super.onAnimationStart(animator);
     }
 
@@ -28,12 +29,10 @@ public class CardAnimatorListenerAdapter extends AnimatorListenerAdapter {
         if (isAddCard) {
             gameView.player.getCardsQueue().addFirst(GameConstants.NOT_A_CARD);
             gameView.player.updateOneMove();
-            gameView.drawBoard();
         } else {
             cardView.setVisibility(View.GONE);
         }
         gameView.animatedCards.remove(cardView.getCard());
-        gameView.postInvalidate();
         super.onAnimationEnd(animation);
     }
 }

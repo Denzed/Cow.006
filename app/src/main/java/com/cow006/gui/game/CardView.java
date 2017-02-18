@@ -3,95 +3,63 @@ package com.cow006.gui.game;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.support.v4.view.GestureDetectorCompat;
 import android.text.TextPaint;
 import android.view.MotionEvent;
+import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import Backend.GameConstants;
 
 public class CardView extends ImageView {
     private int card;
-    static private TextPaint mTextPaint;
-    static private float mTextHeight;
-    static private float STROKE_WIDTH = 2;
-    static private Paint strokePaint,
-                         cardPaints[],
-                         bitmapPaint;
-
-    private int width, height;
+    private int width;
+    private int height;
     private GestureDetectorCompat gestureDetector;
 
-    static {
-        // Set up paints
-        strokePaint = new Paint();
-        strokePaint.setStyle(Paint.Style.STROKE);
-        strokePaint.setColor(Color.BLACK);
-        strokePaint.setStrokeWidth(STROKE_WIDTH);
-
-        bitmapPaint = new Paint();
-        bitmapPaint.setAntiAlias(true);
-        bitmapPaint.setFilterBitmap(true);
-        bitmapPaint.setDither(true);
-
-        cardPaints = new Paint[5];
-        for (int i = 0; i < 5; ++i) {
-            Paint pt = new Paint();
-            pt.setStyle(Paint.Style.FILL_AND_STROKE);
-            pt.setStrokeWidth(STROKE_WIDTH);
-            cardPaints[i] = pt;
-        }
-        cardPaints[0].setColor(Color.GREEN);
-        cardPaints[1].setColor(Color.BLUE);
-        cardPaints[2].setColor(Color.YELLOW);
-        cardPaints[3].setColor(Color.rgb(255, 165, 0)); // ORANGE
-        cardPaints[4].setColor(Color.RED);
-
-        // Set up a default TextPaint object
-        mTextPaint = new TextPaint();
-        mTextPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
-        mTextPaint.setTextAlign(Paint.Align.CENTER);
-        mTextPaint.setColor(Color.BLACK);
-    }
-
-    static private Paint getCardPaint(int number) {
-        if (number == 55) {
-            return cardPaints[4];
-        } else if (number % 10 == number / 10) {
-            return cardPaints[3];
-        } else if (number % 10 == 0) {
-            return cardPaints[2];
-        } else if (number % 5 == 0) {
-            return cardPaints[1];
-        } else {
-            return cardPaints[0];
-        }
-    }
-
-    public CardView(Context context, int card, float width, float height) {
+    public CardView(Context context, GameView gameView, int card,
+                    float width, float height) {
         super(context);
+        this.card = card;
         this.width = Math.round(width);
         this.height = Math.round(height);
+        setImageBitmap(drawCardBitmap());
 
-        // Adjust text size to fit cards
-        mTextPaint.setTextSize(Misc.calcTextSize(this.width,
-                                                 this.height,
-                                                 "" + GameConstants.DECK_SIZE));
-        mTextHeight = mTextPaint.getFontMetrics().bottom;
+        gestureDetector = new GestureDetectorCompat(context,
+                new CardViewGestureDetector(gameView, this));
+        setVisibility(View.GONE);
+    }
 
-        this.card = card;
-        Bitmap bitmap = Bitmap.createBitmap(this.width, this.height, Bitmap.Config.RGB_565);
-        Canvas tempCanvas = new Canvas(bitmap);
-        tempCanvas.drawRect(0, 0, this.width, this.height, getCardPaint(card));
-        tempCanvas.drawRect(0, 0, this.width, this.height, strokePaint);
-        String text = Integer.toString(card);
-        tempCanvas.drawText(text,
-                this.width / 2f,
-                this.height / 2f + mTextHeight,
-                mTextPaint);
-        setImageBitmap(bitmap);
+    private Bitmap drawCardBitmap() {
+        Bitmap cardBitmap = Bitmap.createBitmap(this.width, this.height,
+                Bitmap.Config.RGB_565);
+        drawCardOnBitmap(new Canvas(cardBitmap));
+        return cardBitmap;
+    }
+
+    private void drawCardOnBitmap(Canvas bitmapCanvas) {
+        bitmapCanvas.drawRect(0, 0, this.width, this.height, Misc.getCardPaint(card));
+        bitmapCanvas.drawRect(0, 0, this.width, this.height, Misc.strokePaint);
+        float mainSquareSide = Math.min(this.width, this.height);
+        drawCardNumberInRect(bitmapCanvas,
+                (this.width - mainSquareSide) / 2f, (this.height - mainSquareSide) / 2f,
+                (this.width + mainSquareSide) / 2f, (this.height + mainSquareSide) / 2f);
+        float supplementarySquareSide = Math.min(this.width / 2f, (this.height - mainSquareSide) / 2f);
+        drawCardNumberInRect(bitmapCanvas, 0, 0, supplementarySquareSide, supplementarySquareSide);
+        drawCardNumberInRect(bitmapCanvas,
+                this.width - supplementarySquareSide, this.height - supplementarySquareSide,
+                this.width, this.height);
+    }
+
+    private void drawCardNumberInRect(Canvas canvas, float x1, float y1, float x2, float y2) {
+        TextPaint textPaint = Misc.generateTextPaint(x2 - x1, y2 - y1,
+                Integer.toString(GameConstants.DECK_SIZE));
+        float textHeight = textPaint.getFontMetrics().bottom;
+        canvas.drawText(Integer.toString(this.card),
+                (x1 + x2) / 2f,
+                (y1 + y2) / 2f + textHeight,
+                textPaint);
     }
 
     @Override
@@ -103,7 +71,13 @@ public class CardView extends ImageView {
         return card;
     }
 
-    public void setGestureDetector(GestureDetectorCompat gestureDetector) {
-        this.gestureDetector = gestureDetector;
+    public void resize(float newWidth, float newHeight) {
+        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) getLayoutParams();
+        int deltaX = Math.round(newWidth - width);
+        params.leftMargin -= deltaX;
+        params.width += deltaX;
+        int deltaY = Math.round(newHeight - height);
+        params.topMargin -= deltaY;
+        params.height += deltaY;
     }
 }

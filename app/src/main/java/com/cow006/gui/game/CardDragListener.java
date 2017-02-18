@@ -5,7 +5,7 @@ import android.view.View;
 
 import Backend.GameConstants;
 
-public class GameViewCardDragListener implements View.OnDragListener {
+public class CardDragListener implements View.OnDragListener {
     @Override
     public boolean onDrag(View v, DragEvent event) {
         if (!(v instanceof GameView)) {
@@ -19,13 +19,13 @@ public class GameViewCardDragListener implements View.OnDragListener {
                   y = event.getY(),
                   cardWidth = gv.cardWidth,
                   cardHeight = gv.cardHeight,
-                  fieldsOffsetInCards = gv.fieldsOffsetInCards;
+                    fieldsOffsetInCards = GameView.FIELDS_OFFSET_IN_CARDS;
             // Check that the card is dragged inside the field box, otherwise reject
             float paddingTop = cardHeight * fieldsOffsetInCards / 2,
                     paddingLeft = cardWidth * fieldsOffsetInCards / 2,
                     paddingRight = cardWidth * (5 + fieldsOffsetInCards),
                     paddingBottom = cardHeight * (4 + fieldsOffsetInCards);
-            if (Misc.insideRect(x, y,
+            if (Misc.isInsideRect(x, y,
                     paddingLeft, paddingTop,
                     paddingRight, paddingBottom)) {
                 gv.focusedCard = GameConstants.NOT_A_CARD;

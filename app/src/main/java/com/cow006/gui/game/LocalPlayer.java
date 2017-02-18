@@ -1,10 +1,16 @@
 package com.cow006.gui.game;
 
+import android.content.DialogInterface;
 import android.util.Pair;
+import android.widget.ViewFlipper;
 
+import com.cow006.gui.R;
+
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import Backend.Board;
 import Backend.GameConstants;
 import Backend.Player;
 
@@ -31,30 +37,43 @@ class LocalPlayer extends Player {
     }
 
     @Override
-    protected void setChoosingCardToTake(boolean value) {
-        super.setChoosingCardToTake(value);
-    }
-
-    @Override
     protected void setGameInterrupted() {
         super.setGameInterrupted();
-        gameView.drawMessage("Someone has disconnected! The game will be interrupted.");
-        gameView.postInvalidate();
+        gameView.drawMessageWithAction("Someone has disconnected! The game will be interrupted.",
+                (DialogInterface dialog, int which) ->
+                        gameView.parentActivity.goToResults(getFinalScoresAsString()));
     }
 
     @Override
     protected void setGameFinished() {
         super.setGameFinished();
-        gameView.postInvalidate();
+        gameView.parentActivity.goToResults(getFinalScoresAsString());
     }
 
     @Override
-    public void setHand(ArrayList<Integer> hand) {
-        gameView.drawMessage(getState() == GameState.NEW_GAME
-                ? "The game is starting!"
-                : "Prepare for the next round!");
+    protected void setCardsQueue(ArrayDeque<Integer> cardsQueue) {
+        super.setCardsQueue(cardsQueue);
+        gameView.drawQueue();
+    }
+
+    @Override
+    protected void setBoard(Board board) {
+        super.setBoard(board);
+        gameView.drawBoard();
+    }
+
+    @Override
+    protected void setHand(ArrayList<Integer> hand) {
+        GameActivity parentActivity = gameView.parentActivity;
+        if (getState() == GameState.NEW_GAME) {
+            parentActivity.runOnUiThread(() ->
+                    ((ViewFlipper) parentActivity.findViewById(R.id.activity_game)).showNext());
+            gameView.drawMessage(parentActivity.getString(R.string.game_start_message_text));
+        } else {
+            gameView.drawMessage(parentActivity.getString(R.string.next_round_message_text));
+        }
         super.setHand(hand);
-        gameView.postInvalidate();
+        gameView.drawHand();
     }
 
     @Override
@@ -66,44 +85,58 @@ class LocalPlayer extends Player {
     }
 
     @Override
-    public void tellCard(int card) {
-        super.tellCard(card);
-        gameView.focusedCard = GameConstants.NOT_A_CARD;
-        gameView.postInvalidate();
+    protected void updateScore(int playerIndex, int points) {
+        super.updateScore(playerIndex, points);
+        gameView.drawScores();
     }
 
-    protected String getScoresAsString(boolean isFinal) {
+    @Override
+    public void tellCard(int card) {
+        super.tellCard(card);
+        gameView.unfocusCard();
+    }
+
+    @Override
+    public void updateOneMove() {
+        super.updateOneMove();
+        gameView.drawBoard();
+    }
+
+    protected String getScoresAsString() {
         StringBuilder stringBuilder = new StringBuilder();
-        if (isFinal) {
-            for (ArrayList<String> line: getFinalResults()) {
-                for (String element: line) {
-                    stringBuilder.append(element);
-                    stringBuilder.append("\n");
-                }
-                stringBuilder.append("\n");
-            }
+        ArrayList<Integer> scoresList = new ArrayList<>(getScores());
+        ArrayList<Integer> playerList = new ArrayList<>();
+        for (int i = 0; i < getPlayersNumber(); ++i) {
+            playerList.add(i);
+        }
+        for (int i = 0; i < getPlayersNumber(); ++i) {
+            addMinimalScore(stringBuilder, scoresList, playerList);
+        }
+        return stringBuilder.toString();
+    }
+
+    private void addMinimalScore(StringBuilder stringBuilder,
+                                 ArrayList<Integer> scoresList,
+                                 ArrayList<Integer> playerList) {
+        Integer topScore = Collections.min(scoresList);
+        int index = scoresList.indexOf(topScore);
+        if (playerList.get(index) == getId()) {
+            stringBuilder.append("YOU ");
         } else {
-            int id = getId();
-            ArrayList<Integer> scoresList = new ArrayList<>(getScores()),
-                               playerList = new ArrayList<>();
-            for (int i = 0; i < getPlayersNumber(); ++i) {
-                playerList.add(i);
+            stringBuilder.append("Opponent #").append(playerList.get(index));
+        }
+        stringBuilder.append(" - ").append(scoresList.get(index)).append("; ");
+        scoresList.remove(index);
+        playerList.remove(index);
+    }
+
+    protected String getFinalScoresAsString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (ArrayList<String> line : getFinalResults()) {
+            for (String element : line) {
+                stringBuilder.append(element).append("\n");
             }
-            for (int i = 0; i < getPlayersNumber(); ++i) {
-                Integer topScore = Collections.min(scoresList);
-                int index = scoresList.indexOf(topScore);
-                if (playerList.get(index) == id) {
-                    stringBuilder.append("YOU ");
-                } else {
-                    stringBuilder.append("Opponent #");
-                    stringBuilder.append(playerList.get(index));
-                }
-                stringBuilder.append(" - ");
-                stringBuilder.append(scoresList.get(index));
-                stringBuilder.append("; ");
-                scoresList.remove(index);
-                playerList.remove(index);
-            }
+            stringBuilder.append("\n");
         }
         return stringBuilder.toString();
     }

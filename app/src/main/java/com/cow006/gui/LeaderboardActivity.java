@@ -5,12 +5,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 import Backend.Client;
 
 
 public class LeaderboardActivity extends AppCompatActivity{
+    public static final int LEADERBOARD_SIZE = 100;
     String leaderboard = "";
 
     @Override
@@ -22,34 +22,23 @@ public class LeaderboardActivity extends AppCompatActivity{
     @Override
     protected  void onPostCreate(Bundle bundle) {
         super.onPostCreate(bundle);
-        Thread t = new Thread(() -> {
-            System.out.println("LEADERBOARD:\n" + leaderboard);
+        new Thread(() -> {
             try {
-                Client client = new Client();
-                client.connectToServer(Client.ConnectionTypes.LEADERBOARD);
-
-                for (int i = 0; i < 10; i++) {
-                    String line = client.getClientInput().readLine();
-                    System.out.println(line);
-                    leaderboard += line + ((i % 2 == 1) ? "\n" : "\t");
-                }
-                client.disconnectFromServer();
-
+                getLeaderboard();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        });
-        t.start();
-        while (t.getState() != Thread.State.TERMINATED) {
-            try {
-                System.out.println(t.getState());
-                TimeUnit.MILLISECONDS.sleep(100);
-            } catch (InterruptedException e) {
-                //ignore
-            }
-        }
-
-        ((TextView) findViewById(R.id.leaderboard_text_view)).setText(leaderboard);
+        }).start();
     }
 
+    private void getLeaderboard() throws IOException {
+        Client client = new Client();
+        client.connectToServer(Client.ConnectionTypes.LEADERBOARD);
+        for (int i = 0; i < LEADERBOARD_SIZE; i++) {
+            String line = client.getClientInput().readLine();
+            leaderboard += line + ((i % 2 == 1) ? "\n" : "\t");
+        }
+        client.disconnectFromServer();
+        ((TextView) findViewById(R.id.leaderboard_text_view)).setText(leaderboard);
+    }
 }

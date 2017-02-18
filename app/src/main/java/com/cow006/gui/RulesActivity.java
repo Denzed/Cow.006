@@ -14,6 +14,5 @@ public class RulesActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-
     }
 }

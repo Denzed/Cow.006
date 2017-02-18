@@ -1,14 +1,15 @@
 package com.cow006.gui.game;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 
 import com.cow006.gui.FinalScoresActivity;
 import com.cow006.gui.R;
 
 import java.io.IOException;
+
 import Backend.Bot;
 import Backend.Client;
 import Backend.Server;
@@ -31,6 +32,7 @@ public class GameActivity extends AppCompatActivity {
         if (ab != null) {
             ab.hide();
         }
+
         setContentView(R.layout.activity_game);
 
         Intent intent = getIntent();
@@ -40,7 +42,8 @@ public class GameActivity extends AppCompatActivity {
         botLevel = intent.getIntExtra("Bot level", 5);
         username = intent.getStringExtra("username");
         userID = intent.getStringExtra("userID");
-        if (players == 0){
+        if (players == 0) {
+
             new Thread(() -> {
                     try {
                         System.out.println("SERVER CREATED");
@@ -49,8 +52,7 @@ public class GameActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }).start();
-        }
-        else{
+        } else {
             username = intent.getStringExtra("username");
             userID = intent.getStringExtra("userID");
             System.out.println("username = " + username + ";userID = " + userID);
@@ -61,6 +63,7 @@ public class GameActivity extends AppCompatActivity {
         super.onPostCreate(bundle);
 
         GameView gw = (GameView) findViewById(R.id.game_view);
+
         final LocalPlayer lp;
         if (players == 0){
             lp = new LocalPlayer(gw, players + 1, bots);

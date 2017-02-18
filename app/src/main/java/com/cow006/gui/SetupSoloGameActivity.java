@@ -1,9 +1,9 @@
 package com.cow006.gui;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.SeekBar;
 
@@ -15,17 +15,24 @@ public class SetupSoloGameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setup_solo_game);
-        ActionBar ab = getSupportActionBar();
-        if (ab != null) {
-            ab.setDisplayHomeAsUpEnabled(true);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
+
+    @Override
+    public void onPostCreate(Bundle bundle) {
+        SeekBar seekBar = (SeekBar) findViewById(R.id.botNumberSeekBar);
+        seekBar.setOnSeekBarChangeListener(new DisallowZeroSeekBarChangeListener());
+        super.onPostCreate(bundle);
+    }
+
 
     public void startGame(View view) {
         Intent intent = new Intent(this, GameActivity.class);
         intent.putExtras(getIntent());
         intent.putExtra("Player count", 0);
-        //TODO: It's still possible to play aganist 0 bots. Why?
         intent.putExtra("Bot count", ((SeekBar) findViewById(R.id.botNumberSeekBar)).getProgress());
         intent.putExtra("Bot level", ((SeekBar) findViewById(R.id.botLevelSeekBar)).getProgress());
         startActivity(intent);

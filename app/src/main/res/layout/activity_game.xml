@@ -1,27 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ViewFlipper
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/activity_game"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".game.GameActivity">
+    android:layout_height="match_parent">
 
-    <TextView
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/loading_panel"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/game_scores"
-        android:textSize="@dimen/medium_text_size" />
+        android:layout_height="match_parent"
+        android:gravity="center">
 
-    <com.cow006.gui.game.GameView
-        android:focusable="false"
+        <TextView
+            android:id="@+id/waiting_players_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/text_margin"
+            android:text="@string/waiting_players"
+            android:textSize="@dimen/large_text_size"/>
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@+id/waiting_players_text_view"
+            android:layout_alignLeft="@+id/waiting_players_text_view"
+            android:layout_alignRight="@+id/waiting_players_text_view"
+            android:layout_alignStart="@+id/waiting_players_text_view"
+            android:layout_below="@+id/waiting_players_text_view"
+            android:indeterminate="true"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/game_panel"
         android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/game_view"
-        android:layout_below="@+id/game_scores"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-</RelativeLayout>
+        android:layout_height="match_parent"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        tools:context=".game.GameActivity">
+
+        <TextView
+            android:id="@+id/game_scores"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/medium_text_size"/>
+
+        <com.cow006.gui.game.GameView
+            android:id="@+id/game_view"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/game_scores"
+            android:focusable="false"/>
+    </RelativeLayout>
+</ViewFlipper>

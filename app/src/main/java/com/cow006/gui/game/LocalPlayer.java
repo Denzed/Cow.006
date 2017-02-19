@@ -81,7 +81,7 @@ class LocalPlayer extends Player {
                                           int chosenRowIndex,
                                           ArrayList<Pair<Integer,Integer>> moves) {
         super.playRound(smallestTakeType, chosenRowIndex, moves);
-        gameView.postInvalidate();
+        gameView.setupAnimations();
     }
 
     @Override

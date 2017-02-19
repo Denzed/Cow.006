@@ -39,6 +39,7 @@ public class LeaderboardActivity extends AppCompatActivity{
             leaderboard += line + ((i % 2 == 1) ? "\n" : "\t");
         }
         client.disconnectFromServer();
-        ((TextView) findViewById(R.id.leaderboard_text_view)).setText(leaderboard);
+        runOnUiThread(() ->
+                ((TextView) findViewById(R.id.leaderboard_text_view)).setText(leaderboard));
     }
 }

@@ -6,12 +6,12 @@ import android.view.View;
 
 import Backend.GameConstants;
 
-public class CardAnimatorListenerAdapter extends AnimatorListenerAdapter {
+public class CardAddAnimatorListenerAdapter extends AnimatorListenerAdapter {
     GameView gameView;
     CardView cardView;
     boolean isAddCard;
 
-    public CardAnimatorListenerAdapter(GameView gameView, CardView cardView, boolean isAddCard) {
+    public CardAddAnimatorListenerAdapter(GameView gameView, CardView cardView, boolean isAddCard) {
         this.gameView = gameView;
         this.cardView = cardView;
         this.isAddCard = isAddCard;
@@ -29,8 +29,11 @@ public class CardAnimatorListenerAdapter extends AnimatorListenerAdapter {
         if (isAddCard) {
             gameView.player.getCardsQueue().addFirst(GameConstants.NOT_A_CARD);
             gameView.player.updateOneMove();
+            if (!gameView.player.getQueue().isEmpty()) {
+                gameView.setupAnimations();
+            }
         } else {
-            cardView.setVisibility(View.GONE);
+            cardView.setVisibility(View.INVISIBLE);
         }
         gameView.animatedCards.remove(cardView.getCard());
         super.onAnimationEnd(animation);

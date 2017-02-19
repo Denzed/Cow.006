@@ -123,8 +123,8 @@ public abstract class AbstractPlayer {
     }
 
     void setBoard(Board board, Board currentBoard) {
-        setBoard(board);
-        this.currentBoard = currentBoard;
+        setBoard(currentBoard);
+        this.board = board;
     }
 
     int getMinOnBoard(){
@@ -247,8 +247,8 @@ public abstract class AbstractPlayer {
         return board;
     }
 
-    protected void setBoard(Board board) {
-        this.board = board;
+    protected void setBoard(Board currentBoard) {
+        this.currentBoard = currentBoard;
     }
 
     public int getId(){

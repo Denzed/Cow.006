@@ -22,9 +22,11 @@ import com.cow006.gui.R;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
-import Backend.AbstractPlayer;
-import Backend.GameConstants;
+import Backend.Game.BoardModification;
+import Backend.Game.GameConstants;
+import Backend.Game.Row;
 
 public class GameView extends FrameLayout {
     protected static final float CARD_COEFFICIENT = 0.16f;
@@ -83,7 +85,7 @@ public class GameView extends FrameLayout {
     }
 
     void returnCardToHand(int card) {
-        ArrayList<Integer> hand = player.getHand();
+        List<Integer> hand = player.getHand();
         int index = 0;
         while (index < hand.size() && hand.get(index) < card) {
             index++;
@@ -138,6 +140,7 @@ public class GameView extends FrameLayout {
         float scaledHeight = cardHeight * QUEUE_CARD_SCALE;
         float[] paddingLeftTop = getQueueTopPosition();
         for (int card: player.getCardsQueue()) {
+            System.out.println("drawQueue:size() " + player.getCardsQueue());
             drawCard(paddingLeftTop[0], paddingLeftTop[1],
                     card, QUEUE_CARD_SCALE);
             paddingLeftTop[1] += scaledHeight * (1 + FIELDS_OFFSET_IN_CARDS / 2);
@@ -222,15 +225,15 @@ public class GameView extends FrameLayout {
 
     void setupAnimations() {
         parentActivity.runOnUiThread(() -> {
-            AbstractPlayer.Move move = player.getQueue().peek();
-            int row = move.rowIndex;
-            int column = (move.type == AbstractPlayer.updateStateTypes.CLEAR_ROW
+            BoardModification boardModification = player.getBoardModificationQueue().peek();
+            int row = boardModification.getRowIndex();
+            int column = (boardModification.getType() == Row.RowModificationTypes.CLEAR_ROW
                     ? 0
                     : player.getBoard().get(row).size());
-            if (move.type == AbstractPlayer.updateStateTypes.CLEAR_ROW) {
+            if (boardModification.getType() == Row.RowModificationTypes.CLEAR_ROW) {
                 setupRowClearAnimation(row);
             } else {
-                setupCardAddAnimation(move.card, row, column);
+                setupCardAddAnimation(boardModification.getCard(), row, column);
             }
         });
     }

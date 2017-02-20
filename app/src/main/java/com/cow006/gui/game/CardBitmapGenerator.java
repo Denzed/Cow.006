@@ -4,7 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.text.TextPaint;
 
-import Backend.GameConstants;
+import Backend.Game.GameConstants;
 
 class CardBitmapGenerator {
     static Bitmap generateCardBitmap(int card, int width, int height) {

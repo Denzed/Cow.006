@@ -1,29 +1,21 @@
-package Backend;
-
-//import javafx.util.Pair;
+package Backend.Player;
 
 import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static Backend.GameConstants.*;
+import Backend.Game.Turn;
 
-//some lines are commented: it's for console testing
+import static Backend.Game.GameConstants.*;
+
 public class Player extends AbstractPlayer {
 
-    public Player(int remoteNumber, int botsNumber) {
-        super(remoteNumber, botsNumber);
+    public Player(int playersNumber, PlayerInformation playerInformation) {
+        super(playersNumber, playerInformation);
     }
 
-    public Player(int remoteNumber, int botsNumber, String username, String userID) {
-        super(remoteNumber, botsNumber, username, userID);
-    }
-
-
-    public int move() {
+    public int chooseCard() {
         askForAMove();
-
-//        just wait while player is choosing card
         setChoosingCardToTake(true);
         while (isChoosingCardToTake()){
             try {
@@ -32,17 +24,18 @@ public class Player extends AbstractPlayer {
                 //ignore
             }
         }
-
+        System.out.println("CARD HAS BEEN CHOSEN: " + chosenCardValue);
         int value = chosenCardValue;
 //        int value = new Scanner(System.in).nextInt();
         hand.remove(Integer.valueOf(value));
         return value;
     }
 
-    public int setChosenRow() {
+    public int chooseRow() {
+        if (board.getMinOnBoard() < getCardsQueue().peek()){
+            return -1;
+        }
         askForAChoice();
-
-//        just wait while player is choosing row
         setChoosingRowToTake(true);
         while (isChoosingRowToTake()){
             try {
@@ -52,19 +45,11 @@ public class Player extends AbstractPlayer {
             }
         }
         int index = chosenRowIndex;
-
 //        int index = new Scanner(System.in).nextInt();
-
-        if (0 <= index && index < ROWS) {
-            return index;
-        } else {
-            System.out.println("Not in range");
-            return 0;
-        }
+        return index;
     }
 
     private void askForAMove(){
-        showScores();
         showBoard();
         System.out.println("Please, make a move");
         showCardsLeft();
@@ -93,23 +78,13 @@ public class Player extends AbstractPlayer {
     }
 
     private void showScores(){
-        System.out.print("SCORES: ");
-        for (int i = 0; i < playersNumber; i++){
-            if (i == getId()){
-                System.out.print("(YOU: " + scores.get(i) + ") ");
-            } else {
-                System.out.print(scores.get(i) + " ");
-            }
-        }
-        System.out.println();
-
     }
 
 /*    @Override
-    protected void playRound(SmallestTakeTypes smallestTakeType, int chosenRowIndex, ArrayList<Pair<Integer, Integer>> moves) {
-        super.playRound(smallestTakeType, chosenRowIndex, moves);
+    protected void buildBoardModificationsQueue(int chosenRowIndex, List<Turn> turns) {
+        super.buildBoardModificationsQueue(chosenRowIndex, turns);
         while (!getQueue().isEmpty()){
-            updateOneMove();
+            updateOneTurn();
         }
     }
 */

@@ -3,7 +3,7 @@ package com.cow006.gui.game;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 
-import Backend.GameConstants;
+import Backend.Game.GameConstants;
 
 class CardViewGestureDetector extends GestureDetector.SimpleOnGestureListener {
     GameView gameView;
@@ -24,7 +24,7 @@ class CardViewGestureDetector extends GestureDetector.SimpleOnGestureListener {
     public boolean onSingleTapUp(MotionEvent event) {
         int card = cardView.getCard();
         if (gameView.player.getHand().contains(card)
-                && gameView.player.getQueue().isEmpty()
+                && gameView.player.getBoardModificationQueue().isEmpty()
                 && gameView.player.isChoosingCardToTake()
                 && card != gameView.focusedCard) {
             gameView.focusCard(card);
@@ -36,7 +36,7 @@ class CardViewGestureDetector extends GestureDetector.SimpleOnGestureListener {
     public boolean onDoubleTap(MotionEvent event) {
         int card = cardView.getCard();
         if (gameView.player.getHand().contains(card)
-                && gameView.player.getQueue().isEmpty()
+                && gameView.player.getBoardModificationQueue().isEmpty()
                 && gameView.player.isChoosingCardToTake()
                 && card != GameConstants.NOT_A_CARD) {
             gameView.player.tellCard(card);
@@ -48,7 +48,7 @@ class CardViewGestureDetector extends GestureDetector.SimpleOnGestureListener {
     public void onLongPress(MotionEvent event) {
         int card = cardView.getCard();
         if (gameView.player.getHand().contains(card)
-                && gameView.player.getQueue().isEmpty()
+                && gameView.player.getBoardModificationQueue().isEmpty()
                 && gameView.player.isChoosingCardToTake()) {
             gameView.focusCard(card);
             gameView.dragCardFromHand(card);

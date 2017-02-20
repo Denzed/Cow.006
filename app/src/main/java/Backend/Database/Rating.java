@@ -1,11 +1,12 @@
-package Backend;
+package Backend.Database;
 
 import Backend.Database.DatabaseRecord;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
-class Rating {
+public class Rating {
     
     private static final int TOP_PLAYER_RATING_LIMIT = 2400;
     private static final int NEWBIE_GAMES_PLAYED = 30;
@@ -22,8 +23,8 @@ class Rating {
         return TOP_PLAYER_K_FACTOR;
     }
 
-    static void updateRatings(ArrayList<DatabaseRecord> playersInformation) {
-        ArrayList<Double> ratingChanges = calcRatingChanges(playersInformation);
+    public static void updateRatings(List<DatabaseRecord> playersInformation) {
+        List<Double> ratingChanges = calcRatingChanges(playersInformation);
         int opponentsNumber = playersInformation.size() - 1;
         for (int i = 0; i < playersInformation.size(); i++) {
             DatabaseRecord currentPlayer = playersInformation.get(i);
@@ -34,8 +35,8 @@ class Rating {
     }
 
     //this is elo-like rating system; game between n players <-> game between each pair of players
-    private static ArrayList<Double> calcRatingChanges(ArrayList<DatabaseRecord> playersInformation) {
-        ArrayList<Double> ratingChanges = new ArrayList<>(Collections.nCopies(playersInformation.size(), 0.));
+    private static List<Double> calcRatingChanges(List<DatabaseRecord> playersInformation) {
+        List<Double> ratingChanges = new ArrayList<>(Collections.nCopies(playersInformation.size(), 0.));
         for (int i = 0; i < playersInformation.size(); i++) {
             for (int j = 0; j < playersInformation.size(); j++) {
                 if (i == j) {

@@ -10,12 +10,12 @@ import com.cow006.gui.R;
 
 import java.io.IOException;
 
-import Backend.Bot;
-import Backend.Client;
-import Backend.Server;
+import Backend.Client.Client;
+import Backend.Player.PlayerInformation;
+import Backend.Server.SinglePlayServer;
 
-import static Backend.Client.ConnectionTypes.MULTIPLAYER;
-import static Backend.Client.ConnectionTypes.SINGLEPLAYER;
+import static Backend.Client.Client.LOCALHOST;
+import static Backend.Client.Client.MY_LAPTOP_HOST;
 
 public class GameActivity extends AppCompatActivity {
     private int players;
@@ -38,25 +38,22 @@ public class GameActivity extends AppCompatActivity {
         Intent intent = getIntent();
         players = intent.getIntExtra("Player count", 0);
         bots = intent.getIntExtra("Bot count", 0);
-        System.out.println("PLAYERS = " + players + " BOTS = " + bots);
         botLevel = intent.getIntExtra("Bot level", 5);
         username = intent.getStringExtra("username");
         userID = intent.getStringExtra("userID");
         if (players == 0) {
-
-            new Thread(() -> {
-                    try {
-                        System.out.println("SERVER CREATED");
-                        Server.main(new String[0]);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }).start();
-        } else {
-            username = intent.getStringExtra("username");
-            userID = intent.getStringExtra("userID");
-            System.out.println("username = " + username + ";userID = " + userID);
+            startSingleGameServer();
         }
+    }
+
+    private void startSingleGameServer() {
+        new Thread(() -> {
+            try {
+                SinglePlayServer.main(new String[0]);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     public void onPostCreate(Bundle bundle) {
@@ -64,43 +61,20 @@ public class GameActivity extends AppCompatActivity {
 
         GameView gw = (GameView) findViewById(R.id.game_view);
 
-        final LocalPlayer lp;
-        if (players == 0){
-            lp = new LocalPlayer(gw, players + 1, bots);
-        } else {
-            lp = new LocalPlayer(gw, players + 1, bots, username, userID);
-        }
-        localClient = new Client(lp);
-        if (players == 0) {
-            new Thread(() -> {
-                    try {
-                        localClient.connectToServer(SINGLEPLAYER);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }).start();
-            for (int i = 0; i < bots; i++) {
-                new Thread(() -> {
-                        try {
-                            new Client(new Bot(1, bots)).connectToServer(SINGLEPLAYER);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }).start();
-            }
-        } else {
-            new Thread(() -> {
-                    try {
-                        System.out.println("username = " + username + ";userID = " + userID);
-                        localClient.connectToServer(MULTIPLAYER);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }).start();
-        }
-
+        final LocalPlayer lp = new LocalPlayer(gw, players + bots + 1, new PlayerInformation(username, userID));
+        System.out.println("PLAYERS = " + players + " BOTS = " + bots + " PARAMETER = " + (players + bots + 1));
         gw.setPlayer(lp);
+
+        localClient = new Client(lp);
+        new Thread(() -> {
+            try {
+                localClient.requestGame(players == 0 ? LOCALHOST : MY_LAPTOP_HOST);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
+
 
     @Override
     public void onBackPressed() {

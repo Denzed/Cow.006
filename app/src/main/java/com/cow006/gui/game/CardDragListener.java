@@ -3,7 +3,7 @@ package com.cow006.gui.game;
 import android.view.DragEvent;
 import android.view.View;
 
-import Backend.GameConstants;
+import Backend.Game.GameConstants;
 
 public class CardDragListener implements View.OnDragListener {
     @Override

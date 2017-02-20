@@ -1,20 +1,41 @@
 package Backend.Database;
 
-import Backend.ClientConnection;
+import Backend.Server.ClientConnection;
 
+import java.net.URL;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.*;
 
-public class Database {
-
+public class DatabaseConnection {
+/*
     public static final String SECRET_PASSWORD = "";
+    private String URLAddress;
+    private String tableName;
+    private String login;
+    private String password;
 
-    public static void tellLeaderBoard(ClientConnection connection) throws SQLException {
-        Connection dataBaseConnection = DriverManager.getConnection(
-                "jdbc:mysql://sql11.freemysqlhosting.net/sql11157079", "sql11157079", SECRET_PASSWORD);
-        String query = "SELECT username, rating FROM Information ORDER BY rating DESC LIMIT 5";
-        final Statement statement = dataBaseConnection.createStatement();
+    public DatabaseConnection(String URLAddress, String tableName, String login, String password) {
+        this.URLAddress = URLAddress;
+        this.tableName = tableName;
+        this.login = login;
+        this.password = password;
+    }
+
+    public Connection connectToDatabase() throws SQLException {
+        return DriverManager.getConnection(URLAddress, login, password);
+    }
+
+    public List<DatabaseRecord> requestLeaderBoard(ClientConnection connection) throws SQLException {
+        Connection dbConnection = connectToDatabase();
+        return buildLeaderBoard(dbConnection);
+    }
+
+    private List<DatabaseRecord> buildLeaderBoard(Connection dbConnection) throws SQLException {
+        executeQuery(dbConnection,)
+        String query = "SELECT username, rating FROM Information ORDER BY rating DESC LIMIT 100";
+        Statement statement = dbConnection.createStatement();
         ResultSet resultSet = statement.executeQuery(query);
         while (resultSet.next()){
             String username = resultSet.getString("username");
@@ -23,12 +44,14 @@ public class Database {
             connection.getClientOutput().println(rating);
         }
         statement.close();
-        dataBaseConnection.close();
+        dbConnection.close();
+
+        return null;
     }
 
-    public static ArrayList<DatabaseRecord> getPlayersInformation(int playersNumber, ArrayList<ClientConnection> connections) throws InterruptedException, ExecutionException {
+    public static List<DatabaseRecord> getPlayersInformation(int playersNumber, List<ClientConnection> connections) throws InterruptedException, ExecutionException {
         ExecutorService threadPool = Executors.newFixedThreadPool(playersNumber);
-        ArrayList<Callable<DatabaseRecord>> tasksForDatabaseRecords = new ArrayList<>();
+        List<Callable<DatabaseRecord>> tasksForDatabaseRecords = new ArrayList<>();
         for (final ClientConnection currentConnection : connections) {
             tasksForDatabaseRecords.add(() -> {
                 currentConnection.getClientOutput().println("UserID");
@@ -42,7 +65,7 @@ public class Database {
                 return new DatabaseRecord(userID, username, rating, played, score);
             });
         }
-        ArrayList<DatabaseRecord> playersInformation = new ArrayList<>();
+        List<DatabaseRecord> playersInformation = new ArrayList<>();
         for (Future <DatabaseRecord> taskforDatabaseRecord : threadPool.invokeAll(tasksForDatabaseRecords)) {
             playersInformation.add(taskforDatabaseRecord.get());
         }
@@ -87,6 +110,6 @@ public class Database {
         dataBaseConnection.close();
         return played;
     }
-
+*/
 }
 

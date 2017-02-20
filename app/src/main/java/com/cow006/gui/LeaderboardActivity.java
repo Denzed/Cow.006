@@ -6,8 +6,7 @@ import android.widget.TextView;
 
 import java.io.IOException;
 
-import Backend.Client;
-
+import Backend.Client.Client;
 
 public class LeaderboardActivity extends AppCompatActivity{
     public static final int LEADERBOARD_SIZE = 100;
@@ -32,14 +31,15 @@ public class LeaderboardActivity extends AppCompatActivity{
     }
 
     private void getLeaderboard() throws IOException {
-        Client client = new Client();
+        //TODO: implement this
+        /*        Client client = new Client();
         client.connectToServer(Client.ConnectionTypes.LEADERBOARD);
         for (int i = 0; i < LEADERBOARD_SIZE; i++) {
             String line = client.getClientInput().readLine();
             leaderboard += line + ((i % 2 == 1) ? "\n" : "\t");
         }
         client.disconnectFromServer();
-        runOnUiThread(() ->
+*/        runOnUiThread(() ->
                 ((TextView) findViewById(R.id.leaderboard_text_view)).setText(leaderboard));
     }
 }

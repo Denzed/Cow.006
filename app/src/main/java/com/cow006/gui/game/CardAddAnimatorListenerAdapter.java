@@ -4,7 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.view.View;
 
-import Backend.GameConstants;
+import static Backend.Game.GameConstants.NOT_A_CARD;
 
 public class CardAddAnimatorListenerAdapter extends AnimatorListenerAdapter {
     GameView gameView;
@@ -25,9 +25,9 @@ public class CardAddAnimatorListenerAdapter extends AnimatorListenerAdapter {
     @Override
     public void onAnimationEnd(Animator animation) {
         if (isAddCard) {
-            gameView.player.getCardsQueue().addFirst(GameConstants.NOT_A_CARD);
-            gameView.player.updateOneMove();
-            if (!gameView.player.getQueue().isEmpty()) {
+            gameView.player.getCardsQueue().addFirst(NOT_A_CARD);
+            gameView.player.updateOneTurn();
+            if (!gameView.player.getBoardModificationQueue().isEmpty()) {
                 gameView.setupAnimations();
             }
         } else {

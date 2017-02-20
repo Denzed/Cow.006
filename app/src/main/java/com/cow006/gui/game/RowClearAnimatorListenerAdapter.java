@@ -3,7 +3,7 @@ package com.cow006.gui.game;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 
-import Backend.GameConstants;
+import Backend.Game.GameConstants;
 
 public class RowClearAnimatorListenerAdapter extends AnimatorListenerAdapter {
     GameView gameView;
@@ -21,7 +21,7 @@ public class RowClearAnimatorListenerAdapter extends AnimatorListenerAdapter {
     public void onAnimationEnd(Animator animation) {
         super.onAnimationEnd(animation);
         gameView.player.getCardsQueue().addFirst(GameConstants.NOT_A_CARD);
-        gameView.player.updateOneMove();
+        gameView.player.updateOneTurn();
         gameView.setupAnimations();
     }
 }

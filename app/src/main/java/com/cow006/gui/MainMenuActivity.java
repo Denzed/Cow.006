@@ -20,7 +20,7 @@ public class MainMenuActivity extends AppCompatActivity
         implements GoogleApiClient.OnConnectionFailedListener {
     private static final int RC_SIGN_IN = 9001;
     String userID;
-    String username;
+    String username = "YOU";
     private GoogleApiClient mGoogleApiClient;
 
     @Override

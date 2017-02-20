@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
-import java.util.Queue;
 
 import Backend.Game.Board;
 import Backend.Player.Player;
@@ -80,7 +79,7 @@ class LocalPlayer extends Player {
     @Override
     public synchronized void buildBoardModificationsQueue(int chosenRowIndex) {
         super.buildBoardModificationsQueue(chosenRowIndex);
-        gameView.setupAnimations();
+        gameView.runTurnAnimation();
     }
 
     @Override

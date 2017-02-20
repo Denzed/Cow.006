@@ -1,8 +1,10 @@
-package com.cow006.gui.game;
+package com.cow006.gui.game.card;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.text.TextPaint;
+
+import com.cow006.gui.game.Paints;
 
 import Backend.Game.GameConstants;
 
@@ -15,8 +17,8 @@ class CardBitmapGenerator {
     }
 
     static private void drawCardOnBitmap(Canvas bitmapCanvas, int card, int width, int height) {
-        bitmapCanvas.drawRect(0, 0, width, height, Misc.getCardPaint(card));
-        bitmapCanvas.drawRect(0, 0, width, height, Misc.strokePaint);
+        bitmapCanvas.drawRect(0, 0, width, height, Paints.getCardPaint(card));
+        bitmapCanvas.drawRect(0, 0, width, height, Paints.strokePaint);
         float mainSquareSide = Math.min(width, height);
         drawCardNumberInRect(bitmapCanvas, card,
                 (width - mainSquareSide) / 2f, (height - mainSquareSide) / 2f,
@@ -33,7 +35,7 @@ class CardBitmapGenerator {
     static private void drawCardNumberInRect(Canvas canvas, int card,
                                              float x1, float y1,
                                              float x2, float y2) {
-        TextPaint textPaint = Misc.generateTextPaint(x2 - x1, y2 - y1,
+        TextPaint textPaint = Paints.generateTextPaintToFit(x2 - x1, y2 - y1,
                 Integer.toString(GameConstants.DECK_SIZE));
         float textHeight = textPaint.getFontMetrics().bottom;
         canvas.drawText(Integer.toString(card),

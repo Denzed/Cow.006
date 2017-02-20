@@ -1,8 +1,12 @@
-package com.cow006.gui.game;
+package com.cow006.gui.game.card;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.view.View;
+
+import com.cow006.gui.game.GameView;
+
+import Backend.Player.Player;
 
 import static Backend.Game.GameConstants.NOT_A_CARD;
 
@@ -25,10 +29,11 @@ public class CardAddAnimatorListenerAdapter extends AnimatorListenerAdapter {
     @Override
     public void onAnimationEnd(Animator animation) {
         if (isAddCard) {
-            gameView.player.getCardsQueue().addFirst(NOT_A_CARD);
-            gameView.player.updateOneTurn();
-            if (!gameView.player.getBoardModificationQueue().isEmpty()) {
-                gameView.setupAnimations();
+            Player player = gameView.getPlayer();
+            player.getCardsQueue().addFirst(NOT_A_CARD);
+            player.updateOneTurn();
+            if (!player.getBoardModificationQueue().isEmpty()) {
+                gameView.runTurnAnimation();
             }
         } else {
             cardView.setVisibility(View.INVISIBLE);

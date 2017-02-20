@@ -19,8 +19,10 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.cow006.gui.R;
+import com.cow006.gui.game.card.CardAddAnimatorListenerAdapter;
+import com.cow006.gui.game.card.CardDragListener;
+import com.cow006.gui.game.card.CardView;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -29,44 +31,59 @@ import Backend.Game.GameConstants;
 import Backend.Game.Row;
 
 public class GameView extends FrameLayout {
-    protected static final float CARD_COEFFICIENT = 0.16f;
-    protected static final float FIELDS_OFFSET_IN_CARDS = 0.5f - CARD_COEFFICIENT * 11 / 4;
-    protected static final float FOCUSED_ZOOM = 2 * FIELDS_OFFSET_IN_CARDS / CARD_COEFFICIENT + 1;
-    protected static final float QUEUE_CARD_SCALE = 0.5f;
-    private static final long ANIMATION_LENGTH = 300;
-    GameActivity parentActivity;
+    public static final float CARD_COEFFICIENT = 0.16f;
+    public static final float FIELDS_OFFSET_IN_CARDS = 0.5f - CARD_COEFFICIENT * 11 / 4;
+    public static final float FOCUSED_ZOOM = 2 * FIELDS_OFFSET_IN_CARDS / CARD_COEFFICIENT + 1;
+    public static final float QUEUE_CARD_SCALE = 0.5f;
+    public static final long ANIMATION_LENGTH = 300;
+    final GameActivity parentActivity;
+    final private CardView cardViews[];
     int cardWidth;
     int cardHeight;
     int focusedCard = GameConstants.NOT_A_CARD;
     LocalPlayer player = null;
-    private CardView cardViews[];
 
     public GameView(Context context, AttributeSet attrs) {
         super(context, attrs);
         parentActivity = (GameActivity) context;
-        generateCardViews();
+        cardViews = generateCardViews();
         setOnDragListener(new CardDragListener());
         setWillNotDraw(false);
     }
 
-    private void generateCardViews() {
-        cardViews = new CardView[GameConstants.DECK_SIZE];
-        for (int card = 1; card <= GameConstants.DECK_SIZE; ++card) {
-            cardViews[card - 1] = new CardView(parentActivity, this, card);
-            this.addView(cardViews[card - 1]);
-        }
+    public int getFocusedCard() {
+        return focusedCard;
     }
 
-    private void generateCardBitmaps() {
-        for (CardView cardView : cardViews) {
-            cardView.setImageBitmap(CardBitmapGenerator.generateCardBitmap(cardView.getCard(),
-                    cardWidth,
-                    cardHeight));
-        }
+    public LocalPlayer getPlayer() {
+        return player;
     }
 
     protected void setPlayer(LocalPlayer p) {
         player = p;
+    }
+
+    private CardView[] generateCardViews() {
+        CardView cardViews[] = new CardView[GameConstants.DECK_SIZE];
+        for (int card = 1; card <= GameConstants.DECK_SIZE; ++card) {
+            cardViews[card - 1] = new CardView(parentActivity, this, card);
+            this.addView(cardViews[card - 1]);
+        }
+        return cardViews;
+    }
+
+    private void generateCardBitmaps() {
+        for (CardView cardView : cardViews) {
+            cardView.generateCardBitmap(cardWidth, cardHeight);
+        }
+    }
+
+    public int getCardWidth() {
+        return cardWidth;
+    }
+
+    public int getCardHeight() {
+        return cardHeight;
     }
 
     private float[] getQueueTopPosition() {
@@ -84,7 +101,7 @@ public class GameView extends FrameLayout {
                         + row * cardHeight * (1 + FIELDS_OFFSET_IN_CARDS / 2)};
     }
 
-    void returnCardToHand(int card) {
+    public void returnCardToHand(int card) {
         List<Integer> hand = player.getHand();
         int index = 0;
         while (index < hand.size() && hand.get(index) < card) {
@@ -138,7 +155,7 @@ public class GameView extends FrameLayout {
 
     protected void drawQueue() {
         float scaledHeight = cardHeight * QUEUE_CARD_SCALE;
-        float[] paddingLeftTop = getQueueTopPosition();
+        float paddingLeftTop[] = getQueueTopPosition();
         for (int card: player.getCardsQueue()) {
             System.out.println("drawQueue:size() " + player.getCardsQueue());
             drawCard(paddingLeftTop[0], paddingLeftTop[1],
@@ -149,7 +166,7 @@ public class GameView extends FrameLayout {
 
     protected void drawBoard() {
         float paddingTop = cardHeight * FIELDS_OFFSET_IN_CARDS / 2;
-        for (ArrayList<Integer> row: player.getBoard()) {
+        for (List<Integer> row : player.getBoard()) {
             float paddingLeft = cardWidth * FIELDS_OFFSET_IN_CARDS / 2;
             for (int card: row) {
                 drawCard(paddingLeft, paddingTop, card, 1);
@@ -170,7 +187,7 @@ public class GameView extends FrameLayout {
                         paddingTop,
                         paddingRight,
                         paddingTop + cardHeight * (1 + FIELDS_OFFSET_IN_CARDS / 4),
-                        Misc.strokePaint);
+                        Paints.strokePaint);
 
             }
             paddingTop += cardHeight * (1 + FIELDS_OFFSET_IN_CARDS / 2);
@@ -223,7 +240,7 @@ public class GameView extends FrameLayout {
         return animator.setDuration(ANIMATION_LENGTH);
     }
 
-    void setupAnimations() {
+    public void runTurnAnimation() {
         parentActivity.runOnUiThread(() -> {
             BoardModification boardModification = player.getBoardModificationQueue().peek();
             int row = boardModification.getRowIndex();
@@ -255,8 +272,8 @@ public class GameView extends FrameLayout {
 
     private void setupRowClearAnimation(int row) {
         AnimatorSet animatorSet = new AnimatorSet();
-        LinkedList<Animator> animators = new LinkedList<>();
-        float[] outsideTheField = {-cardWidth, getFieldCellPosition(row, 0)[1]};
+        List<Animator> animators = new LinkedList<>();
+        float outsideTheField[] = {-cardWidth, getFieldCellPosition(row, 0)[1]};
         for (int column = 0;
              column < Math.min(player.getBoard().get(row).size(), GameConstants.COLUMNS);
              column++) {

@@ -30,11 +30,12 @@ public class SetupSoloGameActivity extends AppCompatActivity {
 
 
     public void startGame(View view) {
-        Intent intent = new Intent(this, GameActivity.class);
-        intent.putExtras(getIntent());
-        intent.putExtra("Player count", 0);
-        intent.putExtra("Bot count", ((SeekBar) findViewById(R.id.botNumberSeekBar)).getProgress());
-        intent.putExtra("Bot level", ((SeekBar) findViewById(R.id.botLevelSeekBar)).getProgress());
-        startActivity(intent);
+        startActivity(new Intent(this, GameActivity.class)
+                .putExtras(getIntent())
+                .putExtra("Player count", 0)
+                .putExtra("Bot count",
+                        ((SeekBar) findViewById(R.id.botNumberSeekBar)).getProgress())
+                .putExtra("Bot level",
+                        ((SeekBar) findViewById(R.id.botLevelSeekBar)).getProgress()));
     }
 }

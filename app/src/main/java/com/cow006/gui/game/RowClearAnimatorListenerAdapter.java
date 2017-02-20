@@ -22,6 +22,6 @@ public class RowClearAnimatorListenerAdapter extends AnimatorListenerAdapter {
         super.onAnimationEnd(animation);
         gameView.player.getCardsQueue().addFirst(GameConstants.NOT_A_CARD);
         gameView.player.updateOneTurn();
-        gameView.setupAnimations();
+        gameView.runTurnAnimation();
     }
 }

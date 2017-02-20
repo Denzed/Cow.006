@@ -4,13 +4,13 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.text.TextPaint;
 
-public class Misc {
-    static final Paint strokePaint;
+public class Paints {
+    public static final Paint strokePaint;
     static final Paint cardPaints[];
     static final Paint bitmapPaint;
     static final TextPaint textPaint;
     private static final float TEXT_OFFSET = 0.05f;
-    private static final float STROKE_WIDTH = 2;
+    private static final float STROKE_WIDTH = 4;
 
     static {
         strokePaint = setupStrokePaint();
@@ -56,7 +56,7 @@ public class Misc {
         return strokePaint;
     }
 
-    static Paint getCardPaint(int number) {
+    public static Paint getCardPaint(int number) {
         if (number == 55) {
             return cardPaints[4];
         } else if (number % 10 == number / 10) {
@@ -87,16 +87,9 @@ public class Misc {
         return l;
     }
 
-    static public TextPaint generateTextPaint(float width, float height, String text) {
-        TextPaint textPaint = new TextPaint(Misc.textPaint);
-        textPaint.setTextSize(calcTextSize(width, height, text));
-        return textPaint;
-    }
-
-    static public boolean isInsideRect(float x, float y,
-                                       float xLeft, float yTop,
-                                       float xRight, float yBottom) {
-        return xLeft <= x && x < xRight
-                && yTop <= y && y < yBottom;
+    static public TextPaint generateTextPaintToFit(float width, float height, String text) {
+        TextPaint resultTextPaint = new TextPaint(textPaint);
+        resultTextPaint.setTextSize(calcTextSize(width, height, text));
+        return resultTextPaint;
     }
 }

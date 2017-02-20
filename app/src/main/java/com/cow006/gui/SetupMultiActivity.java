@@ -32,9 +32,8 @@ public class SetupMultiActivity extends AppCompatActivity {
     }
 
     public void startGame(View view) {
-        Intent intent = new Intent(this, GameActivity.class);
-        intent.putExtras(getIntent());
-        intent.putExtra("Player count", getProgressById(R.id.playerNumberSeekBar));
-        startActivity(intent);
+        startActivity(new Intent(this, GameActivity.class)
+                .putExtras(getIntent())
+                .putExtra("Player count", getProgressById(R.id.playerNumberSeekBar)));
     }
 }

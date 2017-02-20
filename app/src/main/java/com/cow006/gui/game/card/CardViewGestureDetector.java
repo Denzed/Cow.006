@@ -1,13 +1,16 @@
-package com.cow006.gui.game;
+package com.cow006.gui.game.card;
 
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 
+import com.cow006.gui.game.GameView;
+
 import Backend.Game.GameConstants;
+import Backend.Player.Player;
 
 class CardViewGestureDetector extends GestureDetector.SimpleOnGestureListener {
-    GameView gameView;
-    CardView cardView;
+    final GameView gameView;
+    final CardView cardView;
 
     public CardViewGestureDetector(GameView gameView,
                                    CardView cardView) {
@@ -17,16 +20,17 @@ class CardViewGestureDetector extends GestureDetector.SimpleOnGestureListener {
 
     @Override
     public boolean onDown(MotionEvent event) {
-        return gameView.player.getHand().contains(cardView.getCard());
+        return ((Player) gameView.getPlayer()).getHand().contains(cardView.getCard());
     }
 
     @Override
     public boolean onSingleTapUp(MotionEvent event) {
         int card = cardView.getCard();
-        if (gameView.player.getHand().contains(card)
-                && gameView.player.getBoardModificationQueue().isEmpty()
-                && gameView.player.isChoosingCardToTake()
-                && card != gameView.focusedCard) {
+        Player player = gameView.getPlayer();
+        if (player.getHand().contains(card)
+                && player.getBoardModificationQueue().isEmpty()
+                && player.isChoosingCardToTake()
+                && card != gameView.getFocusedCard()) {
             gameView.focusCard(card);
         }
         return true;
@@ -35,11 +39,12 @@ class CardViewGestureDetector extends GestureDetector.SimpleOnGestureListener {
     @Override
     public boolean onDoubleTap(MotionEvent event) {
         int card = cardView.getCard();
-        if (gameView.player.getHand().contains(card)
-                && gameView.player.getBoardModificationQueue().isEmpty()
-                && gameView.player.isChoosingCardToTake()
+        Player player = gameView.getPlayer();
+        if (player.getHand().contains(card)
+                && player.getBoardModificationQueue().isEmpty()
+                && player.isChoosingCardToTake()
                 && card != GameConstants.NOT_A_CARD) {
-            gameView.player.tellCard(card);
+            player.tellCard(card);
         }
         return true;
     }
@@ -47,9 +52,10 @@ class CardViewGestureDetector extends GestureDetector.SimpleOnGestureListener {
     @Override
     public void onLongPress(MotionEvent event) {
         int card = cardView.getCard();
-        if (gameView.player.getHand().contains(card)
-                && gameView.player.getBoardModificationQueue().isEmpty()
-                && gameView.player.isChoosingCardToTake()) {
+        Player player = gameView.getPlayer();
+        if (player.getHand().contains(card)
+                && player.getBoardModificationQueue().isEmpty()
+                && player.isChoosingCardToTake()) {
             gameView.focusCard(card);
             gameView.dragCardFromHand(card);
         }

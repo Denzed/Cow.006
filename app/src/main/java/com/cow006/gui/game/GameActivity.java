@@ -5,8 +5,8 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 
-import com.cow006.gui.FinalScoresActivity;
 import com.cow006.gui.R;
+import com.cow006.gui.tableactivities.FinalScoresActivity;
 
 import java.io.IOException;
 

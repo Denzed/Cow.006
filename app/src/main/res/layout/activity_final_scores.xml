@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.percent.PercentRelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_final_scores"
     android:layout_width="match_parent"
@@ -10,22 +9,11 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.cow006.gui.FinalScoresActivity">
+    tools:context=".tableactivities.FinalScoresActivity">
 
     <GridView
+        android:id="@+id/final_scores_table"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/large_text_size"
-        android:id="@+id/final_scores_table"/>
-
-    <Button
-        android:text="@string/back_to_main_menu"
-        android:textSize="@dimen/medium_text_size"
-        app:layout_widthPercent="50%"
-        app:layout_heightPercent="10%"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:onClick="goToMainMenu"
-        android:id="@+id/main_menu_button" />
+        android:textSize="@dimen/large_text_size"/>
 </android.support.percent.PercentRelativeLayout>

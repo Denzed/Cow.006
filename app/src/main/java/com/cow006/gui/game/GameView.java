@@ -21,7 +21,6 @@ import android.widget.TextView;
 import com.cow006.gui.R;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
 import Backend.AbstractPlayer;
@@ -36,7 +35,6 @@ public class GameView extends FrameLayout {
     GameActivity parentActivity;
     int cardWidth;
     int cardHeight;
-    LinkedHashSet<Integer> animatedCards = new LinkedHashSet<>();
     int focusedCard = GameConstants.NOT_A_CARD;
     LocalPlayer player = null;
     private CardView cardViews[];

@@ -39,7 +39,7 @@ class LocalPlayer extends Player {
     @Override
     public void setGameInterrupted() {
         super.setGameInterrupted();
-        gameView.drawMessageWithAction("Someone has disconnected! The game will be interrupted.",
+        gameView.drawMessage("Someone has disconnected! The game will be interrupted.",
                 (DialogInterface dialog, int which) ->
                         gameView.parentActivity.goToResults(getFinalScoresAsString()));
     }
@@ -65,15 +65,16 @@ class LocalPlayer extends Player {
     @Override
     public void setHand(List<Integer> hand) {
         GameActivity parentActivity = gameView.parentActivity;
-        if (getState() == GameState.NEW_GAME) {
-            parentActivity.runOnUiThread(() ->
-                    ((ViewFlipper) parentActivity.findViewById(R.id.activity_game)).showNext());
-            gameView.drawMessage(parentActivity.getString(R.string.game_start_message_text));
-        } else {
-            gameView.drawMessage(parentActivity.getString(R.string.next_round_message_text));
-        }
-        super.setHand(hand);
-        gameView.drawHand();
+        parentActivity.runOnUiThread(() -> {
+            if (getState() == GameState.NEW_GAME) {
+                ((ViewFlipper) parentActivity.findViewById(R.id.activity_game)).showNext();
+                gameView.drawMessage(parentActivity.getString(R.string.game_start_message_text));
+            } else {
+                gameView.drawMessage(parentActivity.getString(R.string.next_round_message_text));
+            }
+            super.setHand(hand);
+            gameView.drawHand();
+        });
     }
 
     @Override

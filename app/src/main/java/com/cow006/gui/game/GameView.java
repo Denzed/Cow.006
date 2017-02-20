@@ -113,7 +113,6 @@ public class GameView extends FrameLayout {
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        super.onLayout(changed, left, top, right, bottom);
         if (changed) {
             cardWidth = Math.round(CARD_COEFFICIENT * (right - left));
             cardHeight = Math.round(CARD_COEFFICIENT * (bottom - top));
@@ -125,6 +124,7 @@ public class GameView extends FrameLayout {
             }
         }
         updateCards();
+        super.onLayout(changed, left, top, right, bottom);
     }
 
     protected void drawScores() {
@@ -140,10 +140,13 @@ public class GameView extends FrameLayout {
         cardViews[card - 1].setScale((card == focusedCard ? FOCUSED_ZOOM : 1) * scale);
         cardViews[card - 1].setX(paddingLeft);
         cardViews[card - 1].setY(paddingTop);
-        parentActivity.runOnUiThread(() -> cardViews[card - 1].setVisibility(View.VISIBLE));
+        if (cardViews[card - 1].getVisibility() != View.VISIBLE) {
+            parentActivity.runOnUiThread(() ->
+                    cardViews[card - 1].setVisibility(View.VISIBLE));
+        }
     }
 
-    protected void drawHand() {
+    protected synchronized void drawHand() {
         int n = player.getHand().size();
         float paddingLeft = (getWidth() - cardWidth * (n + 1) / 2) / 2;
         float paddingTop = getHeight() - cardHeight * (1 + FIELDS_OFFSET_IN_CARDS);
@@ -153,7 +156,7 @@ public class GameView extends FrameLayout {
         }
     }
 
-    protected void drawQueue() {
+    protected synchronized void drawQueue() {
         float scaledHeight = cardHeight * QUEUE_CARD_SCALE;
         float paddingLeftTop[] = getQueueTopPosition();
         for (int card: player.getCardsQueue()) {
@@ -164,7 +167,7 @@ public class GameView extends FrameLayout {
         }
     }
 
-    protected void drawBoard() {
+    protected synchronized void drawBoard() {
         float paddingTop = cardHeight * FIELDS_OFFSET_IN_CARDS / 2;
         for (List<Integer> row : player.getBoard()) {
             float paddingLeft = cardWidth * FIELDS_OFFSET_IN_CARDS / 2;
@@ -194,19 +197,15 @@ public class GameView extends FrameLayout {
         }
     }
 
-    protected void drawMessageWithAction(String message,
-                                         DialogInterface.OnClickListener action) {
-        parentActivity.runOnUiThread(() -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            builder.setMessage(message)
-                    .setNeutralButton("OK", action)
-                    .create()
-                    .show();
-        });
+    protected void drawMessage(String message, DialogInterface.OnClickListener action) {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext())
+                .setMessage(message)
+                .setNeutralButton(R.string.alertdialog_neutral_button_text, action);
+        parentActivity.runOnUiThread(dialogBuilder.create()::show);
     }
 
     protected void drawMessage(String message) {
-        drawMessageWithAction(message, (DialogInterface dialog, int which) -> {/* do nothing */});
+        drawMessage(message, (DialogInterface dialog, int which) -> {/* do nothing */});
     }
 
     @Override
@@ -241,36 +240,27 @@ public class GameView extends FrameLayout {
     }
 
     public void runTurnAnimation() {
-        parentActivity.runOnUiThread(() -> {
-            BoardModification boardModification = player.getBoardModificationQueue().peek();
-            int row = boardModification.getRowIndex();
-            int column = (boardModification.getType() == Row.RowModificationTypes.CLEAR_ROW
-                    ? 0
-                    : player.getBoard().get(row).size());
-            if (boardModification.getType() == Row.RowModificationTypes.CLEAR_ROW) {
-                setupRowClearAnimation(row);
-            } else {
-                setupCardAddAnimation(boardModification.getCard(), row, column);
-            }
-        });
+        BoardModification boardModification = player.getBoardModificationQueue().peek();
+        int row = boardModification.getRowIndex();
+        int column = (boardModification.getType() == Row.RowModificationTypes.CLEAR_ROW
+                ? 0
+                : player.getBoard().get(row).size());
+        parentActivity.runOnUiThread((boardModification.getType() == Row.RowModificationTypes.CLEAR_ROW
+                ? setupRowClearAnimation(row)
+                : setupCardAddAnimation(
+                boardModification.getCard(), row, column))::start);
     }
 
-    private void setupCardAddAnimation(int card, int row, int column) {
-        cardViews[card - 1].bringToFront();
-        ObjectAnimator animator = animateCardTranslation(card,
+    private AnimatorSet setupCardAddAnimation(int card, int row, int column) {
+        parentActivity.runOnUiThread(cardViews[card - 1]::bringToFront);
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.playTogether(animateCardTranslation(card,
                 getQueueTopPosition(), getFieldCellPosition(row, column),
-                new CardAddAnimatorListenerAdapter(this, cardViews[card - 1], true));
-        animator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                super.onAnimationStart(animation);
-                player.getCardsQueue().poll();
-            }
-        });
-        animator.start();
+                new CardAddAnimatorListenerAdapter(this, cardViews[card - 1], true)));
+        return animatorSet;
     }
 
-    private void setupRowClearAnimation(int row) {
+    private AnimatorSet setupRowClearAnimation(int row) {
         AnimatorSet animatorSet = new AnimatorSet();
         List<Animator> animators = new LinkedList<>();
         float outsideTheField[] = {-cardWidth, getFieldCellPosition(row, 0)[1]};
@@ -284,7 +274,7 @@ public class GameView extends FrameLayout {
         }
         animatorSet.addListener(new RowClearAnimatorListenerAdapter(this));
         animatorSet.playTogether(animators);
-        animatorSet.start();
+        return animatorSet;
     }
 
     private boolean isInsideRow(int row, float x, float y) {

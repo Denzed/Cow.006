@@ -23,6 +23,7 @@ public class CardAddAnimatorListenerAdapter extends AnimatorListenerAdapter {
 
     @Override
     public void onAnimationStart(Animator animator) {
+        ((Player) gameView.getPlayer()).getCardsQueue().poll();
         super.onAnimationStart(animator);
     }
 

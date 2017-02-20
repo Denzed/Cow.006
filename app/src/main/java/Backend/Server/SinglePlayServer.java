@@ -20,6 +20,7 @@ import static Backend.Client.Client.PORT_NUMBER;
 public class SinglePlayServer{
 
     public static void main(String[] Args) throws IOException {
+
         ServerSocket serverSocket = new ServerSocket(PORT_NUMBER);
         List<ClientConnection> connections = new ArrayList<>();
         List<PlayerInformation> playersInformations = new ArrayList<>();
@@ -38,6 +39,7 @@ public class SinglePlayServer{
         }
 
         startGame(connections, playersInformations);
+        serverSocket.close();
     }
     
     private static void startGame(List<ClientConnection> connections, List<PlayerInformation> playersInformations) {

@@ -70,8 +70,11 @@ public class GameView extends FrameLayout {
     }
 
     private float[] getQueueTopPosition() {
-        return new float[]{getWidth() - cardWidth * (1 + FIELDS_OFFSET_IN_CARDS / 2),
-                cardHeight * FIELDS_OFFSET_IN_CARDS / 2};
+        float scaledWidth = cardWidth * QUEUE_CARD_SCALE;
+        float scaledHeight = cardHeight * QUEUE_CARD_SCALE;
+        float paddingRight = getWidth() - scaledWidth * FIELDS_OFFSET_IN_CARDS / 2;
+        float paddingBottom = scaledHeight * (1 + FIELDS_OFFSET_IN_CARDS / 2);
+        return new float[]{paddingRight - cardWidth, paddingBottom - cardHeight};
     }
 
     private float[] getFieldCellPosition(int row, int column) {
@@ -104,6 +107,7 @@ public class GameView extends FrameLayout {
                 params.height = cardHeight;
             }
         }
+        updateCards();
     }
 
     protected void drawScores() {
@@ -133,14 +137,12 @@ public class GameView extends FrameLayout {
     }
 
     protected void drawQueue() {
-        float scaledWidth = cardWidth * QUEUE_CARD_SCALE;
         float scaledHeight = cardHeight * QUEUE_CARD_SCALE;
-        float paddingRight = getWidth() - scaledWidth * FIELDS_OFFSET_IN_CARDS / 2;
-        float paddingBottom = scaledHeight * (1 + FIELDS_OFFSET_IN_CARDS / 2);
+        float[] paddingLeftTop = getQueueTopPosition();
         for (int card: player.getCardsQueue()) {
-            drawCard(paddingRight - cardWidth, paddingBottom - cardHeight,
+            drawCard(paddingLeftTop[0], paddingLeftTop[1],
                     card, QUEUE_CARD_SCALE);
-            paddingBottom += scaledHeight * (1 + FIELDS_OFFSET_IN_CARDS / 2);
+            paddingLeftTop[1] += scaledHeight * (1 + FIELDS_OFFSET_IN_CARDS / 2);
         }
     }
 
@@ -191,10 +193,6 @@ public class GameView extends FrameLayout {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if (player == null || player.getState() == AbstractPlayer.GameState.NEW_GAME) {
-            return;
-        }
-        updateCards();
         drawRowChooser(canvas);
     }
 
@@ -240,11 +238,18 @@ public class GameView extends FrameLayout {
     }
 
     private void setupCardAddAnimation(int card, int row, int column) {
-        player.getCardsQueue().poll();
         cardViews[card - 1].bringToFront();
-        animateCardTranslation(card,
+        ObjectAnimator animator = animateCardTranslation(card,
                 getQueueTopPosition(), getFieldCellPosition(row, column),
-                new CardAddAnimatorListenerAdapter(this, cardViews[card - 1], true)).start();
+                new CardAddAnimatorListenerAdapter(this, cardViews[card - 1], true));
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                player.getCardsQueue().poll();
+            }
+        });
+        animator.start();
     }
 
     private void setupRowClearAnimation(int row) {

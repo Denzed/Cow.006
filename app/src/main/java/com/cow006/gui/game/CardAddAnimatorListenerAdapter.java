@@ -19,8 +19,6 @@ public class CardAddAnimatorListenerAdapter extends AnimatorListenerAdapter {
 
     @Override
     public void onAnimationStart(Animator animator) {
-        gameView.animatedCards.add(cardView.getCard());
-        gameView.drawQueue();
         super.onAnimationStart(animator);
     }
 
@@ -35,7 +33,6 @@ public class CardAddAnimatorListenerAdapter extends AnimatorListenerAdapter {
         } else {
             cardView.setVisibility(View.INVISIBLE);
         }
-        gameView.animatedCards.remove(cardView.getCard());
         super.onAnimationEnd(animation);
     }
 }

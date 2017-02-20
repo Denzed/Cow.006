@@ -14,14 +14,14 @@ public class RowClearAnimatorListenerAdapter extends AnimatorListenerAdapter {
 
     @Override
     public void onAnimationStart(Animator animator) {
-        gameView.player.getCardsQueue().addFirst(GameConstants.NOT_A_CARD);
-        gameView.player.updateOneMove();
         super.onAnimationStart(animator);
     }
 
     @Override
     public void onAnimationEnd(Animator animation) {
         super.onAnimationEnd(animation);
+        gameView.player.getCardsQueue().addFirst(GameConstants.NOT_A_CARD);
+        gameView.player.updateOneMove();
         gameView.setupAnimations();
     }
 }

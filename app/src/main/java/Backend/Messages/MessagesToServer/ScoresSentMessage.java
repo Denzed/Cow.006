@@ -5,13 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Backend.Client.Client;
+import Backend.Client.GameClient;
 import Backend.Server.ClientConnection;
 
 import static java.lang.Integer.parseInt;
 
 public class ScoresSentMessage {
 
-    public static void submit(Client client, List<Integer> scores){
+    public static void submit(GameClient client, List<Integer> scores){
         client.getClientOutput().println(scores.size());
         for (Integer x : scores){
             client.getClientOutput().println(x);

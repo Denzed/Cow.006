@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Backend.Client.Client;
+import Backend.Client.GameClient;
 import Backend.Server.ClientConnection;
 
 import static java.lang.Integer.parseInt;
@@ -26,7 +27,7 @@ public class BuildMultiPlayFinalResultsMessage {
         }
     }
 
-    public static void receive(Client client) throws IOException {
+    public static void receive(GameClient client) throws IOException {
         List<String> ratings = new ArrayList<>();
         List<String> ratingChanges = new ArrayList<>();
         int size = parseInt(client.getClientInput().readLine());

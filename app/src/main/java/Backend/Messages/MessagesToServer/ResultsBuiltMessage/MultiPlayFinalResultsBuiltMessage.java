@@ -4,11 +4,12 @@ import java.io.IOException;
 import java.util.List;
 
 import Backend.Client.Client;
+import Backend.Client.GameClient;
 import Backend.Server.ClientConnection;
 
 public class MultiPlayFinalResultsBuiltMessage {
 
-    public static void submit(Client client){
+    public static void submit(GameClient client){
         client.getClientOutput().println("MULTI_PLAY_FINAL_RESULTS_BUILT");
     }
 

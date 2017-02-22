@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import Backend.Client.Client;
+import Backend.Client.GameClient;
 import Backend.GameHandler.GameHandler;
 import Backend.Server.ClientConnection;
 
@@ -20,7 +21,7 @@ public class GameFinishedMessage {
         }
     }
 
-    public static void receive(Client client) throws IOException {
+    public static void receive(GameClient client) throws IOException {
         while (!client.getConnectedPlayer().getCardsQueue().isEmpty()){
             try {
                 Thread.sleep(100);

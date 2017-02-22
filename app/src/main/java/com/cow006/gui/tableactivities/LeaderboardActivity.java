@@ -11,6 +11,9 @@ import com.cow006.gui.R;
 import java.io.IOException;
 import java.util.List;
 
+import Backend.Client.LeaderBoardRequester;
+import Backend.Database.LeaderBoardRecord;
+
 public class LeaderboardActivity extends AppCompatActivity{
     public static final int LEADERBOARD_SIZE = 100;
     List<List<String>> leaderboard;
@@ -38,16 +41,8 @@ public class LeaderboardActivity extends AppCompatActivity{
 
     private void setupLeaderboard() {
         try {
-            /* TODO: implement this
-                Remember to pay attention to LEADERBOARD_SIZE
-            Client client = new Client();
-            client.connectToServer(Client.ConnectionTypes.LEADERBOARD);
-            for (int i = 0; i < LEADERBOARD_SIZE; i++) {
-                String line = client.getClientInput().readLine();
-                leaderboard += line + ((i % 2 == 1) ? "\n" : "\t");
-            }
-            client.disconnectFromServer();
-            */
+            LeaderBoardRequester leaderBoardRequester = new LeaderBoardRequester(LEADERBOARD_SIZE);
+            List<LeaderBoardRecord> leaderboardAsList = leaderBoardRequester.requestLeaderBoard();
             // TODO: delete the line after implementation of the above
             throw new IOException("Placeholder for probable IOException in code below" +
                     "until it is implemented");

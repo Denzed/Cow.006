@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Queue;
 
 import Backend.Client.Client;
+import Backend.Client.GameClient;
 import Backend.Server.ClientConnection;
 import Backend.Game.Turn;
 
@@ -28,7 +29,7 @@ public class CurrentRoundMessage {
         }
     }
 
-    public static void receive(Client client) throws IOException {
+    public static void receive(GameClient client) throws IOException {
         Queue<Turn> turnsQueue = new ArrayDeque<>();
         Deque<Integer> cardsQueue = new ArrayDeque<>();
         for (int i = 0; i < client.getConnectedPlayer().getPlayersNumber(); i++){

@@ -3,13 +3,14 @@ package Backend.Messages.MessagesToServer;
 import java.io.IOException;
 
 import Backend.Client.Client;
+import Backend.Client.GameClient;
 import Backend.Server.ClientConnection;
 
 import static java.lang.Integer.parseInt;
 
 public class CardSelectedMessage {
 
-    public static void submit(Client client, int card){
+    public static void submit(GameClient client, int card){
         client.getClientOutput().println(card);
     }
 

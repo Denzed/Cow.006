@@ -18,11 +18,6 @@ import Backend.Player.PlayerInformation;
 class LocalPlayer extends Player {
     GameView gameView;
 
-/*    public LocalPlayer(GameView gameView, int playersNumber) {
-        super(playersNumber);
-        this.gameView = gameView;
-    }
-*/
     public LocalPlayer(GameView gameView, int playersNumber, PlayerInformation playerInformation) {
         super(playersNumber, playerInformation);
         this.gameView = gameView;

@@ -3,6 +3,7 @@ package Backend.Messages.MessagesToClient.BuildFinalResultsMessages;
 import java.util.List;
 
 import Backend.Client.Client;
+import Backend.Client.GameClient;
 import Backend.Server.ClientConnection;
 
 public class BuildSinglePlayFinalResultsMessage {
@@ -11,7 +12,7 @@ public class BuildSinglePlayFinalResultsMessage {
         connection.getClientOutput().println("BUILD_SINGLE_PLAY_FINAL_RESULTS");
     }
 
-    public static void receive(Client client){
+    public static void receive(GameClient client){
         client.getConnectedPlayer().buildSinglePlayFinalResults();
     }
 

@@ -37,10 +37,10 @@ public class DatabaseConnection {
         return resultSet;
     }
 
-    public List<LeaderBoardRecord> requestLeaderBoard() throws SQLException {
+    public List<LeaderBoardRecord> requestLeaderBoard(int leaderbordSize) throws SQLException {
         Connection dbConnection = connectToDatabase();
-        String query = "SELECT username, rating FROM " + tableName + " ORDER BY rating DESC LIMIT 100";
-        ResultSet resultSet = executeQuery(dbConnection,query);
+        String query = "SELECT username, rating FROM " + tableName + " ORDER BY rating DESC LIMIT " + leaderbordSize;
+        ResultSet resultSet = executeQuery(dbConnection, query);
         dbConnection.close();
         return buildLeaderBoard(resultSet);
     }

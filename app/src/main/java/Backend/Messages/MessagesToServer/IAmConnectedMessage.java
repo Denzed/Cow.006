@@ -3,11 +3,12 @@ package Backend.Messages.MessagesToServer;
 import java.io.IOException;
 
 import Backend.Client.Client;
+import Backend.Client.GameClient;
 import Backend.Server.ClientConnection;
 
 public class IAmConnectedMessage {
 
-    public static void submit(Client client){
+    public static void submit(GameClient client){
         client.getClientOutput().println("I_AM_CONNECTED");
     }
 

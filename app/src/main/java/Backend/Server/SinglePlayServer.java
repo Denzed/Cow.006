@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Backend.Client.Client;
+import Backend.Client.GameClient;
 import Backend.Player.Bot;
 import Backend.GameHandler.SinglePlayHandler;
 import Backend.Messages.MessagesToServer.PlayerInformationMessage;
@@ -44,7 +45,7 @@ public class SinglePlayServer extends GameServer{
         for (int i = 0; i < botsNumber; i++){
             new Thread(() -> {
                 try {
-                    new Client(new Bot(botsNumber + 1)).requestGame(LOCALHOST);
+                    new GameClient(new Bot(botsNumber + 1)).requestGame(LOCALHOST);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

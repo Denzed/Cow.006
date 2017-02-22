@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import Backend.Client.GameClient;
 import Backend.Game.Board;
 import Backend.Client.Client;
 import Backend.Game.Row;
@@ -27,7 +28,7 @@ public class DealStartedMessage {
         }
     }
 
-    public static void receive(Client client) throws IOException {
+    public static void receive(GameClient client) throws IOException {
         while (!client.getConnectedPlayer().getCardsQueue().isEmpty()){
             try {
                 Thread.sleep(100);

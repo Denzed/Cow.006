@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Backend.Client.Client;
+import Backend.Client.GameClient;
 import Backend.Player.PlayerInformation;
 import Backend.Server.ClientConnection;
 
@@ -24,7 +25,7 @@ public class GameStartedMessage {
         }
     }
 
-    public static void receive(Client client) throws IOException {
+    public static void receive(GameClient client) throws IOException {
         List<PlayerInformation> result = new ArrayList<>();
         for (int i = 0; i < client.getConnectedPlayer().getPlayersNumber(); i++){
             String username = client.getClientInput().readLine();

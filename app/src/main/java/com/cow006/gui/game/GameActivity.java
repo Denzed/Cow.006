@@ -11,6 +11,7 @@ import com.cow006.gui.tableactivities.FinalScoresActivity;
 import java.io.IOException;
 
 import Backend.Client.Client;
+import Backend.Client.GameClient;
 import Backend.Player.PlayerInformation;
 import Backend.Server.SinglePlayServer;
 
@@ -21,7 +22,7 @@ public class GameActivity extends AppCompatActivity {
     private int players;
     private int bots;
     private int botLevel;
-    private Client localClient;
+    private GameClient localClient;
     private String username;
     private String userID;
 
@@ -64,7 +65,7 @@ public class GameActivity extends AppCompatActivity {
         final LocalPlayer lp = new LocalPlayer(gw, players + bots + 1, new PlayerInformation(username, userID));
         gw.setPlayer(lp);
 
-        localClient = new Client(lp);
+        localClient = new GameClient(lp);
         new Thread(() -> {
             try {
                 localClient.requestGame(players == 0 ? LOCALHOST : MY_LAPTOP_HOST);

@@ -23,7 +23,7 @@ public class SmallestCardTurnMessage {
 
     public static void receive(Client client) throws IOException {
         int chosenRowIndex = parseInt(client.getClientInput().readLine());
-        client.connectedPlayer.buildBoardModificationsQueue(chosenRowIndex);
+        client.getConnectedPlayer().buildBoardModificationsQueue(chosenRowIndex);
     }
 
 }

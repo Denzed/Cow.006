@@ -62,7 +62,6 @@ public class GameActivity extends AppCompatActivity {
         GameView gw = (GameView) findViewById(R.id.game_view);
 
         final LocalPlayer lp = new LocalPlayer(gw, players + bots + 1, new PlayerInformation(username, userID));
-        System.out.println("PLAYERS = " + players + " BOTS = " + bots + " PARAMETER = " + (players + bots + 1));
         gw.setPlayer(lp);
 
         localClient = new Client(lp);

@@ -12,7 +12,7 @@ public class BuildSinglePlayFinalResultsMessage {
     }
 
     public static void receive(Client client){
-        client.connectedPlayer.buildSinglePlayFinalResults();
+        client.getConnectedPlayer().buildSinglePlayFinalResults();
     }
 
     public static void submitAll(List<ClientConnection> connections) {

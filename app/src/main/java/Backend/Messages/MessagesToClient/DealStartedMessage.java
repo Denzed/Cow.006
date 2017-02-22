@@ -2,7 +2,6 @@ package Backend.Messages.MessagesToClient;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import Backend.Game.Board;
@@ -29,7 +28,7 @@ public class DealStartedMessage {
     }
 
     public static void receive(Client client) throws IOException {
-        while (!client.connectedPlayer.getCardsQueue().isEmpty()){
+        while (!client.getConnectedPlayer().getCardsQueue().isEmpty()){
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -55,9 +54,9 @@ public class DealStartedMessage {
             currentBoard.add(row);
         }
 
-        client.connectedPlayer.setHand(hand);
-        client.connectedPlayer.setBoard(board);
-        client.connectedPlayer.setCurrentBoard(currentBoard);
+        client.getConnectedPlayer().setHand(hand);
+        client.getConnectedPlayer().setBoard(board);
+        client.getConnectedPlayer().setCurrentBoard(currentBoard);
     }
 
 }

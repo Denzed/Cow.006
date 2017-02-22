@@ -1,7 +1,7 @@
 package Backend.Game;
 
 public class GameConstants {
-    public static final int CARD_PENALTY[] = {0,
+    static final int CARD_PENALTY[] = {0,
         1, 1, 1, 1, 2, 1, 1, 1, 1, 3,
         5, 1, 1, 1, 2, 1, 1, 1, 1, 3,
         1, 5, 1, 1, 2, 1, 1, 1, 1, 3,

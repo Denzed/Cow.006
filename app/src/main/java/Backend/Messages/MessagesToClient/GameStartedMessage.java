@@ -8,8 +8,6 @@ import Backend.Client.Client;
 import Backend.Player.PlayerInformation;
 import Backend.Server.ClientConnection;
 
-import static java.lang.Integer.parseInt;
-
 public class GameStartedMessage {
 
     public static void submit(ClientConnection connection, List<PlayerInformation> playersInformations){
@@ -28,13 +26,13 @@ public class GameStartedMessage {
 
     public static void receive(Client client) throws IOException {
         List<PlayerInformation> result = new ArrayList<>();
-        for (int i = 0; i < client.connectedPlayer.getPlayersNumber(); i++){
+        for (int i = 0; i < client.getConnectedPlayer().getPlayersNumber(); i++){
             String username = client.getClientInput().readLine();
             String userID = client.getClientInput().readLine();
             result.add(new PlayerInformation(username, userID));
         }
 
-        client.connectedPlayer.setPlayersInformations(result);
+        client.getConnectedPlayer().setPlayersInformations(result);
     }
 
 }

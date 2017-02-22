@@ -21,7 +21,7 @@ public class GameFinishedMessage {
     }
 
     public static void receive(Client client) throws IOException {
-        while (!client.connectedPlayer.getCardsQueue().isEmpty()){
+        while (!client.getConnectedPlayer().getCardsQueue().isEmpty()){
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -29,11 +29,12 @@ public class GameFinishedMessage {
             }
         }
 
-        GameHandler.GameFinishedReasons reason =  GameHandler.GameFinishedReasons.valueOf(client.getClientInput().readLine());
+        GameHandler.GameFinishedReasons reason =
+                GameHandler.GameFinishedReasons.valueOf(client.getClientInput().readLine());
         if (reason == GameHandler.GameFinishedReasons.GAME_OVER){
-            client.connectedPlayer.setGameFinished();
+            client.getConnectedPlayer().setGameFinished();
         } else {
-            client.connectedPlayer.setGameInterrupted();
+            client.getConnectedPlayer().setGameInterrupted();
         }
     }
 

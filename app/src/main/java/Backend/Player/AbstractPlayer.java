@@ -13,14 +13,14 @@ import static Backend.Game.GameConstants.*;
 
 public abstract class AbstractPlayer {
 
-    protected List<List<String>> finalResults; //???
-    protected PlayerInformation playerInformation;
-    protected List<PlayerInformation> playersInformations;
-    protected int playersNumber;
+    private List<List<String>> finalResults; //???
+    private PlayerInformation playerInformation;
+    private List<PlayerInformation> playersInformations;
+    private int playersNumber;
     protected volatile List<Integer> hand;
     volatile int chosenRowIndex;
     volatile int chosenCardValue;
-    List<Integer> scores;
+    private List<Integer> scores;
     protected volatile Board board;
     private volatile Board currentBoard;
     private volatile GameState state;
@@ -104,20 +104,20 @@ public abstract class AbstractPlayer {
         legend.addAll(Arrays.asList("Player", "Score"));
         finalResults.add(legend);
         for (PlayerInformation playerInformation : playersInformations){
-            List<String> line = new ArrayList<>();
-            line.add(playerInformation.getUsername());
-            line.add(scores.get(playersInformations.indexOf(playerInformation)).toString());
-            finalResults.add(line);
+            List<String> resultLine = new ArrayList<>();
+            resultLine.add(playerInformation.getUsername());
+            resultLine.add(scores.get(playersInformations.indexOf(playerInformation)).toString());
+            finalResults.add(resultLine);
         }
     }
 
-    void buildFinalResultsMultiPlayer(ArrayList<String> usernames, ArrayList<String> ratings, ArrayList<String> ratingChanges) {
+    public void buildMultiPlayFinalResults(List<String> ratings, List<String> ratingChanges) {
         ArrayList<String> legend = new ArrayList<>();
         legend.addAll(Arrays.asList("Player", "Score", "Rating", "Delta"));
         finalResults.add(legend);
         for (int i = 0; i < playersNumber; i++){
             ArrayList<String> resultLine = new ArrayList<>();
-//            resultLine.add(usernames.get(i) + ((i == id) ? "(YOU)" : ""));
+            resultLine.add(playersInformations.get(i).getUsername());
             resultLine.add(String.valueOf(scores.get(i)));
             resultLine.add(ratings.get(i));
             resultLine.add(ratingChanges.get(i));
@@ -125,7 +125,7 @@ public abstract class AbstractPlayer {
         }
     }
 
-    public List<List<String>> getFinalResults() {
+    protected List<List<String>> getFinalResults() {
         return finalResults;
     }
 
@@ -149,23 +149,15 @@ public abstract class AbstractPlayer {
         this.board = board;
     }
 
-/*    public int getPlayersNumber() {
-        return playersNumber;
-    }
-*/
     public List<Integer> getScores(){
         return scores;
     }
 
-    public void setGameInterrupted() {
-        //TODO: Why empty body?
-    }
+    public void setGameInterrupted() {}
 
-    public void setGameFinished() {
-        //TODO: Why empty body?
-    }
+    public void setGameFinished() {}
 
-    public GameState getState() {
+    protected GameState getState() {
         return this.state;
     }
 
@@ -173,7 +165,7 @@ public abstract class AbstractPlayer {
         return playerInformation;
     }
 
-    public List<PlayerInformation> getPlayersInformations() {
+    protected List<PlayerInformation> getPlayersInformations() {
         return playersInformations;
     }
 
@@ -189,14 +181,10 @@ public abstract class AbstractPlayer {
         this.turnsQueue = turnsQueue;
     }
 
-    public enum GameState {NEW_GAME, NEXT_ROUND}
+    protected enum GameState {NEW_GAME, NEXT_ROUND}
 
     public int getPlayersNumber() {
         return playersNumber;
-    }
-
-    boolean isConnected() {
-        return true;
     }
 
     public Deque<Integer> getCardsQueue() {return cardsQueue;}

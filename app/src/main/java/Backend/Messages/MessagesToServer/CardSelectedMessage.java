@@ -10,7 +10,6 @@ import static java.lang.Integer.parseInt;
 public class CardSelectedMessage {
 
     public static void submit(Client client, int card){
-//        client.getClientOutput().println("CARD_SELECTED");
         client.getClientOutput().println(card);
     }
 

@@ -9,10 +9,7 @@ import Backend.Messages.MessagesToClient.LeaderboardSentMessage;
 import Backend.Messages.MessagesToServer.SendLeaderboardMessage;
 
 import static Backend.Client.Client.PORT_NUMBER;
-import static Backend.Database.DatabaseConnection.DB_LOGIN;
-import static Backend.Database.DatabaseConnection.DB_TABLE_NAME;
-import static Backend.Database.DatabaseConnection.DB_URL_ADDRESS;
-import static Backend.Database.DatabaseConnection.SECRET_PASSWORD;
+import static Backend.Database.DatabaseConnection.*;
 
 public class LeaderboardServer {
 

@@ -2,41 +2,17 @@ package Backend.GameHandler;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.*;
+import java.util.concurrent.*;
 
-import Backend.Game.Board;
-import Backend.Game.Row;
-import Backend.Game.Turn;
-import Backend.Messages.MessagesToClient.CurrentRoundMessage;
-import Backend.Messages.MessagesToClient.DealStartedMessage;
-import Backend.Messages.MessagesToClient.GameFinishedMessage;
-import Backend.Messages.MessagesToClient.GameStartedMessage;
-import Backend.Messages.MessagesToClient.SendCardMessage;
-import Backend.Messages.MessagesToClient.SendMaxScoreMessage;
-import Backend.Messages.MessagesToClient.SendRowMessage;
-import Backend.Messages.MessagesToClient.SmallestCardTurnMessage;
-import Backend.Messages.MessagesToServer.CardSelectedMessage;
-import Backend.Messages.MessagesToServer.MaxScoreSentMessage;
-import Backend.Messages.MessagesToServer.RowSelectedMessage;
+import Backend.Game.*;
+import Backend.Messages.MessagesToClient.*;
+import Backend.Messages.MessagesToServer.*;
 import Backend.Player.PlayerInformation;
 import Backend.Server.ClientConnection;
 
-import static Backend.Game.GameConstants.DECK_SIZE;
-import static Backend.Game.GameConstants.ROUNDS;
-import static Backend.Game.GameConstants.ROWS;
-import static Backend.Game.GameConstants.STOP_POINTS;
+import static Backend.Game.GameConstants.*;
 import static Backend.GameHandler.GameHandler.GameFinishedReasons.GAME_OVER;
-
-//import javafx.util.Pair;
 
 public abstract class GameHandler {
 
@@ -130,4 +106,5 @@ public abstract class GameHandler {
     }
 
     protected abstract void processResults() throws SQLException, InterruptedException, IOException, ExecutionException;
+
 }

@@ -1,11 +1,15 @@
 package Backend.Database;
 
-import Backend.Player.PlayerInformation;
-
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+
+import Backend.Player.PlayerInformation;
 
 public class DatabaseConnection {
 
@@ -37,41 +41,41 @@ public class DatabaseConnection {
         return resultSet;
     }
 
-    public List<LeaderBoardRecord> requestLeaderBoard(int leaderbordSize) throws SQLException {
+    public List<LeaderboardRecord> requestLeaderboard(int leaderbordSize) throws SQLException {
         Connection dbConnection = connectToDatabase();
         String query = "SELECT username, rating FROM " + tableName + " ORDER BY rating DESC LIMIT " + leaderbordSize;
         ResultSet resultSet = executeQuery(dbConnection, query);
         dbConnection.close();
-        return buildLeaderBoard(resultSet);
+        return buildLeaderboard(resultSet);
     }
 
-    private List<LeaderBoardRecord> buildLeaderBoard(ResultSet resultSet) throws SQLException {
-        List<LeaderBoardRecord> result = new ArrayList<>();
+    private List<LeaderboardRecord> buildLeaderboard(ResultSet resultSet) throws SQLException {
+        List<LeaderboardRecord> result = new ArrayList<>();
         while (resultSet.next()){
             String username = resultSet.getString("username");
             int rating = resultSet.getInt("rating");
-            result.add(new LeaderBoardRecord(username, rating));
+            result.add(new LeaderboardRecord(username, rating));
         }
         return result;
     }
 
-    public List<DatabaseRecord> requestDatabaseRecords(List<PlayerInformation> playersInformations)
+    public List<DatabaseRecord> requestDatabaseRecords(List<PlayerInformation> playerInformations)
             throws InterruptedException, ExecutionException, SQLException {
         List<DatabaseRecord> result = new ArrayList<>();
         Connection dbConnection = connectToDatabase();
-        insertAbsentPlayersIntoDatabase(dbConnection, playersInformations);
-        for (PlayerInformation playerInformation : playersInformations){
+        insertAbsentPlayersIntoDatabase(dbConnection, playerInformations);
+        for (PlayerInformation playerInformation : playerInformations){
             String query = "SELECT rating, played FROM" + tableName + " WHERE userID='" + playerInformation.getUserID() + "';";
-            buildDatabaseRecord(playersInformations, executeQuery(dbConnection, query));
+            buildDatabaseRecord(playerInformations, executeQuery(dbConnection, query));
         }
         dbConnection.close();
         return result;
     }
 
     private List<DatabaseRecord> buildDatabaseRecord(
-            List<PlayerInformation> playersInformations, ResultSet resultSet) throws SQLException {
+            List<PlayerInformation> playerInformations, ResultSet resultSet) throws SQLException {
         List<DatabaseRecord> results = new ArrayList<>();
-        for (PlayerInformation playerInformation : playersInformations){
+        for (PlayerInformation playerInformation : playerInformations){
             String username = playerInformation.getUsername();
             String userID = playerInformation.getUserID();
             int rating = resultSet.getInt("rating");
@@ -81,8 +85,8 @@ public class DatabaseConnection {
         return results;
     }
 
-    private void insertAbsentPlayersIntoDatabase(Connection dbConnection, List<PlayerInformation> playersInformations) throws SQLException {
-        for (PlayerInformation playerInformation : playersInformations){
+    private void insertAbsentPlayersIntoDatabase(Connection dbConnection, List<PlayerInformation> playerInformations) throws SQLException {
+        for (PlayerInformation playerInformation : playerInformations){
             String query = "INSERT IGNORE INTO Information (userID, username) "
                     + "VALUES ('" + playerInformation.getUserID() + "', '" + playerInformation.getUsername() + "');";
             executeQuery(dbConnection, query);

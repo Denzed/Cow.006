@@ -5,7 +5,6 @@ import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.List;
 
-import Backend.Client.Client;
 import Backend.Client.GameClient;
 import Backend.Player.Bot;
 import Backend.GameHandler.SinglePlayHandler;
@@ -22,22 +21,22 @@ public class SinglePlayServer extends GameServer{
 
         ServerSocket serverSocket = new ServerSocket(PORT_NUMBER);
         List<ClientConnection> connections = new ArrayList<>();
-        List<PlayerInformation> playersInformations = new ArrayList<>();
+        List<PlayerInformation> playerInformations = new ArrayList<>();
         ClientConnection playerConnection = new ClientConnection(serverSocket.accept());
 
         connections.add(playerConnection);
         int botsNumber = PlayersNumberMessage.receive(playerConnection) - 1;
         PlayerInformation playerInformation = PlayerInformationMessage.receive(playerConnection);
-        playersInformations.add(playerInformation);
+        playerInformations.add(playerInformation);
 
         requestBots(botsNumber);
         for (int i = 0; i < botsNumber; i++){
             ClientConnection botConnection = new ClientConnection(serverSocket.accept());
             connections.add(botConnection);
-            playersInformations.add(PlayerInformationMessage.receive(botConnection));
+            playerInformations.add(PlayerInformationMessage.receive(botConnection));
         }
 
-        startGame(new SinglePlayHandler(connections, playersInformations));
+        startGame(new SinglePlayHandler(connections, playerInformations));
         serverSocket.close();
     }
     

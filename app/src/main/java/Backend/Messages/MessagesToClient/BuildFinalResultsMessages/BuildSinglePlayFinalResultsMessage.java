@@ -2,7 +2,6 @@ package Backend.Messages.MessagesToClient.BuildFinalResultsMessages;
 
 import java.util.List;
 
-import Backend.Client.Client;
 import Backend.Client.GameClient;
 import Backend.Server.ClientConnection;
 

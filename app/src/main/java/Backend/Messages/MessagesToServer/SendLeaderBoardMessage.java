@@ -2,15 +2,14 @@ package Backend.Messages.MessagesToServer;
 
 import java.io.IOException;
 
-import Backend.Client.GameClient;
-import Backend.Client.LeaderBoardRequester;
+import Backend.Client.LeaderboardRequester;
 import Backend.Server.ClientConnection;
 
 import static java.lang.Integer.parseInt;
 
-public class SendLeaderBoardMessage {
+public class SendLeaderboardMessage {
 
-    public static void submit(LeaderBoardRequester client, int leaderboardSize){
+    public static void submit(LeaderboardRequester client, int leaderboardSize){
         client.getClientOutput().println(leaderboardSize);
     }
 

@@ -3,7 +3,6 @@ package Backend.Messages.MessagesToClient;
 import java.io.IOException;
 import java.util.List;
 
-import Backend.Client.Client;
 import Backend.Client.GameClient;
 import Backend.Server.ClientConnection;
 

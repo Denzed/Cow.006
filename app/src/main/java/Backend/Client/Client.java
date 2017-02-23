@@ -1,15 +1,10 @@
 package Backend.Client;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
-
-import Backend.Messages.MessagesToClient.BuildFinalResultsMessages.*;
-import Backend.Messages.MessagesToServer.ResultsBuiltMessage.*;
-import Backend.Messages.MessagesToClient.*;
-import Backend.Messages.MessagesToServer.*;
-import Backend.Player.*;
-
-import static java.util.Collections.max;
 
 public abstract class Client {
 
@@ -17,15 +12,14 @@ public abstract class Client {
     public static final String MY_LAPTOP_HOST = "192.168.210.110";
     public static final int PORT_NUMBER = 8080;
 
-    protected Socket clientSocket;
-    protected BufferedReader clientInput;
-    protected PrintWriter clientOutput;
-    protected volatile boolean isClosed;
-
+    Socket clientSocket;
+    BufferedReader clientInput;
+    PrintWriter clientOutput;
+    volatile boolean isClosed;
 
     public Client(){}
 
-    protected void connectToServer(String host) throws IOException {
+    void connectToServer(String host) throws IOException {
         clientSocket = new Socket(host, PORT_NUMBER);
         clientInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         clientOutput = new PrintWriter(clientSocket.getOutputStream(), true);
@@ -42,7 +36,6 @@ public abstract class Client {
         isClosed = true;
         clientSocket.close();
     }
-
 
     public BufferedReader getClientInput() {
         return clientInput;

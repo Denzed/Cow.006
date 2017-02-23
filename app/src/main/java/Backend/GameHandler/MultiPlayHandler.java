@@ -23,15 +23,15 @@ import static Backend.Database.Rating.updateRatings;
 
 public class MultiPlayHandler extends GameHandler{
 
-    public MultiPlayHandler(List<ClientConnection> connections, List<PlayerInformation> playersInformations) {
-        super(connections, playersInformations);
+    public MultiPlayHandler(List<ClientConnection> connections, List<PlayerInformation> playerInformations) {
+        super(connections, playerInformations);
     }
 
     @Override
     protected void processResults() throws SQLException, InterruptedException, IOException, ExecutionException {
         DatabaseConnection dbConnection =
                 new DatabaseConnection(DB_URL_ADDRESS, DB_TABLE_NAME, DB_LOGIN, SECRET_PASSWORD);
-        List<DatabaseRecord> databaseRecords = dbConnection.requestDatabaseRecords(playersInformations);
+        List<DatabaseRecord> databaseRecords = dbConnection.requestDatabaseRecords(playerInformations);
         SendScoresMessage.submit(connections.get(0));
         List<Integer> scores = ScoresSentMessage.receive(connections.get(0));
         List<Integer> ratings = new ArrayList<>();

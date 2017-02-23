@@ -1,11 +1,11 @@
 package Backend.Database;
 
-public class LeaderBoardRecord {
+public class LeaderboardRecord {
 
     private String username;
     private int rating;
 
-    public LeaderBoardRecord(String username, int rating) {
+    public LeaderboardRecord(String username, int rating) {
         this.username = username;
         this.rating = rating;
     }

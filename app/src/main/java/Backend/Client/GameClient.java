@@ -1,12 +1,13 @@
 package Backend.Client;
 
-import java.io.*;
-import java.net.Socket;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 
-import Backend.Messages.MessagesToClient.BuildFinalResultsMessages.*;
-import Backend.Messages.MessagesToServer.ResultsBuiltMessage.*;
 import Backend.Messages.MessagesToClient.*;
 import Backend.Messages.MessagesToServer.*;
+import Backend.Messages.MessagesToClient.BuildFinalResultsMessages.*;
+import Backend.Messages.MessagesToServer.ResultsBuiltMessage.*;
 import Backend.Player.*;
 
 import static java.util.Collections.max;
@@ -20,7 +21,6 @@ public class GameClient extends Client{
         isClosed = true;
     }
 
-
     public void requestGame(String host) throws IOException {
         connectToServer(host);
         if (connectedPlayer instanceof Player) {
@@ -30,7 +30,6 @@ public class GameClient extends Client{
         isClosed = false;
         receiveAndSubmitMessagesAboutGameSession();
     }
-
 
     private void receiveAndSubmitMessagesAboutGameSession() throws IOException {
         String messageType;

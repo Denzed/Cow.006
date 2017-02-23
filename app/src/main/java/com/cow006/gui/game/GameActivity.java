@@ -10,7 +10,6 @@ import com.cow006.gui.tableactivities.FinalScoresActivity;
 
 import java.io.IOException;
 
-import Backend.Client.Client;
 import Backend.Client.GameClient;
 import Backend.Player.PlayerInformation;
 import Backend.Server.SinglePlayServer;

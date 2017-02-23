@@ -45,9 +45,9 @@ public class MultiPlayServer extends GameServer {
         if (bucket.size() >= playersNumber) {
             if (haveEnoughConnectedPlayers(new ArrayList<>(bucket), new ArrayList<>(infoBucket), playersNumber)){
                 List<ClientConnection> players = new ArrayList<>();
-                List<PlayerInformation> playersInformations = new ArrayList<>();
-                buildPlayersList(bucket, infoBucket, playersNumber, players, playersInformations);
-                startGame(new MultiPlayHandler(players, playersInformations));
+                List<PlayerInformation> playerInformations = new ArrayList<>();
+                buildPlayersList(bucket, infoBucket, playersNumber, players, playerInformations);
+                startGame(new MultiPlayHandler(players, playerInformations));
             }
         }
     }
@@ -69,10 +69,10 @@ public class MultiPlayServer extends GameServer {
 
     private static void buildPlayersList(
             Queue<ClientConnection> bucket, Queue<PlayerInformation> infoBucket, int playersNumber,
-            List<ClientConnection> players, List<PlayerInformation> playersInformations) {
+            List<ClientConnection> players, List<PlayerInformation> playerInformations) {
         while (players.size() < playersNumber) {
             players.add(bucket.poll());
-            playersInformations.add(infoBucket.poll());
+            playerInformations.add(infoBucket.poll());
         }
     }
 

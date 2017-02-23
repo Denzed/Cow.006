@@ -6,7 +6,6 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Queue;
 
-import Backend.Client.Client;
 import Backend.Client.GameClient;
 import Backend.Server.ClientConnection;
 import Backend.Game.Turn;

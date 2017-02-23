@@ -6,7 +6,6 @@ import java.util.List;
 
 import Backend.Client.GameClient;
 import Backend.Game.Board;
-import Backend.Client.Client;
 import Backend.Game.Row;
 import Backend.Server.ClientConnection;
 

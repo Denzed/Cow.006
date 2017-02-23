@@ -5,7 +5,7 @@ import Backend.Messages.MessagesToClient.GameFinishedMessage;
 
 abstract class GameServer {
 
-    protected static void startGame(GameHandler gameHandler) {
+    static void startGame(GameHandler gameHandler) {
         try {
             gameHandler.playGame();
         } catch (Exception e) {

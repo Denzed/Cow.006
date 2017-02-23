@@ -5,11 +5,14 @@ import java.net.ServerSocket;
 import java.sql.SQLException;
 
 import Backend.Database.DatabaseConnection;
-import Backend.Messages.MessagesToClient.LeaderBoardSentMessage;
-import Backend.Messages.MessagesToServer.SendLeaderBoardMessage;
+import Backend.Messages.MessagesToClient.LeaderboardSentMessage;
+import Backend.Messages.MessagesToServer.SendLeaderboardMessage;
 
 import static Backend.Client.Client.PORT_NUMBER;
-import static Backend.Database.DatabaseConnection.*;
+import static Backend.Database.DatabaseConnection.DB_LOGIN;
+import static Backend.Database.DatabaseConnection.DB_TABLE_NAME;
+import static Backend.Database.DatabaseConnection.DB_URL_ADDRESS;
+import static Backend.Database.DatabaseConnection.SECRET_PASSWORD;
 
 public class LeaderboardServer {
 
@@ -24,8 +27,8 @@ public class LeaderboardServer {
         ClientConnection connection = new ClientConnection(serverSocket.accept());
         DatabaseConnection dbConnection = new DatabaseConnection(DB_URL_ADDRESS, DB_TABLE_NAME, DB_LOGIN, SECRET_PASSWORD);
         try{
-            int leaderbordSize = SendLeaderBoardMessage.receive(connection);
-            LeaderBoardSentMessage.submit(connection, dbConnection.requestLeaderBoard(leaderbordSize));
+            int leaderbordSize = SendLeaderboardMessage.receive(connection);
+            LeaderboardSentMessage.submit(connection, dbConnection.requestLeaderboard(leaderbordSize));
         } catch (SQLException e) {
             //TODO
             e.printStackTrace();

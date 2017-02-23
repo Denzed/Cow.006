@@ -5,30 +5,29 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import Backend.Database.LeaderBoardRecord;
-import Backend.Messages.MessagesToClient.LeaderBoardSentMessage;
-import Backend.Messages.MessagesToServer.SendLeaderBoardMessage;
+import Backend.Database.LeaderboardRecord;
+import Backend.Messages.MessagesToClient.LeaderboardSentMessage;
+import Backend.Messages.MessagesToServer.SendLeaderboardMessage;
 
-public class LeaderBoardRequester extends Client{
+public class LeaderboardRequester extends Client{
 
     private int leaderboardSize;
-    private List<LeaderBoardRecord> leaderBoard;
+    private List<LeaderboardRecord> leaderboard;
 
-    public LeaderBoardRequester(int leaderboardSize) {
+    public LeaderboardRequester(int leaderboardSize) {
         this.leaderboardSize = leaderboardSize;
-        leaderBoard = new ArrayList<>();
+        leaderboard = new ArrayList<>();
     }
 
-    public List<LeaderBoardRecord> requestLeaderBoard() throws IOException {
-        List<LeaderBoardRecord> leaderbord = new ArrayList<>();
+    public List<LeaderboardRecord> requestLeaderboard() throws IOException {
         connectToServer(MY_LAPTOP_HOST);
-        SendLeaderBoardMessage.submit(this, leaderboardSize);
-        LeaderBoardSentMessage.receive(this);
-        return leaderbord;
+        SendLeaderboardMessage.submit(this, leaderboardSize);
+        LeaderboardSentMessage.receive(this);
+        return leaderboard;
     }
 
 
-    public void setLeaderBoard(List<LeaderBoardRecord> leaderBoard) {
-        this.leaderBoard = leaderBoard;
+    public void setLeaderboard(List<LeaderboardRecord> leaderboard) {
+        this.leaderboard = leaderboard;
     }
 }

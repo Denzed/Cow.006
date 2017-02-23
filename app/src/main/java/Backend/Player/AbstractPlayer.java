@@ -15,13 +15,13 @@ public abstract class AbstractPlayer {
 
     private List<List<String>> finalResults; //???
     private PlayerInformation playerInformation;
-    private List<PlayerInformation> playersInformations;
+    private List<PlayerInformation> playerInformations;
     private int playersNumber;
     protected volatile List<Integer> hand;
     volatile int chosenRowIndex;
     volatile int chosenCardValue;
     private List<Integer> scores;
-    protected volatile Board board;
+    volatile Board board;
     private volatile Board currentBoard;
     private volatile GameState state;
     private volatile boolean choosingRowToTake;
@@ -103,10 +103,10 @@ public abstract class AbstractPlayer {
         ArrayList<String> legend = new ArrayList<>();
         legend.addAll(Arrays.asList("Player", "Score"));
         finalResults.add(legend);
-        for (PlayerInformation playerInformation : playersInformations){
+        for (PlayerInformation playerInformation : playerInformations){
             List<String> resultLine = new ArrayList<>();
             resultLine.add(playerInformation.getUsername());
-            resultLine.add(scores.get(playersInformations.indexOf(playerInformation)).toString());
+            resultLine.add(scores.get(playerInformations.indexOf(playerInformation)).toString());
             finalResults.add(resultLine);
         }
     }
@@ -117,7 +117,7 @@ public abstract class AbstractPlayer {
         finalResults.add(legend);
         for (int i = 0; i < playersNumber; i++){
             ArrayList<String> resultLine = new ArrayList<>();
-            resultLine.add(playersInformations.get(i).getUsername());
+            resultLine.add(playerInformations.get(i).getUsername());
             resultLine.add(String.valueOf(scores.get(i)));
             resultLine.add(ratings.get(i));
             resultLine.add(ratingChanges.get(i));
@@ -166,11 +166,11 @@ public abstract class AbstractPlayer {
     }
 
     protected List<PlayerInformation> getPlayersInformations() {
-        return playersInformations;
+        return playerInformations;
     }
 
-    public void setPlayersInformations(List<PlayerInformation> playersInformations) {
-        this.playersInformations = playersInformations;
+    public void setPlayersInformations(List<PlayerInformation> playerInformations) {
+        this.playerInformations = playerInformations;
     }
 
     public void setCurrentBoard(Board currentBoard) {
@@ -209,7 +209,7 @@ public abstract class AbstractPlayer {
         return choosingCardToTake;
     }
 
-    protected void setChoosingCardToTake(boolean value) {
+    void setChoosingCardToTake(boolean value) {
         choosingCardToTake = value;
     }
 

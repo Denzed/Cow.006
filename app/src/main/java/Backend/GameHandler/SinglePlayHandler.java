@@ -12,8 +12,8 @@ import Backend.Server.ClientConnection;
 
 
 public class SinglePlayHandler extends GameHandler{
-    public SinglePlayHandler(List<ClientConnection> connections, List<PlayerInformation> playersInformations){
-        super(connections, playersInformations);
+    public SinglePlayHandler(List<ClientConnection> connections, List<PlayerInformation> playerInformations){
+        super(connections, playerInformations);
     }
 
     @Override

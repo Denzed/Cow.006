@@ -1,30 +1,48 @@
 package Backend.GameHandler;
 
-import Backend.Game.Board;
-import Backend.Game.Row;
-import Backend.Messages.MessagesToClient.*;
-import Backend.Messages.MessagesToServer.*;
-import Backend.Player.PlayerInformation;
-import Backend.Server.ClientConnection;
-import Backend.Game.Turn;
-//import javafx.util.Pair;
 import java.io.IOException;
-import java.sql.*;
+import java.sql.SQLException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
-import static Backend.Game.GameConstants.*;
+import Backend.Game.Board;
+import Backend.Game.Row;
+import Backend.Game.Turn;
+import Backend.Messages.MessagesToClient.CurrentRoundMessage;
+import Backend.Messages.MessagesToClient.DealStartedMessage;
+import Backend.Messages.MessagesToClient.GameFinishedMessage;
+import Backend.Messages.MessagesToClient.GameStartedMessage;
+import Backend.Messages.MessagesToClient.SendCardMessage;
+import Backend.Messages.MessagesToClient.SendMaxScoreMessage;
+import Backend.Messages.MessagesToClient.SendRowMessage;
+import Backend.Messages.MessagesToClient.SmallestCardTurnMessage;
+import Backend.Messages.MessagesToServer.CardSelectedMessage;
+import Backend.Messages.MessagesToServer.MaxScoreSentMessage;
+import Backend.Messages.MessagesToServer.RowSelectedMessage;
+import Backend.Player.PlayerInformation;
+import Backend.Server.ClientConnection;
+
+import static Backend.Game.GameConstants.DECK_SIZE;
+import static Backend.Game.GameConstants.ROUNDS;
+import static Backend.Game.GameConstants.ROWS;
+import static Backend.Game.GameConstants.STOP_POINTS;
 import static Backend.GameHandler.GameHandler.GameFinishedReasons.GAME_OVER;
+
+//import javafx.util.Pair;
 
 public abstract class GameHandler {
 
     private int playersNumber;
     protected List<ClientConnection> connections;
-    protected List<PlayerInformation> playersInformations;
+    List<PlayerInformation> playerInformations;
 
     public List<ClientConnection> getConnections() {
         return connections;
@@ -32,14 +50,14 @@ public abstract class GameHandler {
 
     public enum GameFinishedReasons { GAME_OVER, SOMEONE_HAS_DISCONNECTED }
 
-    protected GameHandler(List<ClientConnection> connections, List<PlayerInformation> playersInformations) {
+    GameHandler(List<ClientConnection> connections, List<PlayerInformation> playerInformations) {
         playersNumber = connections.size();
         this.connections = connections;
-        this.playersInformations = playersInformations;
+        this.playerInformations = playerInformations;
     }
 
     public void playGame() throws InterruptedException, ExecutionException, IOException, SQLException {
-        GameStartedMessage.submitAll(connections, playersInformations);
+        GameStartedMessage.submitAll(connections, playerInformations);
         do {
             dealCards();
             for (int i = 0; i < ROUNDS; i++) {

@@ -22,6 +22,7 @@ import android.widget.TextView;
 import com.cow006.gui.R;
 import com.cow006.gui.game.card.CardAddAnimatorListenerAdapter;
 import com.cow006.gui.game.card.CardDragListener;
+import com.cow006.gui.game.card.CardDragShadowBuilder;
 import com.cow006.gui.game.card.CardView;
 
 import java.util.LinkedList;
@@ -221,16 +222,15 @@ public class GameView extends FrameLayout {
 
     public void dragCardFromHand(int card) {
         System.err.println("Starting drag of " + card);
-        focusCard(card);
         player.getHand().remove(Integer.valueOf(card));
+        focusCard(card);
         ClipData data = ClipData.newPlainText("", "");
-        View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(cardViews[card - 1]);
+        View.DragShadowBuilder shadowBuilder = new CardDragShadowBuilder(cardViews[card - 1]);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             startDragAndDrop(data, shadowBuilder, card, 0);
         } else {
             startDrag(data, shadowBuilder, card, 0);
         }
-        cardViews[card - 1].setVisibility(View.GONE);
         drawHand();
     }
 

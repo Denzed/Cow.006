@@ -12,8 +12,8 @@ import Backend.Messages.MessagesToServer.PlayerInformationMessage;
 import Backend.Messages.MessagesToServer.PlayersNumberMessage;
 import Backend.Player.PlayerInformation;
 
+import static Backend.Client.Client.GAME_PORT_NUMBER;
 import static Backend.Client.Client.LOCALHOST;
-import static Backend.Client.Client.PORT_NUMBER;
 
 public class SinglePlayServer extends GameServer{
 
@@ -21,7 +21,7 @@ public class SinglePlayServer extends GameServer{
 
         ServerSocket serverSocket = null;
         try {
-            serverSocket = new ServerSocket(PORT_NUMBER);
+            serverSocket = new ServerSocket(GAME_PORT_NUMBER);
             List<ClientConnection> connections = new ArrayList<>();
             List<PlayerInformation> playerInformations = new ArrayList<>();
             ClientConnection playerConnection = new ClientConnection(serverSocket.accept());
@@ -50,7 +50,7 @@ public class SinglePlayServer extends GameServer{
         for (int i = 0; i < botsNumber; i++){
             new Thread(() -> {
                 try {
-                    new GameClient(new Bot(botsNumber + 1)).requestGame(LOCALHOST);
+                    new GameClient(new Bot(botsNumber + 1)).requestGame(LOCALHOST, GAME_PORT_NUMBER);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

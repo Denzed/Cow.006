@@ -93,6 +93,7 @@ public abstract class GameHandler {
 
         for (Future<Turn> taskForTurn : threadPool.invokeAll(tasksForTurns)){
             turns.add(taskForTurn.get());
+            System.out.println(turns.get(turns.size() - 1).getCard() + " " + turns.get(turns.size() - 1).getCard());
         }
         threadPool.shutdown();
 

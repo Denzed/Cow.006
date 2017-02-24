@@ -20,7 +20,7 @@ public class LeaderboardRequester extends Client{
     }
 
     public List<LeaderboardRecord> requestLeaderboard() throws IOException {
-        connectToServer(MY_LAPTOP_HOST);
+        connectToServer(MY_LAPTOP_HOST, LEADERBOARD_PORT_NUMBER);
         SendLeaderboardMessage.submit(this, leaderboardSize);
         LeaderboardSentMessage.receive(this);
         return leaderboard;

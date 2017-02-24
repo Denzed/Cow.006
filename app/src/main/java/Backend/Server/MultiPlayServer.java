@@ -11,15 +11,14 @@ import Backend.Messages.MessagesToServer.PlayerInformationMessage;
 import Backend.Messages.MessagesToServer.PlayersNumberMessage;
 import Backend.Player.PlayerInformation;
 
+import static Backend.Client.Client.GAME_PORT_NUMBER;
 import static Backend.Game.GameConstants.DECK_SIZE;
 import static Backend.Game.GameConstants.ROUNDS;
 
 public class MultiPlayServer extends GameServer {
 
-    private static final int PORT_NUMBER = 8080;
-
     public static void main(String[] Args) throws IOException {
-        ServerSocket serverSocket = new ServerSocket(PORT_NUMBER);
+        ServerSocket serverSocket = new ServerSocket(GAME_PORT_NUMBER);
         List<Queue<ClientConnection>> buckets =
                 new ArrayList<>(Collections.nCopies(DECK_SIZE / ROUNDS + 1, new ArrayDeque<>()));
         List<Queue<PlayerInformation>> infoBuckets =

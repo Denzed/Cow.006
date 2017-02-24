@@ -20,6 +20,7 @@ public class Player extends AbstractPlayer {
                 //ignore
             }
         }
+
         System.out.println("CARD HAS BEEN CHOSEN: " + chosenCardValue);
         int value = chosenCardValue;
 //        int value = new Scanner(System.in).nextInt();
@@ -33,6 +34,8 @@ public class Player extends AbstractPlayer {
         }
         showScores();
         askForAChoice();
+
+
         setChoosingRowToTake(true);
         while (isChoosingRowToTake()){
             try {
@@ -41,6 +44,7 @@ public class Player extends AbstractPlayer {
                 //ignore
             }
         }
+
         int index = chosenRowIndex;
 //        int index = new Scanner(System.in).nextInt();
         return index;
@@ -82,9 +86,9 @@ public class Player extends AbstractPlayer {
     }
 
 /*    @Override
-    protected void buildBoardModificationsQueue(int chosenRowIndex, List<Turn> turns) {
-        super.buildBoardModificationsQueue(chosenRowIndex, turns);
-        while (!getQueue().isEmpty()){
+    public void buildBoardModificationsQueue(int chosenRowIndex) {
+        super.buildBoardModificationsQueue(chosenRowIndex);
+        while (!getBoardModificationQueue().isEmpty()){
             updateOneTurn();
         }
     }

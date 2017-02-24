@@ -8,7 +8,7 @@ import Backend.Server.ClientConnection;
 public class SinglePlayFinalResultsBuiltMessage {
 
     public static void submit(GameClient client){
-        //TODO THIS SHOULD BE REPLACED WITH ANIMATION_FIISHED METHOD
+        //TODO THIS SHOULD BE REPLACED WITH ANIMATION_FINISHED METHOD
         while (!client.getConnectedPlayer().getCardsQueue().isEmpty()){
             try {
                 System.out.println("WAITING FOR DRAWING");

@@ -15,8 +15,8 @@ public class GameConstants {
         1, 1, 1, 1};
     public static final int DECK_SIZE = 104;
     public static final int NOT_A_CARD = 0;
-    public static final int ROUNDS = 10;
+    public static final int ROUNDS = 1;
     public static final int ROWS = 4;
     public static final int COLUMNS = 5;
-    public static final int STOP_POINTS = 1;
+    public static final int STOP_POINTS = 0;
 }

@@ -5,6 +5,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.GridView;
+import android.widget.ViewFlipper;
 
 import com.cow006.gui.MainMenuActivity;
 import com.cow006.gui.R;

@@ -14,6 +14,7 @@ import Backend.Client.GameClient;
 import Backend.Player.PlayerInformation;
 import Backend.Server.SinglePlayServer;
 
+import static Backend.Client.Client.GAME_PORT_NUMBER;
 import static Backend.Client.Client.LOCALHOST;
 import static Backend.Client.Client.MY_LAPTOP_HOST;
 
@@ -67,7 +68,7 @@ public class GameActivity extends AppCompatActivity {
         localClient = new GameClient(lp);
         new Thread(() -> {
             try {
-                localClient.requestGame(players == 0 ? LOCALHOST : MY_LAPTOP_HOST);
+                localClient.requestGame(players == 0 ? LOCALHOST : MY_LAPTOP_HOST, GAME_PORT_NUMBER);
             } catch (IOException e) {
                 e.printStackTrace();
             }

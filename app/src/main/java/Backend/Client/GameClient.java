@@ -21,8 +21,8 @@ public class GameClient extends Client{
         isClosed = true;
     }
 
-    public void requestGame(String host) throws IOException {
-        connectToServer(host);
+    public void requestGame(String host, int portNumber) throws IOException {
+        connectToServer(host, portNumber);
         if (connectedPlayer instanceof Player) {
             PlayersNumberMessage.submit(this, connectedPlayer.getPlayersNumber());
         }
@@ -60,6 +60,7 @@ public class GameClient extends Client{
                     break;
                 case "IS_CONNECTED":
                     IAmConnectedMessage.submit(this);
+                    break;
                 case "SEND_CARD":
                     CardSelectedMessage.submit(this, connectedPlayer.chooseCard());
                     break;

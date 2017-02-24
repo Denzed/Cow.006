@@ -10,7 +10,8 @@ public abstract class Client {
 
     public static final String LOCALHOST = "localhost";
     public static final String MY_LAPTOP_HOST = "192.168.210.110";
-    public static final int PORT_NUMBER = 8080;
+    public static final int GAME_PORT_NUMBER = 8080;
+    public static final int LEADERBOARD_PORT_NUMBER = 8888;
 
     Socket clientSocket;
     BufferedReader clientInput;
@@ -19,8 +20,8 @@ public abstract class Client {
 
     public Client(){}
 
-    void connectToServer(String host) throws IOException {
-        clientSocket = new Socket(host, PORT_NUMBER);
+    void connectToServer(String host, int portNumber) throws IOException {
+        clientSocket = new Socket(host, portNumber);
         clientInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         clientOutput = new PrintWriter(clientSocket.getOutputStream(), true);
         while (clientInput == null || clientOutput == null) {

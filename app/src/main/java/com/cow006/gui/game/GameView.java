@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.os.Build;
+import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -38,6 +39,7 @@ public class GameView extends FrameLayout {
     public static final long ANIMATION_LENGTH = 300;
     final GameActivity parentActivity;
     final private CardView cardViews[];
+    Handler handler;
     int cardWidth;
     int cardHeight;
     int focusedCard = GameConstants.NOT_A_CARD;
@@ -45,6 +47,7 @@ public class GameView extends FrameLayout {
 
     public GameView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        handler = new Handler();
         parentActivity = (GameActivity) context;
         cardViews = generateCardViews();
         setOnDragListener(new CardDragListener());
@@ -140,42 +143,45 @@ public class GameView extends FrameLayout {
         cardViews[card - 1].setScale((card == focusedCard ? FOCUSED_ZOOM : 1) * scale);
         cardViews[card - 1].setX(paddingLeft);
         cardViews[card - 1].setY(paddingTop);
-        if (cardViews[card - 1].getVisibility() != View.VISIBLE) {
-            parentActivity.runOnUiThread(() ->
-                    cardViews[card - 1].setVisibility(View.VISIBLE));
-        }
+        post(() -> cardViews[card - 1].setVisibility(View.VISIBLE));
     }
 
-    protected synchronized void drawHand() {
+    public void drawHand() {
         int n = player.getHand().size();
         float paddingLeft = (getWidth() - cardWidth * (n + 1) / 2) / 2;
         float paddingTop = getHeight() - cardHeight * (1 + FIELDS_OFFSET_IN_CARDS);
-        for (int card: player.getHand()) {
-            drawCard(paddingLeft, paddingTop, card, 1);
-            paddingLeft += cardWidth / 2;
+        synchronized (player.getHand()) {
+            for (int card : player.getHand()) {
+                drawCard(paddingLeft, paddingTop, card, 1);
+                paddingLeft += cardWidth / 2;
+            }
         }
     }
 
-    protected synchronized void drawQueue() {
+    public void drawQueue() {
         float scaledHeight = cardHeight * QUEUE_CARD_SCALE;
         float paddingLeftTop[] = getQueueTopPosition();
-        for (int card: player.getCardsQueue()) {
-            System.out.println("drawQueue:size() " + player.getCardsQueue());
-            drawCard(paddingLeftTop[0], paddingLeftTop[1],
-                    card, QUEUE_CARD_SCALE);
-            paddingLeftTop[1] += scaledHeight * (1 + FIELDS_OFFSET_IN_CARDS / 2);
+        synchronized (player.getCardsQueue()) {
+            for (int card : player.getCardsQueue()) {
+                System.out.println("drawQueue:size() " + player.getCardsQueue());
+                drawCard(paddingLeftTop[0], paddingLeftTop[1],
+                        card, QUEUE_CARD_SCALE);
+                paddingLeftTop[1] += scaledHeight * (1 + FIELDS_OFFSET_IN_CARDS / 2);
+            }
         }
     }
 
-    protected synchronized void drawBoard() {
+    protected void drawBoard() {
         float paddingTop = cardHeight * FIELDS_OFFSET_IN_CARDS / 2;
-        for (List<Integer> row : player.getBoard()) {
-            float paddingLeft = cardWidth * FIELDS_OFFSET_IN_CARDS / 2;
-            for (int card: row) {
-                drawCard(paddingLeft, paddingTop, card, 1);
-                paddingLeft += cardWidth * (1 + FIELDS_OFFSET_IN_CARDS / 2);
+        synchronized (player.getBoard()) {
+            for (List<Integer> row : player.getBoard()) {
+                float paddingLeft = cardWidth * FIELDS_OFFSET_IN_CARDS / 2;
+                for (int card : row) {
+                    drawCard(paddingLeft, paddingTop, card, 1);
+                    paddingLeft += cardWidth * (1 + FIELDS_OFFSET_IN_CARDS / 2);
+                }
+                paddingTop += cardHeight * (1 + FIELDS_OFFSET_IN_CARDS / 2);
             }
-            paddingTop += cardHeight * (1 + FIELDS_OFFSET_IN_CARDS / 2);
         }
     }
 
@@ -201,7 +207,7 @@ public class GameView extends FrameLayout {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext())
                 .setMessage(message)
                 .setNeutralButton(R.string.alertdialog_neutral_button_text, action);
-        parentActivity.runOnUiThread(dialogBuilder.create()::show);
+        parentActivity.runOnUiThread(() -> dialogBuilder.create().show());
     }
 
     protected void drawMessage(String message) {
@@ -214,6 +220,9 @@ public class GameView extends FrameLayout {
     }
 
     public void dragCardFromHand(int card) {
+        System.err.println("Starting drag of " + card);
+        focusCard(card);
+        player.getHand().remove(Integer.valueOf(card));
         ClipData data = ClipData.newPlainText("", "");
         View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(cardViews[card - 1]);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -221,9 +230,8 @@ public class GameView extends FrameLayout {
         } else {
             startDrag(data, shadowBuilder, card, 0);
         }
-        player.getHand().remove(Integer.valueOf(card));
+        cardViews[card - 1].setVisibility(View.GONE);
         drawHand();
-        cardViews[card - 1].setVisibility(View.INVISIBLE);
     }
 
     private ObjectAnimator animateCardTranslation(int card,
@@ -245,14 +253,14 @@ public class GameView extends FrameLayout {
         int column = (boardModification.getType() == Row.RowModificationTypes.CLEAR_ROW
                 ? 0
                 : player.getBoard().get(row).size());
-        parentActivity.runOnUiThread((boardModification.getType() == Row.RowModificationTypes.CLEAR_ROW
+        (boardModification.getType() == Row.RowModificationTypes.CLEAR_ROW
                 ? setupRowClearAnimation(row)
                 : setupCardAddAnimation(
-                boardModification.getCard(), row, column))::start);
+                boardModification.getCard(), row, column)).start();
     }
 
     private AnimatorSet setupCardAddAnimation(int card, int row, int column) {
-        parentActivity.runOnUiThread(cardViews[card - 1]::bringToFront);
+        cardViews[card - 1].bringToFront();
         AnimatorSet animatorSet = new AnimatorSet();
         animatorSet.playTogether(animateCardTranslation(card,
                 getQueueTopPosition(), getFieldCellPosition(row, column),
@@ -320,5 +328,9 @@ public class GameView extends FrameLayout {
         drawBoard();
         drawHand();
         drawQueue();
+    }
+
+    public boolean post(Runnable runnable) {
+        return handler.post(runnable);
     }
 }

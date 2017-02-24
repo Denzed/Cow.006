@@ -56,7 +56,6 @@ class CardViewGestureDetector extends GestureDetector.SimpleOnGestureListener {
         if (player.getHand().contains(card)
                 && player.getBoardModificationQueue().isEmpty()
                 && player.isChoosingCardToTake()) {
-            gameView.focusCard(card);
             gameView.dragCardFromHand(card);
         }
         super.onLongPress(event);

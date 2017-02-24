@@ -65,22 +65,21 @@ class LocalPlayer extends Player {
     @Override
     public void setHand(List<Integer> hand) {
         GameActivity parentActivity = gameView.parentActivity;
-        parentActivity.runOnUiThread(() -> {
-            if (getState() == GameState.NEW_GAME) {
-                ((ViewFlipper) parentActivity.findViewById(R.id.activity_game)).showNext();
-                gameView.drawMessage(parentActivity.getString(R.string.game_start_message_text));
-            } else {
-                gameView.drawMessage(parentActivity.getString(R.string.next_round_message_text));
-            }
-            super.setHand(hand);
-            gameView.drawHand();
-        });
+        if (getState() == GameState.NEW_GAME) {
+            parentActivity.runOnUiThread(((ViewFlipper) parentActivity.findViewById(R.id.activity_game))
+                    ::showNext);
+            gameView.drawMessage(parentActivity.getString(R.string.game_start_message_text));
+        } else {
+            gameView.drawMessage(parentActivity.getString(R.string.next_round_message_text));
+        }
+        super.setHand(hand);
+        gameView.drawHand();
     }
 
     @Override
     public synchronized void buildBoardModificationsQueue(int chosenRowIndex) {
         super.buildBoardModificationsQueue(chosenRowIndex);
-        gameView.runTurnAnimation();
+        gameView.post(gameView::runTurnAnimation);
     }
 
     @Override

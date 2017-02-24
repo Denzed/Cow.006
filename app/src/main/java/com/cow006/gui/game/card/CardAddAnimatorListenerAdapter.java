@@ -23,7 +23,10 @@ public class CardAddAnimatorListenerAdapter extends AnimatorListenerAdapter {
 
     @Override
     public void onAnimationStart(Animator animator) {
-        ((Player) gameView.getPlayer()).getCardsQueue().poll();
+        if (isAddCard) {
+            ((Player) gameView.getPlayer()).getCardsQueue().poll();
+            gameView.drawQueue();
+        }
         super.onAnimationStart(animator);
     }
 
@@ -33,6 +36,7 @@ public class CardAddAnimatorListenerAdapter extends AnimatorListenerAdapter {
             Player player = gameView.getPlayer();
             player.getCardsQueue().addFirst(NOT_A_CARD);
             player.updateOneTurn();
+            gameView.drawQueue();
             if (!player.getBoardModificationQueue().isEmpty()) {
                 gameView.runTurnAnimation();
             }

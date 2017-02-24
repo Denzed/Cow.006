@@ -1,15 +1,24 @@
 package Backend.Player;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.List;
+import java.util.Queue;
 
 import Backend.Game.Board;
 import Backend.Game.BoardModification;
 import Backend.Game.Row;
 import Backend.Game.Turn;
 
-import static Backend.Game.Row.RowModificationTypes.*;
+import static Backend.Game.GameConstants.COLUMNS;
+import static Backend.Game.GameConstants.NOT_A_CARD;
+import static Backend.Game.Row.RowModificationTypes.ADD_CARD;
+import static Backend.Game.Row.RowModificationTypes.CLEAR_ROW;
 import static Backend.Game.Row.getModifyingRowIndex;
-import static Backend.Game.GameConstants.*;
+import static java.lang.Integer.parseInt;
 
 public abstract class AbstractPlayer {
 
@@ -109,6 +118,8 @@ public abstract class AbstractPlayer {
             resultLine.add(scores.get(playerInformations.indexOf(playerInformation)).toString());
             finalResults.add(resultLine);
         }
+        Collections.sort(finalResults.subList(1, finalResults.size()),
+                (a, b) -> parseInt(a.get(1)) - parseInt(b.get(1)));
     }
 
     public void buildMultiPlayFinalResults(List<String> ratings, List<String> ratingChanges) {
@@ -123,6 +134,10 @@ public abstract class AbstractPlayer {
             resultLine.add(ratingChanges.get(i));
             finalResults.add(resultLine);
         }
+        Collections.sort(finalResults.subList(1, finalResults.size()),
+                (a, b) -> parseInt(a.get(1)) - parseInt(b.get(1)));
+
+
     }
 
     protected List<List<String>> getFinalResults() {
@@ -187,7 +202,7 @@ public abstract class AbstractPlayer {
         return playersNumber;
     }
 
-    public Deque<Integer> getCardsQueue() {return cardsQueue;}
+    public synchronized Deque<Integer> getCardsQueue() {return cardsQueue;}
 
     public void setCardsQueue(Deque<Integer> cardsQueue) {
         this.cardsQueue = cardsQueue;

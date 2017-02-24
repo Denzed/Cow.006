@@ -19,25 +19,31 @@ public class SinglePlayServer extends GameServer{
 
     public static void main(String[] Args) throws IOException {
 
-        ServerSocket serverSocket = new ServerSocket(PORT_NUMBER);
-        List<ClientConnection> connections = new ArrayList<>();
-        List<PlayerInformation> playerInformations = new ArrayList<>();
-        ClientConnection playerConnection = new ClientConnection(serverSocket.accept());
+        ServerSocket serverSocket = null;
+        try {
+            serverSocket = new ServerSocket(PORT_NUMBER);
+            List<ClientConnection> connections = new ArrayList<>();
+            List<PlayerInformation> playerInformations = new ArrayList<>();
+            ClientConnection playerConnection = new ClientConnection(serverSocket.accept());
 
-        connections.add(playerConnection);
-        int botsNumber = PlayersNumberMessage.receive(playerConnection) - 1;
-        PlayerInformation playerInformation = PlayerInformationMessage.receive(playerConnection);
-        playerInformations.add(playerInformation);
+            connections.add(playerConnection);
+            int botsNumber = PlayersNumberMessage.receive(playerConnection) - 1;
+            PlayerInformation playerInformation = PlayerInformationMessage.receive(playerConnection);
+            playerInformations.add(playerInformation);
 
-        requestBots(botsNumber);
-        for (int i = 0; i < botsNumber; i++){
-            ClientConnection botConnection = new ClientConnection(serverSocket.accept());
-            connections.add(botConnection);
-            playerInformations.add(PlayerInformationMessage.receive(botConnection));
+            requestBots(botsNumber);
+            for (int i = 0; i < botsNumber; i++) {
+                ClientConnection botConnection = new ClientConnection(serverSocket.accept());
+                connections.add(botConnection);
+                playerInformations.add(PlayerInformationMessage.receive(botConnection));
+            }
+
+            startGame(new SinglePlayHandler(connections, playerInformations));
+        } finally {
+            if (serverSocket != null){
+                serverSocket.close();
+            }
         }
-
-        startGame(new SinglePlayHandler(connections, playerInformations));
-        serverSocket.close();
     }
     
     private static void requestBots(int botsNumber) {

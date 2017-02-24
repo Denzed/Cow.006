@@ -15,7 +15,7 @@ public class LeaderboardServer {
 
     public static void main(String[] args) throws IOException {
         ServerSocket serverSocket = new ServerSocket(PORT_NUMBER);
-        while(true){
+        while (true){
             waitForConnections(serverSocket);
         }
     }

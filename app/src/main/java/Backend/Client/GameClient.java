@@ -81,7 +81,9 @@ public class GameClient extends Client{
 
     public void disconnectFromServer() throws IOException {
         isClosed = true;
-        clientSocket.close();
+        if (clientSocket != null) {
+            clientSocket.close();
+        }
     }
 
     public AbstractPlayer getConnectedPlayer() {

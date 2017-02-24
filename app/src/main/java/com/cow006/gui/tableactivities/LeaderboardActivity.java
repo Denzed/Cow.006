@@ -1,7 +1,6 @@
 package com.cow006.gui.tableactivities;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -19,9 +18,11 @@ import java.util.List;
 import Backend.Client.LeaderboardRequester;
 import Backend.Database.LeaderboardRecord;
 
+import static java.lang.Thread.sleep;
+
 public class LeaderboardActivity extends AppCompatActivity{
     public static final int LEADERBOARD_SIZE = 100;
-    Handler handler = new Handler(); //TODO Really need this???
+    Handler handler = new Handler();
 
 
     @Override
@@ -40,29 +41,33 @@ public class LeaderboardActivity extends AppCompatActivity{
     @Override
     protected  void onPostCreate(Bundle bundle) {
         super.onPostCreate(bundle);
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                setupLeaderboard();
-                return null;
+        List<List<String>> table = new ArrayList<>();
+        Thread t = new Thread(() -> setupLeaderboard(table));
+        t.start();
+        while (t.getState() != Thread.State.TERMINATED){
+            try {
+                sleep(100);
+            } catch (InterruptedException e) {
+                //
             }
-        }.execute();
+        }
+        Helper.fillTable((GridView) findViewById(R.id.leaderboard_table), table);
+        handler.post(
+                ((ViewFlipper) findViewById(
+                        R.id.leaderboard_and_loading_viewflipper))::showNext);
+
     }
 
-    private void setupLeaderboard() {
+    private void setupLeaderboard(List<List<String>> table) {
         try {
+            System.out.println("HERE");
             LeaderboardRequester leaderboardRequester = new LeaderboardRequester(LEADERBOARD_SIZE);
-            List<List<String>> table = new ArrayList<>();
             table.add(Arrays.asList("Name", "Rating"));
             for (LeaderboardRecord record : leaderboardRequester.requestLeaderboard()) {
                 table.add(
                         Arrays.asList(record.getUsername(),
                                 Integer.toString(record.getRating())));
             }
-            Helper.fillTable((GridView) findViewById(R.id.leaderboard_table), table);
-            handler.post(
-                    ((ViewFlipper) findViewById(
-                            R.id.leaderboard_and_loading_viewflipper))::showNext);
         } catch (IOException e) {
             e.printStackTrace();
         }

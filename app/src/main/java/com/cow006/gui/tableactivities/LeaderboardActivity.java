@@ -1,6 +1,7 @@
 package com.cow006.gui.tableactivities;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -10,16 +11,18 @@ import android.widget.ViewFlipper;
 import com.cow006.gui.MainMenuActivity;
 import com.cow006.gui.R;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static java.lang.Thread.sleep;
+import Backend.Client.LeaderboardRequester;
+import Backend.Database.LeaderboardRecord;
 
-public class LeaderboardActivity extends AppCompatActivity{
+public class LeaderboardActivity extends AppCompatActivity {
     public static final int LEADERBOARD_SIZE = 100;
+    List<List<String>> table = new ArrayList<>();
     Handler handler = new Handler();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,41 +40,38 @@ public class LeaderboardActivity extends AppCompatActivity{
     @Override
     protected  void onPostCreate(Bundle bundle) {
         super.onPostCreate(bundle);
-        List<List<String>> table = new ArrayList<>();
-        Thread t = new Thread(() -> setupLeaderboard(table));
-        t.start();
-        while (t.getState() != Thread.State.TERMINATED){
-            try {
-                sleep(100);
-            } catch (InterruptedException e) {
-                //
-            }
-        }
-        Helper.fillTable((GridView) findViewById(R.id.leaderboard_table), table);
-        handler.post(
-                ((ViewFlipper) findViewById(
-                        R.id.leaderboard_and_loading_viewflipper))::showNext);
-
+        AsyncTask.execute(this::setupLeaderboard);
     }
 
-    private void setupLeaderboard(List<List<String>> table) {
-        //try {
+    private void setupLeaderboard() {
+        boolean isSuccess[] = {false}; // effectively final hack
+        try {
             System.out.println("HERE");
-//            LeaderboardRequester leaderboardRequester = new LeaderboardRequester(LEADERBOARD_SIZE);
             table.add(new ArrayList<>(Arrays.asList("Name", "Rating")));
             table.add(new ArrayList<>(Arrays.asList("USER1", "100500")));
             table.add(new ArrayList<>(Arrays.asList("USER2", "100000")));
             table.add(new ArrayList<>(Arrays.asList("USER3", "100")));
-        System.out.println(table.size());
+            System.out.println(table.size());
 
-            /*            for (LeaderboardRecord record : leaderboardRequester.requestLeaderboard()) {
+            LeaderboardRequester leaderboardRequester = new LeaderboardRequester(LEADERBOARD_SIZE);
+            for (LeaderboardRecord record : leaderboardRequester.requestLeaderboard()) {
                 table.add(
                         Arrays.asList(record.getUsername(),
                                 Integer.toString(record.getRating())));
             }
-*/
-        /*} catch (IOException e) {
+            isSuccess[0] = true;
+        } catch (IOException e) {
+            isSuccess[0] = true; // TODO: delete when leaderboard is okay
             e.printStackTrace();
-        }*/
+        }
+        handler.post(() -> {
+            ViewFlipper flipper =
+                    (ViewFlipper) findViewById(R.id.leaderboard_and_loading_viewflipper);
+            flipper.setDisplayedChild(flipper.indexOfChild(
+                    flipper.findViewById(isSuccess[0]
+                            ? R.id.leaderboard_table
+                            : R.id.no_connection_text_view)));
+            Helper.fillTable((GridView) findViewById(R.id.leaderboard_table), table);
+        });
     }
 }

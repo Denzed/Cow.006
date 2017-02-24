@@ -9,6 +9,9 @@ import java.util.List;
 
 public class Helper {
     static void fillTable(GridView table, List<List<String>> data) {
+        if (data.isEmpty()) {
+            return;
+        }
         table.setNumColumns(data.get(0).size());
         System.out.println("HELPER: " + data.size());
         List<String> joinedData = new LinkedList<>();

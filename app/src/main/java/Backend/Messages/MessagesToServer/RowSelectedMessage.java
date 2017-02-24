@@ -2,15 +2,14 @@ package Backend.Messages.MessagesToServer;
 
 import java.io.IOException;
 
-import Backend.Client.Client;
+import Backend.Client.GameClient;
 import Backend.Server.ClientConnection;
 
 import static java.lang.Integer.parseInt;
 
 public class RowSelectedMessage {
 
-    public static void submit(Client client, int row){
-//        client.getClientOutput().println("ROW_SELECTED");
+    public static void submit(GameClient client, int row){
         client.getClientOutput().println(row);
     }
 

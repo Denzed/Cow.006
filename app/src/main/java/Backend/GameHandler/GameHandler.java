@@ -1,43 +1,39 @@
 package Backend.GameHandler;
 
-import Backend.Game.Board;
-import Backend.Game.Row;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.concurrent.*;
+
+import Backend.Game.*;
 import Backend.Messages.MessagesToClient.*;
 import Backend.Messages.MessagesToServer.*;
 import Backend.Player.PlayerInformation;
 import Backend.Server.ClientConnection;
-import Backend.Game.Turn;
-//import javafx.util.Pair;
-import java.io.IOException;
-import java.sql.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.IntSummaryStatistics;
-import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.*;
 
 import static Backend.Game.GameConstants.*;
 import static Backend.GameHandler.GameHandler.GameFinishedReasons.GAME_OVER;
-import static java.util.Collections.max;
 
 public abstract class GameHandler {
 
-    protected int playersNumber;
+    private int playersNumber;
     protected List<ClientConnection> connections;
-    protected List<PlayerInformation> playersInformations;
-    protected ExecutorService threadPool;
-    public enum GameFinishedReasons { GAME_OVER, SOMEONE_HAS_DISCONNECTED };
+    List<PlayerInformation> playerInformations;
 
-    public GameHandler(List<ClientConnection> connections, List<PlayerInformation> playersInformations) {
+    public List<ClientConnection> getConnections() {
+        return connections;
+    }
+
+    public enum GameFinishedReasons { GAME_OVER, SOMEONE_HAS_DISCONNECTED }
+
+    GameHandler(List<ClientConnection> connections, List<PlayerInformation> playerInformations) {
         playersNumber = connections.size();
         this.connections = connections;
-        this.playersInformations = playersInformations;
+        this.playerInformations = playerInformations;
     }
 
     public void playGame() throws InterruptedException, ExecutionException, IOException, SQLException {
-        GameStartedMessage.submitAll(connections, playersInformations);
+        GameStartedMessage.submitAll(connections, playerInformations);
         do {
             dealCards();
             for (int i = 0; i < ROUNDS; i++) {
@@ -48,7 +44,7 @@ public abstract class GameHandler {
         GameFinishedMessage.submitAll(connections, GAME_OVER);
     }
 
-    protected void dealCards() {
+    private void dealCards() {
         List<Integer> deck = new ArrayList<>();
         for (int i = 1; i <= DECK_SIZE; i++){
             deck.add(i);
@@ -71,7 +67,7 @@ public abstract class GameHandler {
         }
     }
 
-    protected void playRound() throws IOException, InterruptedException, ExecutionException {
+    private void playRound() throws IOException, InterruptedException, ExecutionException {
         final Queue<Turn> turnsQueue = buildTurnsQueue();
         CurrentRoundMessage.submitAll(connections, turnsQueue);
 
@@ -81,8 +77,8 @@ public abstract class GameHandler {
         SmallestCardTurnMessage.submitAll(connections, chosenRowIndex);
     }
 
-    protected Queue<Turn> buildTurnsQueue() throws InterruptedException, ExecutionException {
-        threadPool = Executors.newFixedThreadPool(playersNumber);
+    private Queue<Turn> buildTurnsQueue() throws InterruptedException, ExecutionException {
+        ExecutorService threadPool = Executors.newFixedThreadPool(playersNumber);
         List<Callable<Turn>> tasksForTurns = new ArrayList<>();
         List<Turn> turns = new ArrayList<>();
 
@@ -104,10 +100,11 @@ public abstract class GameHandler {
         return new ArrayDeque<>(turns);
     }
 
-    protected boolean hasSomeoneBusted() throws InterruptedException, ExecutionException, IOException {
+    private boolean hasSomeoneBusted() throws InterruptedException, ExecutionException, IOException {
         SendMaxScoreMessage.submit(connections.get(0));
         return MaxScoreSentMessage.receive(connections.get(0)) >= STOP_POINTS;
     }
 
     protected abstract void processResults() throws SQLException, InterruptedException, IOException, ExecutionException;
+
 }

@@ -11,7 +11,7 @@ public class ClientConnection {
     private BufferedReader clientInput;
     private PrintWriter clientOutput;
 
-    ClientConnection(Socket clientSocket) {
+    public ClientConnection(Socket clientSocket) {
         try {
             clientInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             clientOutput = new PrintWriter(clientSocket.getOutputStream(), true);

@@ -3,7 +3,7 @@ package Backend.Messages.MessagesToClient;
 import java.io.IOException;
 import java.util.List;
 
-import Backend.Client.Client;
+import Backend.Client.GameClient;
 import Backend.GameHandler.GameHandler;
 import Backend.Server.ClientConnection;
 
@@ -20,20 +20,13 @@ public class GameFinishedMessage {
         }
     }
 
-    public static void receive(Client client) throws IOException {
-        while (!client.connectedPlayer.getCardsQueue().isEmpty()){
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                //ignore
-            }
-        }
-
-        GameHandler.GameFinishedReasons reason =  GameHandler.GameFinishedReasons.valueOf(client.getClientInput().readLine());
+    public static void receive(GameClient client) throws IOException {
+        GameHandler.GameFinishedReasons reason =
+                GameHandler.GameFinishedReasons.valueOf(client.getClientInput().readLine());
         if (reason == GameHandler.GameFinishedReasons.GAME_OVER){
-            client.connectedPlayer.setGameFinished();
+            client.getConnectedPlayer().setGameFinished();
         } else {
-            client.connectedPlayer.setGameInterrupted();
+            client.getConnectedPlayer().setGameInterrupted();
         }
     }
 

@@ -2,13 +2,13 @@ package Backend.Messages.MessagesToServer;
 
 import java.io.IOException;
 
-import Backend.Client.Client;
+import Backend.Client.GameClient;
 import Backend.Player.PlayerInformation;
 import Backend.Server.ClientConnection;
 
 public class PlayerInformationMessage {
 
-    public static void submit(Client client, PlayerInformation playerInformation){
+    public static void submit(GameClient client, PlayerInformation playerInformation){
         client.getClientOutput().println(playerInformation.getUsername());
         client.getClientOutput().println(playerInformation.getUserID());
     }

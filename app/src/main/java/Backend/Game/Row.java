@@ -9,7 +9,7 @@ import static Backend.Game.GameConstants.ROWS;
 
 public class Row extends ArrayList<Integer>{
 
-    public enum RowModificationTypes { ADD_CARD, CLEAR_ROW };
+    public enum RowModificationTypes { ADD_CARD, CLEAR_ROW }
 
     public int getRowPenalty() {
         int res = 0;

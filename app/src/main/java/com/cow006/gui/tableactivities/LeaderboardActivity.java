@@ -11,10 +11,13 @@ import com.cow006.gui.R;
 import java.io.IOException;
 import java.util.List;
 
+import Backend.Client.LeaderboardRequester;
+import Backend.Database.LeaderboardRecord;
+
 public class LeaderboardActivity extends AppCompatActivity{
     public static final int LEADERBOARD_SIZE = 100;
-    List<List<String>> leaderboard;
-    Handler handler = new Handler();
+    List<List<String>> leaderboard; //TODO List<LeaderboardRecord>
+    Handler handler = new Handler(); //TODO Really need this???
 
 
     @Override
@@ -38,16 +41,8 @@ public class LeaderboardActivity extends AppCompatActivity{
 
     private void setupLeaderboard() {
         try {
-            /* TODO: implement this
-                Remember to pay attention to LEADERBOARD_SIZE
-            Client client = new Client();
-            client.connectToServer(Client.ConnectionTypes.LEADERBOARD);
-            for (int i = 0; i < LEADERBOARD_SIZE; i++) {
-                String line = client.getClientInput().readLine();
-                leaderboard += line + ((i % 2 == 1) ? "\n" : "\t");
-            }
-            client.disconnectFromServer();
-            */
+            LeaderboardRequester leaderboardRequester = new LeaderboardRequester(LEADERBOARD_SIZE);
+            List<LeaderboardRecord> leaderboardAsList = leaderboardRequester.requestLeaderboard();
             // TODO: delete the line after implementation of the above
             throw new IOException("Placeholder for probable IOException in code below" +
                     "until it is implemented");

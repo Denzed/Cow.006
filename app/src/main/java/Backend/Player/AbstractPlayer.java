@@ -1,27 +1,36 @@
 package Backend.Player;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.List;
+import java.util.Queue;
 
 import Backend.Game.Board;
 import Backend.Game.BoardModification;
 import Backend.Game.Row;
 import Backend.Game.Turn;
 
-import static Backend.Game.Row.RowModificationTypes.*;
+import static Backend.Game.GameConstants.COLUMNS;
+import static Backend.Game.GameConstants.NOT_A_CARD;
+import static Backend.Game.Row.RowModificationTypes.ADD_CARD;
+import static Backend.Game.Row.RowModificationTypes.CLEAR_ROW;
 import static Backend.Game.Row.getModifyingRowIndex;
-import static Backend.Game.GameConstants.*;
+import static java.lang.Integer.parseInt;
 
 public abstract class AbstractPlayer {
 
-    protected List<List<String>> finalResults; //???
-    protected PlayerInformation playerInformation;
-    protected List<PlayerInformation> playersInformations;
-    protected int playersNumber;
+    private List<List<String>> finalResults; //???
+    private PlayerInformation playerInformation;
+    private List<PlayerInformation> playerInformations;
+    private int playersNumber;
     protected volatile List<Integer> hand;
     volatile int chosenRowIndex;
     volatile int chosenCardValue;
-    List<Integer> scores;
-    protected volatile Board board;
+    private List<Integer> scores;
+    volatile Board board;
     private volatile Board currentBoard;
     private volatile GameState state;
     private volatile boolean choosingRowToTake;
@@ -103,29 +112,35 @@ public abstract class AbstractPlayer {
         ArrayList<String> legend = new ArrayList<>();
         legend.addAll(Arrays.asList("Player", "Score"));
         finalResults.add(legend);
-        for (PlayerInformation playerInformation : playersInformations){
-            List<String> line = new ArrayList<>();
-            line.add(playerInformation.getUsername());
-            line.add(scores.get(playersInformations.indexOf(playerInformation)).toString());
-            finalResults.add(line);
+        for (PlayerInformation playerInformation : playerInformations){
+            List<String> resultLine = new ArrayList<>();
+            resultLine.add(playerInformation.getUsername());
+            resultLine.add(scores.get(playerInformations.indexOf(playerInformation)).toString());
+            finalResults.add(resultLine);
         }
+        Collections.sort(finalResults.subList(1, finalResults.size()),
+                (a, b) -> parseInt(a.get(1)) - parseInt(b.get(1)));
     }
 
-    void buildFinalResultsMultiPlayer(ArrayList<String> usernames, ArrayList<String> ratings, ArrayList<String> ratingChanges) {
+    public void buildMultiPlayFinalResults(List<String> ratings, List<String> ratingChanges) {
         ArrayList<String> legend = new ArrayList<>();
         legend.addAll(Arrays.asList("Player", "Score", "Rating", "Delta"));
         finalResults.add(legend);
         for (int i = 0; i < playersNumber; i++){
             ArrayList<String> resultLine = new ArrayList<>();
-//            resultLine.add(usernames.get(i) + ((i == id) ? "(YOU)" : ""));
+            resultLine.add(playerInformations.get(i).getUsername());
             resultLine.add(String.valueOf(scores.get(i)));
             resultLine.add(ratings.get(i));
             resultLine.add(ratingChanges.get(i));
             finalResults.add(resultLine);
         }
+        Collections.sort(finalResults.subList(1, finalResults.size()),
+                (a, b) -> parseInt(a.get(1)) - parseInt(b.get(1)));
+
+
     }
 
-    public List<List<String>> getFinalResults() {
+    protected List<List<String>> getFinalResults() {
         return finalResults;
     }
 
@@ -149,23 +164,15 @@ public abstract class AbstractPlayer {
         this.board = board;
     }
 
-/*    public int getPlayersNumber() {
-        return playersNumber;
-    }
-*/
     public List<Integer> getScores(){
         return scores;
     }
 
-    public void setGameInterrupted() {
-        //TODO: Why empty body?
-    }
+    public void setGameInterrupted() {}
 
-    public void setGameFinished() {
-        //TODO: Why empty body?
-    }
+    public void setGameFinished() {}
 
-    public GameState getState() {
+    protected GameState getState() {
         return this.state;
     }
 
@@ -173,12 +180,12 @@ public abstract class AbstractPlayer {
         return playerInformation;
     }
 
-    public List<PlayerInformation> getPlayersInformations() {
-        return playersInformations;
+    protected List<PlayerInformation> getPlayersInformations() {
+        return playerInformations;
     }
 
-    public void setPlayersInformations(List<PlayerInformation> playersInformations) {
-        this.playersInformations = playersInformations;
+    public void setPlayersInformations(List<PlayerInformation> playerInformations) {
+        this.playerInformations = playerInformations;
     }
 
     public void setCurrentBoard(Board currentBoard) {
@@ -189,17 +196,13 @@ public abstract class AbstractPlayer {
         this.turnsQueue = turnsQueue;
     }
 
-    public enum GameState {NEW_GAME, NEXT_ROUND}
+    protected enum GameState {NEW_GAME, NEXT_ROUND}
 
     public int getPlayersNumber() {
         return playersNumber;
     }
 
-    boolean isConnected() {
-        return true;
-    }
-
-    public Deque<Integer> getCardsQueue() {return cardsQueue;}
+    public synchronized Deque<Integer> getCardsQueue() {return cardsQueue;}
 
     public void setCardsQueue(Deque<Integer> cardsQueue) {
         this.cardsQueue = cardsQueue;
@@ -221,7 +224,7 @@ public abstract class AbstractPlayer {
         return choosingCardToTake;
     }
 
-    protected void setChoosingCardToTake(boolean value) {
+    void setChoosingCardToTake(boolean value) {
         choosingCardToTake = value;
     }
 

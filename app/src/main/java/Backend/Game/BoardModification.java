@@ -1,7 +1,5 @@
 package Backend.Game;
 
-import Backend.Player.AbstractPlayer;
-
 public class BoardModification extends Turn {
 
     private Row.RowModificationTypes type;

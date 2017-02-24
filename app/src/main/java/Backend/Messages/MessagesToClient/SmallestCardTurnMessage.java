@@ -3,7 +3,7 @@ package Backend.Messages.MessagesToClient;
 import java.io.IOException;
 import java.util.List;
 
-import Backend.Client.Client;
+import Backend.Client.GameClient;
 import Backend.Server.ClientConnection;
 
 import static java.lang.Integer.parseInt;
@@ -21,9 +21,9 @@ public class SmallestCardTurnMessage {
         }
     }
 
-    public static void receive(Client client) throws IOException {
+    public static void receive(GameClient client) throws IOException {
         int chosenRowIndex = parseInt(client.getClientInput().readLine());
-        client.connectedPlayer.buildBoardModificationsQueue(chosenRowIndex);
+        client.getConnectedPlayer().buildBoardModificationsQueue(chosenRowIndex);
     }
 
 }

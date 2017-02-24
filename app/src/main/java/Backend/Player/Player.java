@@ -1,12 +1,7 @@
 package Backend.Player;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import Backend.Game.Turn;
-
-import static Backend.Game.GameConstants.*;
 
 public class Player extends AbstractPlayer {
 
@@ -15,6 +10,7 @@ public class Player extends AbstractPlayer {
     }
 
     public int chooseCard() {
+        showScores();
         askForAMove();
         setChoosingCardToTake(true);
         while (isChoosingCardToTake()){
@@ -35,6 +31,7 @@ public class Player extends AbstractPlayer {
         if (board.getMinOnBoard() < getCardsQueue().peek()){
             return -1;
         }
+        showScores();
         askForAChoice();
         setChoosingRowToTake(true);
         while (isChoosingRowToTake()){
@@ -78,6 +75,10 @@ public class Player extends AbstractPlayer {
     }
 
     private void showScores(){
+        for (Integer x : getScores()){
+            System.out.print(x + " ");
+        }
+        System.out.println();
     }
 
 /*    @Override

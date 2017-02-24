@@ -2,10 +2,7 @@ package Backend.Messages.MessagesToClient;
 
 import java.io.IOException;
 
-import Backend.Messages.MessagesToServer.RowSelectedMessage;
 import Backend.Server.ClientConnection;
-
-import static java.lang.Integer.parseInt;
 
 public class SendRowMessage {
 

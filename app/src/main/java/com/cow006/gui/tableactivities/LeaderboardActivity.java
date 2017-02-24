@@ -10,13 +10,9 @@ import android.widget.ViewFlipper;
 import com.cow006.gui.MainMenuActivity;
 import com.cow006.gui.R;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import Backend.Client.LeaderboardRequester;
-import Backend.Database.LeaderboardRecord;
 
 import static java.lang.Thread.sleep;
 
@@ -59,17 +55,23 @@ public class LeaderboardActivity extends AppCompatActivity{
     }
 
     private void setupLeaderboard(List<List<String>> table) {
-        try {
+        //try {
             System.out.println("HERE");
-            LeaderboardRequester leaderboardRequester = new LeaderboardRequester(LEADERBOARD_SIZE);
-            table.add(Arrays.asList("Name", "Rating"));
-            for (LeaderboardRecord record : leaderboardRequester.requestLeaderboard()) {
+//            LeaderboardRequester leaderboardRequester = new LeaderboardRequester(LEADERBOARD_SIZE);
+            table.add(new ArrayList<>(Arrays.asList("Name", "Rating")));
+            table.add(new ArrayList<>(Arrays.asList("USER1", "100500")));
+            table.add(new ArrayList<>(Arrays.asList("USER2", "100000")));
+            table.add(new ArrayList<>(Arrays.asList("USER3", "100")));
+        System.out.println(table.size());
+
+            /*            for (LeaderboardRecord record : leaderboardRequester.requestLeaderboard()) {
                 table.add(
                         Arrays.asList(record.getUsername(),
                                 Integer.toString(record.getRating())));
             }
-        } catch (IOException e) {
+*/
+        /*} catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 }

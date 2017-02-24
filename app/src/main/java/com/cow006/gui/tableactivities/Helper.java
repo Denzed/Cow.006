@@ -10,9 +10,11 @@ import java.util.List;
 public class Helper {
     static void fillTable(GridView table, List<List<String>> data) {
         table.setNumColumns(data.get(0).size());
+        System.out.println("HELPER: " + data.size());
         List<String> joinedData = new LinkedList<>();
         for (List<String> row : data) {
             joinedData.addAll(row);
+            System.out.println("HELPER: added " + row.get(0) + "\t" + row.get(1) + "\t\ttmp: " + joinedData);
         }
         final ArrayAdapter<String> gridViewArrayAdapter =
                 new ArrayAdapter<>(table.getContext(),

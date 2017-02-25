@@ -9,6 +9,21 @@ import Backend.Server.ClientConnection;
 public class MultiPlayFinalResultsBuiltMessage {
 
     public static void submit(GameClient client){
+        while (!client.getConnectedPlayer().getCardsQueue().isEmpty()){
+            try {
+                System.out.println("WAITING FOR DRAWING");
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                //ignore
+            }
+        }
+        try {
+            System.out.println("FINAL WAITING FOR DRAWING");
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            //ignore
+        }
+
         client.getClientOutput().println("MULTI_PLAY_FINAL_RESULTS_BUILT");
     }
 

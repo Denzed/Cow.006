@@ -18,5 +18,5 @@ public class GameConstants {
     public static final int ROUNDS = 1;
     public static final int ROWS = 4;
     public static final int COLUMNS = 5;
-    public static final int STOP_POINTS = 0;
+    public static final int STOP_POINTS = 1;
 }

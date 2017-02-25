@@ -1,5 +1,6 @@
 package Backend.Database;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -21,19 +22,22 @@ public class Rating {
         return TOP_PLAYER_K_FACTOR;
     }
 
-    public static void updateRatings(List<DatabaseRecord> databaseRecords, List<Integer> scores,
-            List<Integer> ratings, List<Integer> ratingChanges) {
+    public static void updateRatings(DatabaseConnection dbConnection,
+                                     List<DatabaseRecord> databaseRecords, List<Integer> scores,
+                                     List<Integer> ratings, List<Integer> ratingChanges) throws SQLException {
         List<Double> ratingPreChanges = calcRatingChanges(databaseRecords, scores);
         int opponentsNumber = databaseRecords.size() - 1;
         for (int i = 0; i < databaseRecords.size(); i++) {
             DatabaseRecord currentPlayer = databaseRecords.get(i);
             int ratingChange = ratingPreChanges.get(i).intValue();
+            System.out.println("delta = " + ratingChange);
             currentPlayer.setRatingChange(ratingChange);
             currentPlayer.updateRating(opponentsNumber);
             currentPlayer.updatePlayed();
             ratings.add(currentPlayer.getRating());
             ratingChanges.add(currentPlayer.getRatingChange());
         }
+        dbConnection.submitUpdatedRatingsToDatabase(databaseRecords);
 
     }
 

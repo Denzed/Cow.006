@@ -39,4 +39,8 @@ public class DatabaseRecord {
     void updateRating(int opponentsNumber) {
         rating += ratingChange / opponentsNumber;
     }
+
+    String getUserID() {
+        return userID;
+    }
 }

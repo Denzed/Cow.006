@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutionException;
 
 import Backend.Database.DatabaseConnection;
 import Backend.Database.DatabaseRecord;
+import Backend.Database.Rating;
 import Backend.Messages.MessagesToClient.BuildFinalResultsMessages.BuildMultiPlayFinalResultsMessage;
 import Backend.Messages.MessagesToClient.SendScoresMessage;
 import Backend.Messages.MessagesToServer.ResultsBuiltMessage.MultiPlayFinalResultsBuiltMessage;
@@ -19,7 +20,6 @@ import static Backend.Database.DatabaseConnection.DB_LOGIN;
 import static Backend.Database.DatabaseConnection.DB_TABLE_NAME;
 import static Backend.Database.DatabaseConnection.DB_URL_ADDRESS;
 import static Backend.Database.DatabaseConnection.SECRET_PASSWORD;
-import static Backend.Database.Rating.updateRatings;
 
 public class MultiPlayHandler extends GameHandler{
 
@@ -36,7 +36,7 @@ public class MultiPlayHandler extends GameHandler{
         List<Integer> scores = ScoresSentMessage.receive(connections.get(0));
         List<Integer> ratings = new ArrayList<>();
         List<Integer> ratingChanges = new ArrayList<>();
-        updateRatings(databaseRecords, scores, ratings, ratingChanges);
+        Rating.updateRatings(dbConnection, databaseRecords, scores, ratings, ratingChanges);
         BuildMultiPlayFinalResultsMessage.submitAll(connections, ratings, ratingChanges);
         MultiPlayFinalResultsBuiltMessage.receiveAll(connections);
     }

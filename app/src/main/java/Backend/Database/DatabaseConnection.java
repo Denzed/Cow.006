@@ -11,13 +11,15 @@ import java.util.concurrent.ExecutionException;
 
 import Backend.Player.PlayerInformation;
 
+import javax.xml.crypto.Data;
+
 public class DatabaseConnection {
 
     //ask me: daniilplyushchenko@gmail.com
     public static final String DB_URL_ADDRESS = "";
     public static final String DB_TABLE_NAME = "";
     public static final String DB_LOGIN = "";
-    public static final String SECRET_PASSWORD = ""; 
+    public static final String SECRET_PASSWORD = "";
 
     private String URLAddress;
     private String tableName;
@@ -35,13 +37,6 @@ public class DatabaseConnection {
         return DriverManager.getConnection(URLAddress, login, password);
     }
 
-    private ResultSet executeQuery(Connection dbConnection, String query) throws SQLException {
-        Statement statement = dbConnection.createStatement();
-        ResultSet resultSet = statement.executeQuery(query);
-        statement.close();
-        return resultSet;
-    }
-
     public List<LeaderboardRecord> requestLeaderboard(int leaderbordSize) throws SQLException {
         Connection dbConnection = connectToDatabase();
         String query = "SELECT username, rating FROM " + tableName + " ORDER BY rating DESC LIMIT " + leaderbordSize;
@@ -56,7 +51,7 @@ public class DatabaseConnection {
 
     private List<LeaderboardRecord> buildLeaderboard(ResultSet resultSet) throws SQLException {
         List<LeaderboardRecord> result = new ArrayList<>();
-        while (resultSet.next()){
+        while (resultSet.next()) {
             String username = resultSet.getString("username");
             int rating = resultSet.getInt("rating");
             result.add(new LeaderboardRecord(username, rating));
@@ -68,8 +63,8 @@ public class DatabaseConnection {
             throws InterruptedException, ExecutionException, SQLException {
         List<DatabaseRecord> result = new ArrayList<>();
         Connection dbConnection = connectToDatabase();
-        insertAbsentPlayersIntoDatabase(dbConnection, playerInformations); //TODO
-        for (PlayerInformation playerInformation : playerInformations){
+        insertAbsentPlayersIntoDatabase(dbConnection, playerInformations);
+        for (PlayerInformation playerInformation : playerInformations) {
             String query = "SELECT rating, played FROM " + tableName + " WHERE userID='" + playerInformation.getUserID() + "';";
             System.out.println(query);
             Statement statement = dbConnection.createStatement();
@@ -86,7 +81,7 @@ public class DatabaseConnection {
         String userID = playerInformation.getUserID();
         int rating = 0;
         int played = 0;
-        while (resultSet.next()){
+        while (resultSet.next()) {
             rating = resultSet.getInt("rating");
             played = resultSet.getInt("played");
         }
@@ -94,7 +89,7 @@ public class DatabaseConnection {
     }
 
     private void insertAbsentPlayersIntoDatabase(Connection dbConnection, List<PlayerInformation> playerInformations) throws SQLException {
-        for (PlayerInformation playerInformation : playerInformations){
+        for (PlayerInformation playerInformation : playerInformations) {
             String query = "INSERT IGNORE INTO Information (userID, username) "
                     + "VALUES ('" + playerInformation.getUserID() + "', '" + playerInformation.getUsername() + "');";
             System.out.println(query);
@@ -104,5 +99,19 @@ public class DatabaseConnection {
         }
     }
 
-}
+    void submitUpdatedRatingsToDatabase(List<DatabaseRecord> databaseRecords)
+            throws SQLException {
+        Connection dbConnection = connectToDatabase();
+        for (DatabaseRecord databaseRecord : databaseRecords) {
+            String query = "UPDATE " + tableName
+                    + " SET rating='" + databaseRecord.getRating() + "', played='" + databaseRecord.getPlayed()
+                    + "' WHERE userID='" + databaseRecord.getUserID() + "'";
+            System.out.println(query);
+            Statement statement = dbConnection.createStatement();
+            statement.execute(query);
+            statement.close();
+        }
+        dbConnection.close();
+    }
 
+}

@@ -13,10 +13,11 @@ import Backend.Player.PlayerInformation;
 
 public class DatabaseConnection {
 
-    public static final String DB_URL_ADDRESS = "jdbc:mysql://sql11.freemysqlhosting.net/sql11157079";
-    public static final String DB_TABLE_NAME = "Information";
-    public static final String DB_LOGIN = "sql11157079";
-    public static final String SECRET_PASSWORD = "JFWUclYwwG"; //ask me: daniilplyushchenko@gmail.com
+    //ask me: daniilplyushchenko@gmail.com
+    public static final String DB_URL_ADDRESS = "";
+    public static final String DB_TABLE_NAME = "";
+    public static final String DB_LOGIN = "";
+    public static final String SECRET_PASSWORD = ""; 
 
     private String URLAddress;
     private String tableName;

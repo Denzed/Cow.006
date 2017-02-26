@@ -100,9 +100,11 @@ public class MainMenuActivity extends AppCompatActivity
         if (loggedIn) {
             childIndex = flipper.indexOfChild(findViewById(R.id.sign_out_button));
             text = getString(R.string.logged_in_prefix) + username;
+            findViewById(R.id.multi_button).setClickable(true);
         } else {
             childIndex = flipper.indexOfChild(findViewById(R.id.sign_in_button));
             text = getString(R.string.not_logged_in_text);
+            findViewById(R.id.multi_button).setClickable(false);
         }
         flipper.setDisplayedChild(childIndex);
         ((TextView) findViewById(R.id.sign_in_information_text_view)).setText(text);

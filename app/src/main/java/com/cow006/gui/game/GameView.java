@@ -7,17 +7,17 @@ import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.content.ClipData;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.os.Build;
 import android.os.Handler;
-import android.support.v7.app.AlertDialog;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.cow006.gui.R;
 import com.cow006.gui.game.card.CardAddAnimatorListenerAdapter;
@@ -31,6 +31,9 @@ import java.util.List;
 import Backend.Game.BoardModification;
 import Backend.Game.GameConstants;
 import Backend.Game.Row;
+
+import static android.view.View.MeasureSpec.EXACTLY;
+import static android.view.View.MeasureSpec.makeMeasureSpec;
 
 public class GameView extends FrameLayout {
     public static final float CARD_COEFFICIENT = 0.16f;
@@ -116,18 +119,35 @@ public class GameView extends FrameLayout {
     }
 
     @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        cardWidth = Math.round(CARD_COEFFICIENT * getMeasuredWidth());
+        cardHeight = Math.round(CARD_COEFFICIENT * getMeasuredHeight());
+        for (CardView card : cardViews) {
+            card.measure(makeMeasureSpec(cardWidth, EXACTLY),
+                    makeMeasureSpec(cardHeight, EXACTLY));
+        }
+    }
+
+    @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        if ((right - left) <= 0 || (bottom - top) <= 0) {
+            return;
+        }
         if (changed) {
             cardWidth = Math.round(CARD_COEFFICIENT * (right - left));
             cardHeight = Math.round(CARD_COEFFICIENT * (bottom - top));
-            generateCardBitmaps();
             for (CardView card : cardViews) {
                 LayoutParams params = (LayoutParams) card.getLayoutParams();
                 params.width = cardWidth;
                 params.height = cardHeight;
             }
-            updateCards();
+            generateCardBitmaps();
         }
+        drawScores();
+        drawBoard();
+        drawHand();
+        drawQueue();
         super.onLayout(changed, left, top, right, bottom);
     }
 
@@ -146,7 +166,7 @@ public class GameView extends FrameLayout {
         cardViews[card - 1].setScale((card == focusedCard ? FOCUSED_ZOOM : 1) * scale);
         cardViews[card - 1].setX(paddingLeft);
         cardViews[card - 1].setY(paddingTop);
-        post(() -> cardViews[card - 1].setVisibility(View.VISIBLE));
+        cardViews[card - 1].setVisibility(View.VISIBLE);
     }
 
     public void drawHand() {
@@ -166,7 +186,7 @@ public class GameView extends FrameLayout {
         float paddingLeftTop[] = getQueueTopPosition();
         synchronized (player.getCardsQueue()) {
             for (int card : player.getCardsQueue()) {
-                System.out.println("drawQueue:size() " + player.getCardsQueue());
+                System.out.println("requestDrawQueue:size() " + player.getCardsQueue());
                 drawCard(paddingLeftTop[0], paddingLeftTop[1],
                         card, QUEUE_CARD_SCALE);
                 paddingLeftTop[1] += scaledHeight * (1 + FIELDS_OFFSET_IN_CARDS / 2);
@@ -206,11 +226,12 @@ public class GameView extends FrameLayout {
         }
     }
 
-    protected void drawMessage(String message, DialogInterface.OnClickListener action) {
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext())
-                .setMessage(message)
-                .setNeutralButton(R.string.alertdialog_neutral_button_text, action);
-        parentActivity.runOnUiThread(() -> dialogBuilder.create().show());
+    protected void drawMessage(String message) {
+        parentActivity.runOnUiThread(() -> {
+            Toast toast = Toast.makeText(parentActivity.getApplicationContext(), message, Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+        });
     }
 
     @Override
@@ -229,7 +250,7 @@ public class GameView extends FrameLayout {
         } else {
             startDrag(data, shadowBuilder, card, 0);
         }
-        drawHand();
+        requestLayout();
     }
 
     private ObjectAnimator animateCardTranslation(int card,
@@ -313,19 +334,14 @@ public class GameView extends FrameLayout {
     }
 
     public void focusCard(int card) {
-        focusedCard = card;
-        drawHand();
+        if (focusedCard != card) {
+            focusedCard = card;
+            requestLayout();
+        }
     }
 
     public void unfocusCard() {
         focusCard(GameConstants.NOT_A_CARD);
-    }
-
-    public void updateCards() {
-        drawScores();
-        drawBoard();
-        drawHand();
-        drawQueue();
     }
 
     public boolean post(Runnable runnable) {

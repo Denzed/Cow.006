@@ -15,5 +15,6 @@
         android:id="@+id/final_scores_table"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/large_text_size"/>
+        android:scrollbars="vertical"
+        android:textSize="@dimen/large_text_size" />
 </android.support.percent.PercentRelativeLayout>

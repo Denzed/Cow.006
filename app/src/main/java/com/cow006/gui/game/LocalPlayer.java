@@ -1,6 +1,5 @@
 package com.cow006.gui.game;
 
-import android.content.DialogInterface;
 import android.util.Pair;
 import android.widget.ViewFlipper;
 
@@ -34,9 +33,9 @@ class LocalPlayer extends Player {
     @Override
     public void setGameInterrupted() {
         super.setGameInterrupted();
-        gameView.drawMessage("Someone has disconnected! The game will be interrupted.",
-                (DialogInterface dialog, int which) ->
-                        gameView.parentActivity.goToResults(getFinalScoresAsString()));
+        gameView.drawMessage("Someone has disconnected! The game will be interrupted.");
+        gameView.parentActivity.goToMainMenu();
+        gameView.parentActivity.goToResults(getFinalScoresAsString());
     }
 
     @Override
@@ -48,13 +47,13 @@ class LocalPlayer extends Player {
     @Override
     public void setCardsQueue(Deque<Integer> cardsQueue) {
         super.setCardsQueue(cardsQueue);
-        gameView.drawQueue();
+        gameView.post(gameView::requestLayout);
     }
 
     @Override
     public void setBoard(Board board) {
         super.setBoard(board);
-        gameView.drawBoard();
+        gameView.post(gameView::requestLayout);
     }
 
     @Override
@@ -69,7 +68,8 @@ class LocalPlayer extends Player {
             message = parentActivity.getString(R.string.next_round_message_text);
         }
         super.setHand(hand);
-        gameView.drawMessage(message, (DialogInterface dialog, int which) -> gameView.drawHand());
+        gameView.drawMessage(message);
+        gameView.post(gameView::requestLayout);
     }
 
     @Override
@@ -94,7 +94,7 @@ class LocalPlayer extends Player {
     @Override
     public void updateOneTurn() {
         super.updateOneTurn();
-        gameView.drawBoard();
+        gameView.post(gameView::requestLayout);
     }
 
     String getScoresAsString() {

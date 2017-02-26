@@ -3,11 +3,13 @@ package com.cow006.gui.tableactivities;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 
+import com.cow006.gui.R;
+
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Helper {
+class Helper {
     static void fillTable(GridView table, List<List<String>> data) {
         if (data.isEmpty()) {
             return;
@@ -21,7 +23,7 @@ public class Helper {
         }
         final ArrayAdapter<String> gridViewArrayAdapter =
                 new ArrayAdapter<>(table.getContext(),
-                        android.R.layout.simple_list_item_1,
+                        R.layout.grid_view_text,
                         joinedData);
         table.setAdapter(gridViewArrayAdapter);
     }

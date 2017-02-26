@@ -11,9 +11,9 @@ import Backend.Player.Player;
 import static Backend.Game.GameConstants.NOT_A_CARD;
 
 public class CardAddAnimatorListenerAdapter extends AnimatorListenerAdapter {
-    GameView gameView;
-    CardView cardView;
-    boolean isAddCard;
+    private GameView gameView;
+    private CardView cardView;
+    private boolean isAddCard;
 
     public CardAddAnimatorListenerAdapter(GameView gameView, CardView cardView, boolean isAddCard) {
         this.gameView = gameView;
@@ -25,7 +25,7 @@ public class CardAddAnimatorListenerAdapter extends AnimatorListenerAdapter {
     public void onAnimationStart(Animator animator) {
         if (isAddCard) {
             ((Player) gameView.getPlayer()).getCardsQueue().poll();
-            gameView.drawQueue();
+            gameView.post(gameView::requestLayout);
         }
         super.onAnimationStart(animator);
     }
@@ -36,7 +36,7 @@ public class CardAddAnimatorListenerAdapter extends AnimatorListenerAdapter {
             Player player = gameView.getPlayer();
             player.getCardsQueue().addFirst(NOT_A_CARD);
             player.updateOneTurn();
-            gameView.drawQueue();
+            gameView.post(gameView::requestLayout);
             if (!player.getBoardModificationQueue().isEmpty()) {
                 gameView.runTurnAnimation();
             }

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 
+import com.cow006.gui.MainMenuActivity;
 import com.cow006.gui.R;
 import com.cow006.gui.tableactivities.FinalScoresActivity;
 
@@ -91,6 +92,12 @@ public class GameActivity extends AppCompatActivity {
     public void goToResults(String finalScores) {
         Intent intent = new Intent(this, FinalScoresActivity.class);
         intent.putExtra("finalScores", finalScores);
+        startActivity(intent);
+        finish();
+    }
+
+    public void goToMainMenu() {
+        Intent intent = new Intent(this, MainMenuActivity.class);
         startActivity(intent);
         finish();
     }

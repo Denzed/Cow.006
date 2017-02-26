@@ -11,8 +11,6 @@ import java.util.concurrent.ExecutionException;
 
 import Backend.Player.PlayerInformation;
 
-import javax.xml.crypto.Data;
-
 public class DatabaseConnection {
 
     //ask me: daniilplyushchenko@gmail.com

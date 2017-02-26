@@ -33,7 +33,7 @@ public class MultiPlayFinalResultsBuiltMessage {
 
     public static void receiveAll(List<ClientConnection> connections) throws IOException {
         for (ClientConnection connection : connections){
-            SinglePlayFinalResultsBuiltMessage.receive(connection);
+            MultiPlayFinalResultsBuiltMessage.receive(connection);
         }
     }
 }

@@ -23,24 +23,58 @@ public class MultiPlayServer extends GameServer {
                 new ArrayList<>(Collections.nCopies(DECK_SIZE / ROUNDS + 1, new ArrayDeque<>()));
         List<Queue<PlayerInformation>> infoBuckets =
                 new ArrayList<>(Collections.nCopies(DECK_SIZE / ROUNDS + 1, new ArrayDeque<>()));
+        Set<String> uniqueIDs = new HashSet<>();
         while (true) {
-            waitForConnections(serverSocket, buckets, infoBuckets);
+            waitForConnections(serverSocket, buckets, infoBuckets, uniqueIDs);
         }
     }
 
     private static synchronized void waitForConnections(
             ServerSocket serverSocket,
             List<Queue<ClientConnection>> buckets,
-            List<Queue<PlayerInformation>> infoBuckets) throws IOException {
-        ClientConnection playerConnection = new ClientConnection(serverSocket.accept());
+            List<Queue<PlayerInformation>> infoBuckets,
+            Set<String> uniqueIDs) {
+        System.out.print("WAITING...");
+        ClientConnection playerConnection;
+        int playersNumber;
+        PlayerInformation playerInformation;
+        try {
+            playerConnection = new ClientConnection(serverSocket.accept());
+            System.out.print("CONNECTED ");
+            playersNumber = PlayersNumberMessage.receive(playerConnection);
+            System.out.println(playersNumber);
+            playerInformation = PlayerInformationMessage.receive(playerConnection);
+            String userID = playerInformation.getUserID();
+            if (uniqueIDs.contains(userID)){
+                for (int i = 0; i < buckets.size(); i++){
+                    List<ClientConnection> x = new ArrayList<>(buckets.get(i));
+                    List<PlayerInformation> y = new ArrayList<>(infoBuckets.get(i));
+                    for (int j = 0; j < y.size(); j++){
+                        if (y.get(j).getUserID().equals(userID)){
+                            x.remove(j);
+                            y.remove(j);
+                        }
+                    }
+                    buckets.set(i, new ArrayDeque<>(x));
+                    infoBuckets.set(i, new ArrayDeque<>(y));
+                }
+            }
+            System.out.println(playerInformation.getUsername() + " " + playerInformation.getUserID());
+            uniqueIDs.add(userID);
 
-        int playersNumber = PlayersNumberMessage.receive(playerConnection);
-        PlayerInformation playerInformation = PlayerInformationMessage.receive(playerConnection);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
         Queue<ClientConnection> bucket = buckets.get(playersNumber);
         Queue<PlayerInformation> infoBucket = infoBuckets.get(playersNumber);
         bucket.add(playerConnection);
         infoBucket.add(playerInformation);
-
+        System.out.println("IN BUCKET:");
+        for (PlayerInformation x : new ArrayList<>(infoBucket)){
+            System.out.println(x.getUsername() + " " + x.getUserID());
+        }
+        System.out.println(bucket.size());
         if (bucket.size() >= playersNumber) {
             if (haveEnoughConnectedPlayers(new ArrayList<>(bucket), new ArrayList<>(infoBucket), playersNumber)){
                 List<ClientConnection> players = new ArrayList<>();
@@ -57,7 +91,9 @@ public class MultiPlayServer extends GameServer {
             IsConnectedMessage.submit(candidates.get(i));
             try{
                 IAmConnectedMessage.receive(candidates.get(i));
+                System.out.println("IAMCONNECTED");
             } catch (IOException e) {
+                System.out.println("IAMDISCONNECTED");
                 candidates.remove(i);
                 infoCandidates.remove(i);
                 return false;

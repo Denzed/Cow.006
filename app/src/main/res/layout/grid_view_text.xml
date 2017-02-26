@@ -3,7 +3,6 @@
     android:id="@+id/grid_view_text"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:textAlignment="center"
     android:textSize="@dimen/medium_text_size">
 
 </TextView>

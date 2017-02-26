@@ -35,7 +35,6 @@ class LocalPlayer extends Player {
         super.setGameInterrupted();
         gameView.drawMessage("Someone has disconnected! The game will be interrupted.");
         gameView.parentActivity.goToMainMenu();
-        gameView.parentActivity.goToResults(getFinalScoresAsString());
     }
 
     @Override

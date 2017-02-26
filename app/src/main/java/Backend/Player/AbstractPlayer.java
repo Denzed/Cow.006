@@ -124,14 +124,15 @@ public abstract class AbstractPlayer {
 
     public void buildMultiPlayFinalResults(List<String> ratings, List<String> ratingChanges) {
         ArrayList<String> legend = new ArrayList<>();
-        legend.addAll(Arrays.asList("Player", "Score", "Rating", "Delta"));
+        legend.addAll(Arrays.asList("Player", "Score", "Rating"));
         finalResults.add(legend);
         for (int i = 0; i < playersNumber; i++){
             ArrayList<String> resultLine = new ArrayList<>();
             resultLine.add(playerInformations.get(i).getUsername());
             resultLine.add(String.valueOf(scores.get(i)));
-            resultLine.add(ratings.get(i));
-            resultLine.add(ratingChanges.get(i));
+            resultLine.add(ratings.get(i) + "("
+                    + (ratingChanges.get(i).charAt(0) == '-' ? "" : "+")
+                    + ratingChanges.get(i) + ")");
             finalResults.add(resultLine);
         }
         Collections.sort(finalResults.subList(1, finalResults.size()),

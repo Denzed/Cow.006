@@ -47,7 +47,7 @@ public class LeaderboardActivity extends AppCompatActivity {
         boolean isSuccess[] = {false}; // effectively final hack
         try {
             System.out.println("HERE");
-            table.add(new ArrayList<>(Arrays.asList("Position", "Name", "Rating")));
+            table.add(new ArrayList<>(Arrays.asList("Name and position", "Rating")));
             System.out.println(table.size());
 
             LeaderboardRequester leaderboardRequester = new LeaderboardRequester(LEADERBOARD_SIZE);
@@ -55,14 +55,12 @@ public class LeaderboardActivity extends AppCompatActivity {
             for (LeaderboardRecord record : leaderboardRequester.requestLeaderboard()) {
                 table.add(
                         Arrays.asList(
-                                Integer.toString(position) + ".",
-                                record.getUsername(),
+                                Integer.toString(position) + ". " + record.getStrippedUsername(),
                                 Integer.toString(record.getRating())));
                 position++;
             }
             isSuccess[0] = true;
         } catch (IOException e) {
-            isSuccess[0] = true; // TODO: delete when leaderboard is okay
             e.printStackTrace();
         }
         handler.post(() -> {

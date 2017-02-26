@@ -3,8 +3,6 @@ package com.cow006.gui.tableactivities;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 
-import com.cow006.gui.R;
-
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,7 +21,7 @@ class Helper {
         }
         final ArrayAdapter<String> gridViewArrayAdapter =
                 new ArrayAdapter<>(table.getContext(),
-                        R.layout.grid_view_text,
+                        android.R.layout.simple_expandable_list_item_1,
                         joinedData);
         table.setAdapter(gridViewArrayAdapter);
     }

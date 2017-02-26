@@ -48,9 +48,6 @@ public class LeaderboardActivity extends AppCompatActivity {
         try {
             System.out.println("HERE");
             table.add(new ArrayList<>(Arrays.asList("Name", "Rating")));
-            table.add(new ArrayList<>(Arrays.asList("USER1", "100500")));
-            table.add(new ArrayList<>(Arrays.asList("USER2", "100000")));
-            table.add(new ArrayList<>(Arrays.asList("USER3", "100")));
             System.out.println(table.size());
 
             LeaderboardRequester leaderboardRequester = new LeaderboardRequester(LEADERBOARD_SIZE);

@@ -16,9 +16,9 @@ import Backend.Player.Player;
 import Backend.Player.PlayerInformation;
 
 class LocalPlayer extends Player {
-    GameView gameView;
+    private GameView gameView;
 
-    public LocalPlayer(GameView gameView, int playersNumber, PlayerInformation playerInformation) {
+    LocalPlayer(GameView gameView, int playersNumber, PlayerInformation playerInformation) {
         super(playersNumber, playerInformation);
         this.gameView = gameView;
     }
@@ -60,15 +60,16 @@ class LocalPlayer extends Player {
     @Override
     public void setHand(List<Integer> hand) {
         GameActivity parentActivity = gameView.parentActivity;
+        String message;
         if (getState() == GameState.NEW_GAME) {
             parentActivity.runOnUiThread(((ViewFlipper) parentActivity.findViewById(R.id.activity_game))
                     ::showNext);
-            gameView.drawMessage(parentActivity.getString(R.string.game_start_message_text));
+            message = parentActivity.getString(R.string.game_start_message_text);
         } else {
-            gameView.drawMessage(parentActivity.getString(R.string.next_round_message_text));
+            message = parentActivity.getString(R.string.next_round_message_text);
         }
         super.setHand(hand);
-        gameView.drawHand();
+        gameView.drawMessage(message, (DialogInterface dialog, int which) -> gameView.drawHand());
     }
 
     @Override
@@ -86,6 +87,7 @@ class LocalPlayer extends Player {
     @Override
     public void tellCard(int card) {
         super.tellCard(card);
+        hand.remove(Integer.valueOf(card));
         gameView.unfocusCard();
     }
 
@@ -95,7 +97,7 @@ class LocalPlayer extends Player {
         gameView.drawBoard();
     }
 
-    protected String getScoresAsString() {
+    String getScoresAsString() {
         StringBuilder stringBuilder = new StringBuilder();
         ArrayList<Integer> scoresList = new ArrayList<>(getScores());
         List<PlayerInformation> informationList = new ArrayList<>(getPlayersInformations());
@@ -126,14 +128,16 @@ class LocalPlayer extends Player {
         playerList.remove(index);
     }
 */
-    protected String getFinalScoresAsString() {
+
+    private String getFinalScoresAsString() {
+        System.err.println("Final scores: " + getFinalResults());
         StringBuilder stringBuilder = new StringBuilder();
         for (List<String> line : getFinalResults()) {
             for (String element : line) {
                 stringBuilder.append(element).append("\n");
             }
             stringBuilder.append("\n");
-        }
+            }
         return stringBuilder.toString();
+        }
     }
-}

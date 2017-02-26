@@ -22,15 +22,15 @@ import static java.lang.Integer.parseInt;
 
 public abstract class AbstractPlayer {
 
+    protected volatile List<Integer> hand;
+    volatile int chosenRowIndex;
+    volatile int chosenCardValue;
+    volatile Board board;
     private List<List<String>> finalResults; //???
     private PlayerInformation playerInformation;
     private List<PlayerInformation> playerInformations;
     private int playersNumber;
-    protected volatile List<Integer> hand;
-    volatile int chosenRowIndex;
-    volatile int chosenCardValue;
     private List<Integer> scores;
-    volatile Board board;
     private volatile Board currentBoard;
     private volatile GameState state;
     private volatile boolean choosingRowToTake;
@@ -149,7 +149,7 @@ public abstract class AbstractPlayer {
     }
 
     public void setHand(List<Integer> hand) {
-        this.hand = hand;
+        this.hand = Collections.synchronizedList(hand);
         if (this.state == GameState.NEW_GAME) {
             this.state = GameState.NEXT_ROUND;
         }
@@ -196,8 +196,6 @@ public abstract class AbstractPlayer {
         this.turnsQueue = turnsQueue;
     }
 
-    protected enum GameState {NEW_GAME, NEXT_ROUND}
-
     public int getPlayersNumber() {
         return playersNumber;
     }
@@ -241,5 +239,7 @@ public abstract class AbstractPlayer {
         chosenCardValue = card;
         setChoosingCardToTake(false);
     }
+
+    protected enum GameState {NEW_GAME, NEXT_ROUND}
 
 }

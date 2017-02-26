@@ -10,7 +10,7 @@ public abstract class Client {
 
     public static final String LOCALHOST = "localhost";
     public static final String MY_LAPTOP_HOST = "192.168.210.110";
-    public static final int GAME_PORT_NUMBER = 8080;
+    public static final int GAME_PORT_NUMBER = 8081;
     public static final int LEADERBOARD_PORT_NUMBER = 8899;
 
     Socket clientSocket;

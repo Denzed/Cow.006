@@ -126,8 +126,8 @@ public class GameView extends FrameLayout {
                 params.width = cardWidth;
                 params.height = cardHeight;
             }
+            updateCards();
         }
-        updateCards();
         super.onLayout(changed, left, top, right, bottom);
     }
 
@@ -141,6 +141,8 @@ public class GameView extends FrameLayout {
                             float paddingTop,
                             int card,
                             float scale) {
+        System.err.println("Drawing card " + card + " with scale " + scale
+                + "at (" + paddingLeft + ", " + paddingTop + ")");
         cardViews[card - 1].setScale((card == focusedCard ? FOCUSED_ZOOM : 1) * scale);
         cardViews[card - 1].setX(paddingLeft);
         cardViews[card - 1].setY(paddingTop);
@@ -209,10 +211,6 @@ public class GameView extends FrameLayout {
                 .setMessage(message)
                 .setNeutralButton(R.string.alertdialog_neutral_button_text, action);
         parentActivity.runOnUiThread(() -> dialogBuilder.create().show());
-    }
-
-    protected void drawMessage(String message) {
-        drawMessage(message, (DialogInterface dialog, int which) -> {/* do nothing */});
     }
 
     @Override

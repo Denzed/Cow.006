@@ -2,6 +2,7 @@ package com.cow006.gui.game.card;
 
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.View;
 
 import com.cow006.gui.game.GameView;
 
@@ -9,11 +10,11 @@ import Backend.Game.GameConstants;
 import Backend.Player.Player;
 
 class CardViewGestureDetector extends GestureDetector.SimpleOnGestureListener {
-    final GameView gameView;
-    final CardView cardView;
+    private final GameView gameView;
+    private final CardView cardView;
 
-    public CardViewGestureDetector(GameView gameView,
-                                   CardView cardView) {
+    CardViewGestureDetector(GameView gameView,
+                            CardView cardView) {
         this.gameView = gameView;
         this.cardView = cardView;
     }
@@ -44,6 +45,7 @@ class CardViewGestureDetector extends GestureDetector.SimpleOnGestureListener {
                 && player.getBoardModificationQueue().isEmpty()
                 && player.isChoosingCardToTake()
                 && card != GameConstants.NOT_A_CARD) {
+            cardView.setVisibility(View.INVISIBLE);
             player.tellCard(card);
         }
         return true;

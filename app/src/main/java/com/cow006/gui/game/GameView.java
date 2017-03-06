@@ -161,8 +161,6 @@ public class GameView extends FrameLayout {
                             float paddingTop,
                             int card,
                             float scale) {
-        System.err.println("Drawing card " + card + " with scale " + scale
-                + "at (" + paddingLeft + ", " + paddingTop + ")");
         cardViews[card - 1].setScale((card == focusedCard ? FOCUSED_ZOOM : 1) * scale);
         cardViews[card - 1].setX(paddingLeft);
         cardViews[card - 1].setY(paddingTop);
@@ -175,6 +173,7 @@ public class GameView extends FrameLayout {
         float paddingTop = getHeight() - cardHeight * (1 + FIELDS_OFFSET_IN_CARDS);
         synchronized (player.getHand()) {
             for (int card : player.getHand()) {
+                cardViews[card - 1].bringToFront();
                 drawCard(paddingLeft, paddingTop, card, 1);
                 paddingLeft += cardWidth / 2;
             }
@@ -345,5 +344,11 @@ public class GameView extends FrameLayout {
 
     public boolean post(Runnable runnable) {
         return handler.post(runnable);
+    }
+
+    public void resetVisibleCards() {
+        for (CardView card : cardViews) {
+            card.setVisibility(View.INVISIBLE);
+        }
     }
 }

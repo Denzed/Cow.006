@@ -68,7 +68,10 @@ class LocalPlayer extends Player {
         }
         super.setHand(hand);
         gameView.drawMessage(message);
-        gameView.post(gameView::requestLayout);
+        gameView.post(() -> {
+            gameView.resetVisibleCards();
+            gameView.requestLayout();
+        });
     }
 
     @Override

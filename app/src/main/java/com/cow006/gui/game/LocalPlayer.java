@@ -50,13 +50,13 @@ class LocalPlayer extends Player {
     }
 
     @Override
-    public synchronized void setBoard(Board board) {
+    public void setBoard(Board board) {
         super.setBoard(board);
         gameView.post(gameView::requestLayout);
     }
 
     @Override
-    public synchronized void setHand(List<Integer> hand) {
+    public void setHand(List<Integer> hand) {
         GameActivity parentActivity = gameView.parentActivity;
         String message;
         if (getState() == GameState.NEW_GAME) {
@@ -72,7 +72,7 @@ class LocalPlayer extends Player {
     }
 
     @Override
-    public synchronized void buildBoardModificationsQueue(int chosenRowIndex) {
+    public void buildBoardModificationsQueue(int chosenRowIndex) {
         super.buildBoardModificationsQueue(chosenRowIndex);
         gameView.post(gameView::runTurnAnimation);
     }

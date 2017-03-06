@@ -35,7 +35,6 @@ public class GameClient extends Client{
         String messageType;
         while (!isClosed) {
             messageType = clientInput.readLine();
-            System.out.println("Thread: " + Thread.currentThread().getName() + "\tmessageType: " + messageType);
             switch (messageType) {
                 case "BUILD_MULTI_PLAY_FINAL_RESULTS":
                     BuildMultiPlayFinalResultsMessage.receive(this);

@@ -93,7 +93,6 @@ public abstract class GameHandler {
 
         for (Future<Turn> taskForTurn : threadPool.invokeAll(tasksForTurns)){
             turns.add(taskForTurn.get());
-            System.out.println(turns.get(turns.size() - 1).getCard() + " " + turns.get(turns.size() - 1).getCard());
         }
         threadPool.shutdown();
 
@@ -103,9 +102,7 @@ public abstract class GameHandler {
 
     private boolean hasSomeoneBusted() throws InterruptedException, ExecutionException, IOException {
         SendMaxScoreMessage.submit(connections.get(0));
-        int x = MaxScoreSentMessage.receive(connections.get(0));
-        System.out.println("MAX SCORE IS " + x);
-        return  x >= STOP_POINTS;
+        return MaxScoreSentMessage.receive(connections.get(0)) >= STOP_POINTS;
     }
 
     protected abstract void processResults() throws SQLException, InterruptedException, IOException, ExecutionException;

@@ -13,7 +13,6 @@ class Helper {
             return;
         }
         table.setNumColumns(data.get(0).size());
-        System.out.println("HELPER: " + data.size());
         List<String> joinedData = new LinkedList<>();
         for (List<String> row : data) {
             joinedData.addAll(row);

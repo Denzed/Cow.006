@@ -34,21 +34,17 @@ public class MultiPlayServer extends GameServer {
             List<Queue<ClientConnection>> buckets,
             List<Queue<PlayerInformation>> infoBuckets,
             Set<String> uniqueIDs) {
-        System.out.print("WAITING...");
         ClientConnection playerConnection;
         int playersNumber;
         PlayerInformation playerInformation;
         try {
             playerConnection = new ClientConnection(serverSocket.accept());
-            System.out.print("CONNECTED ");
             playersNumber = PlayersNumberMessage.receive(playerConnection);
-            System.out.println(playersNumber);
             playerInformation = PlayerInformationMessage.receive(playerConnection);
             String userID = playerInformation.getUserID();
             if (uniqueIDs.contains(userID)){
                 removeAllTheOccurrencesFromBuckets(buckets, infoBuckets, userID);
             }
-            System.out.println(playerInformation.getUsername() + " " + playerInformation.getUserID());
             uniqueIDs.add(userID);
 
         } catch (IOException e) {
@@ -58,11 +54,6 @@ public class MultiPlayServer extends GameServer {
         Queue<PlayerInformation> infoBucket = infoBuckets.get(playersNumber);
         bucket.add(playerConnection);
         infoBucket.add(playerInformation);
-        System.out.println("IN BUCKET:");
-        for (PlayerInformation x : new ArrayList<>(infoBucket)){
-            System.out.println(x.getUsername() + " " + x.getUserID());
-        }
-        System.out.println(bucket.size());
         if (bucket.size() >= playersNumber) {
             if (haveEnoughConnectedPlayers(new ArrayList<>(bucket), new ArrayList<>(infoBucket), playersNumber)){
                 List<ClientConnection> players = new ArrayList<>();

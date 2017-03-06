@@ -63,7 +63,6 @@ public class DatabaseConnection {
         insertAbsentPlayersIntoDatabase(dbConnection, playerInformations);
         for (PlayerInformation playerInformation : playerInformations) {
             String query = "SELECT rating, played FROM " + tableName + " WHERE userID='" + playerInformation.getUserID() + "';";
-            System.out.println(query);
             Statement statement = dbConnection.createStatement();
             result.add(buildDatabaseRecord(playerInformation, statement.executeQuery(query)));
             statement.close();
@@ -89,7 +88,6 @@ public class DatabaseConnection {
         for (PlayerInformation playerInformation : playerInformations) {
             String query = "INSERT IGNORE INTO Information (userID, username) "
                     + "VALUES ('" + playerInformation.getUserID() + "', '" + playerInformation.getUsername() + "');";
-            System.out.println(query);
             Statement statement = dbConnection.createStatement();
             statement.executeUpdate(query);
             statement.close();
@@ -103,7 +101,6 @@ public class DatabaseConnection {
             String query = "UPDATE " + tableName
                     + " SET rating='" + databaseRecord.getRating() + "', played='" + databaseRecord.getPlayed()
                     + "' WHERE userID='" + databaseRecord.getUserID() + "'";
-            System.out.println(query);
             Statement statement = dbConnection.createStatement();
             statement.execute(query);
             statement.close();

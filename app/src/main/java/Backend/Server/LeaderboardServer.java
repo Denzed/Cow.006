@@ -21,13 +21,11 @@ public class LeaderboardServer {
     }
 
     private static synchronized void waitForConnections(ServerSocket serverSocket) throws IOException {
-        System.out.print("WAITING...");
         ClientConnection connection = new ClientConnection(serverSocket.accept());
-        System.out.println("CONNECTED");
         DatabaseConnection dbConnection = new DatabaseConnection(DB_URL_ADDRESS, DB_TABLE_NAME, DB_LOGIN, SECRET_PASSWORD);
         try{
-            int leaderbordSize = SendLeaderboardMessage.receive(connection);
-            LeaderboardSentMessage.submit(connection, dbConnection.requestLeaderboard(leaderbordSize));
+            int leaderboardSize = SendLeaderboardMessage.receive(connection);
+            LeaderboardSentMessage.submit(connection, dbConnection.requestLeaderboard(leaderboardSize));
         } catch (SQLException e) {
             //ignore
         }

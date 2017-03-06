@@ -51,7 +51,6 @@ public abstract class AbstractPlayer {
         turnsQueue = new ArrayDeque<>();
         finalResults = new ArrayList<>();
         this.playerInformation = playerInformation;
-        System.out.println("USERNAME = " + playerInformation.getUsername());
     }
 
     public void updateOneTurn(){
@@ -85,7 +84,6 @@ public abstract class AbstractPlayer {
             int currentPlayer = turnsQueue.peek().getID();
             int currentCard = turnsQueue.peek().getCard();
             turnsQueue.poll();
-            System.out.println(turnsQueue.size());
             int modifyingRowIndex = getModifyingRowIndex(currentBoard, currentCard);
             Row.RowModificationTypes rowModificationType = currentBoard.get(modifyingRowIndex).size() >= COLUMNS ? CLEAR_ROW : ADD_CARD;
             BoardModification boardModification;
@@ -136,13 +134,6 @@ public abstract class AbstractPlayer {
         }
         Collections.sort(finalResults.subList(1, finalResults.size()),
                 (a, b) -> parseInt(a.get(1)) - parseInt(b.get(1)));
-
-        for (List<String> x : finalResults){
-            for (String y : x){
-                System.out.print(y + "\t");
-            }
-            System.out.println();
-        }
     }
 
     protected List<List<String>> getFinalResults() {
@@ -153,8 +144,8 @@ public abstract class AbstractPlayer {
         return hand;
     }
 
-    public synchronized void setHand(List<Integer> hand) {
-        this.hand = hand;
+    public void setHand(List<Integer> hand) {
+        this.hand = Collections.synchronizedList(hand);
         if (this.state == GameState.NEW_GAME) {
             this.state = GameState.NEXT_ROUND;
         }

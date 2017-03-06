@@ -186,7 +186,6 @@ public class GameView extends FrameLayout {
         float paddingLeftTop[] = getQueueTopPosition();
         synchronized (player.getCardsQueue()) {
             for (int card : player.getCardsQueue()) {
-                System.out.println("requestDrawQueue:size() " + player.getCardsQueue());
                 drawCard(paddingLeftTop[0], paddingLeftTop[1],
                         card, QUEUE_CARD_SCALE);
                 paddingLeftTop[1] += scaledHeight * (1 + FIELDS_OFFSET_IN_CARDS / 2);

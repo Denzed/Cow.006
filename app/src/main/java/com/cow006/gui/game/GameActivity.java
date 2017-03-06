@@ -77,7 +77,7 @@ public class GameActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        System.out.println("USER LEFT THE GAME!");
+
         try {
             localClient.disconnectFromServer();
         } catch (Exception e) {

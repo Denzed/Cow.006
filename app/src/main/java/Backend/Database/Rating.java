@@ -30,12 +30,10 @@ public class Rating {
         for (int i = 0; i < databaseRecords.size(); i++) {
             DatabaseRecord currentPlayer = databaseRecords.get(i);
             int ratingChange = ratingPreChanges.get(i).intValue() / opponentsNumber;
-            System.out.print("old rating = " + currentPlayer.getRating() + ", delta = " + ratingChange + ", ");
             currentPlayer.setRatingChange(ratingChange);
             currentPlayer.updateRating();
             currentPlayer.updatePlayed();
             ratings.add(currentPlayer.getRating());
-            System.out.println("new rating = " + currentPlayer.getRating());
             ratingChanges.add(currentPlayer.getRatingChange());
         }
         dbConnection.submitUpdatedRatingsToDatabase(databaseRecords);

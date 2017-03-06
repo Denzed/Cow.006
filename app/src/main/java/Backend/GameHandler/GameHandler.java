@@ -103,7 +103,9 @@ public abstract class GameHandler {
 
     private boolean hasSomeoneBusted() throws InterruptedException, ExecutionException, IOException {
         SendMaxScoreMessage.submit(connections.get(0));
-        return MaxScoreSentMessage.receive(connections.get(0)) >= STOP_POINTS;
+        int x = MaxScoreSentMessage.receive(connections.get(0));
+        System.out.println("MAX SCORE IS " + x);
+        return  x >= STOP_POINTS;
     }
 
     protected abstract void processResults() throws SQLException, InterruptedException, IOException, ExecutionException;

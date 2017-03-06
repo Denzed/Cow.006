@@ -46,24 +46,12 @@ public class MultiPlayServer extends GameServer {
             playerInformation = PlayerInformationMessage.receive(playerConnection);
             String userID = playerInformation.getUserID();
             if (uniqueIDs.contains(userID)){
-                for (int i = 0; i < buckets.size(); i++){
-                    List<ClientConnection> x = new ArrayList<>(buckets.get(i));
-                    List<PlayerInformation> y = new ArrayList<>(infoBuckets.get(i));
-                    for (int j = 0; j < y.size(); j++){
-                        if (y.get(j).getUserID().equals(userID)){
-                            x.remove(j);
-                            y.remove(j);
-                        }
-                    }
-                    buckets.set(i, new ArrayDeque<>(x));
-                    infoBuckets.set(i, new ArrayDeque<>(y));
-                }
+                removeAllTheOccurrencesFromBuckets(buckets, infoBuckets, userID);
             }
             System.out.println(playerInformation.getUsername() + " " + playerInformation.getUserID());
             uniqueIDs.add(userID);
 
         } catch (IOException e) {
-            e.printStackTrace();
             return;
         }
         Queue<ClientConnection> bucket = buckets.get(playersNumber);
@@ -85,15 +73,30 @@ public class MultiPlayServer extends GameServer {
         }
     }
 
+    private static void removeAllTheOccurrencesFromBuckets(List<Queue<ClientConnection>> buckets,
+                                                           List<Queue<PlayerInformation>> infoBuckets,
+                                                           String userID) {
+        for (int i = 0; i < buckets.size(); i++){
+            List<ClientConnection> x = new ArrayList<>(buckets.get(i));
+            List<PlayerInformation> y = new ArrayList<>(infoBuckets.get(i));
+            for (int j = 0; j < y.size(); j++){
+                if (y.get(j).getUserID().equals(userID)){
+                    x.remove(j);
+                    y.remove(j);
+                }
+            }
+            buckets.set(i, new ArrayDeque<>(x));
+            infoBuckets.set(i, new ArrayDeque<>(y));
+        }
+    }
+
     private static boolean haveEnoughConnectedPlayers(
             List<ClientConnection> candidates, List<PlayerInformation> infoCandidates, int playersNumber) {
         for (int i = 0; i < playersNumber; i++){
             IsConnectedMessage.submit(candidates.get(i));
             try{
                 IAmConnectedMessage.receive(candidates.get(i));
-                System.out.println("IAMCONNECTED");
-            } catch (IOException e) {
-                System.out.println("IAMDISCONNECTED");
+            } catch (Exception e) {
                 candidates.remove(i);
                 infoCandidates.remove(i);
                 return false;

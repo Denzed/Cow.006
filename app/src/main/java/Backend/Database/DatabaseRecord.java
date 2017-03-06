@@ -36,8 +36,8 @@ public class DatabaseRecord {
         this.ratingChange = ratingChange;
     }
 
-    void updateRating(int opponentsNumber) {
-        rating += ratingChange / opponentsNumber;
+    void updateRating() {
+        rating += ratingChange;
     }
 
     String getUserID() {

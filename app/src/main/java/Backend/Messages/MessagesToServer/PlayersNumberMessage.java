@@ -12,6 +12,7 @@ public class PlayersNumberMessage{
     public static void submit(GameClient client, int playersNumber) {
         client.getClientOutput().println(playersNumber);
     }
+
     public static int receive(ClientConnection connection) throws IOException {
         return parseInt(connection.getClientInput().readLine());
     }

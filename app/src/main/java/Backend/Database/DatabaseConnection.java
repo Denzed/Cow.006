@@ -13,11 +13,10 @@ import Backend.Player.PlayerInformation;
 
 public class DatabaseConnection {
 
-    //ask me: daniilplyushchenko@gmail.com
     public static final String DB_URL_ADDRESS = "";
     public static final String DB_TABLE_NAME = "";
     public static final String DB_LOGIN = "";
-    public static final String SECRET_PASSWORD = "";
+    public static final String SECRET_PASSWORD = ""; //ask me: daniilplyushchenko@gmail.com
 
     private String URLAddress;
     private String tableName;

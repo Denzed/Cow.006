@@ -9,8 +9,8 @@ import static Backend.Game.GameConstants.*;
 
 public class Bot extends AbstractPlayer {
 
-    public Bot(int playersNumber) {
-        super(playersNumber, new PlayerInformation("Bot #" + new Random().nextInt(100000), ""));
+    public Bot(int playersNumber, PlayerInformation playerInformation) {
+        super(playersNumber, playerInformation);
     }
 
     public int chooseCard() {

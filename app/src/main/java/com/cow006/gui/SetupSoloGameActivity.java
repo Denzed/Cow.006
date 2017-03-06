@@ -34,8 +34,6 @@ public class SetupSoloGameActivity extends AppCompatActivity {
                 .putExtras(getIntent())
                 .putExtra("Player count", 0)
                 .putExtra("Bot count",
-                        ((SeekBar) findViewById(R.id.botNumberSeekBar)).getProgress())
-                .putExtra("Bot level",
-                        ((SeekBar) findViewById(R.id.botLevelSeekBar)).getProgress()));
+                        ((SeekBar) findViewById(R.id.botNumberSeekBar)).getProgress()));
     }
 }

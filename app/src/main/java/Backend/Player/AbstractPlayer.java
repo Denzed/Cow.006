@@ -22,15 +22,15 @@ import static java.lang.Integer.parseInt;
 
 public abstract class AbstractPlayer {
 
-    protected volatile List<Integer> hand;
-    volatile int chosenRowIndex;
-    volatile int chosenCardValue;
-    volatile Board board;
     private List<List<String>> finalResults; //???
     private PlayerInformation playerInformation;
     private List<PlayerInformation> playerInformations;
     private int playersNumber;
+    protected volatile List<Integer> hand;
+    volatile int chosenRowIndex;
+    volatile int chosenCardValue;
     private List<Integer> scores;
+    volatile Board board;
     private volatile Board currentBoard;
     private volatile GameState state;
     private volatile boolean choosingRowToTake;
@@ -114,7 +114,7 @@ public abstract class AbstractPlayer {
         finalResults.add(legend);
         for (PlayerInformation playerInformation : playerInformations){
             List<String> resultLine = new ArrayList<>();
-            resultLine.add(playerInformation.getUsername());
+            resultLine.add(playerInformation.getStrippedUsername());
             resultLine.add(scores.get(playerInformations.indexOf(playerInformation)).toString());
             finalResults.add(resultLine);
         }
@@ -124,21 +124,25 @@ public abstract class AbstractPlayer {
 
     public void buildMultiPlayFinalResults(List<String> ratings, List<String> ratingChanges) {
         ArrayList<String> legend = new ArrayList<>();
-        legend.addAll(Arrays.asList("Player", "Score", "Rating"));
+        legend.addAll(Arrays.asList("Player", "Score", "New Rating", "Delta"));
         finalResults.add(legend);
         for (int i = 0; i < playersNumber; i++){
             ArrayList<String> resultLine = new ArrayList<>();
-            resultLine.add(playerInformations.get(i).getUsername());
+            resultLine.add(playerInformations.get(i).getStrippedUsername());
             resultLine.add(String.valueOf(scores.get(i)));
-            resultLine.add(ratings.get(i) + "("
-                    + (ratingChanges.get(i).charAt(0) == '-' ? "" : "+")
-                    + ratingChanges.get(i) + ")");
+            resultLine.add(ratings.get(i));
+            resultLine.add("(" + ((parseInt(ratingChanges.get(i)) > 0) ? "+" : "") + ratingChanges.get(i) + ")");
             finalResults.add(resultLine);
         }
         Collections.sort(finalResults.subList(1, finalResults.size()),
                 (a, b) -> parseInt(a.get(1)) - parseInt(b.get(1)));
 
-
+        for (List<String> x : finalResults){
+            for (String y : x){
+                System.out.print(y + "\t");
+            }
+            System.out.println();
+        }
     }
 
     protected List<List<String>> getFinalResults() {
@@ -149,8 +153,8 @@ public abstract class AbstractPlayer {
         return hand;
     }
 
-    public void setHand(List<Integer> hand) {
-        this.hand = Collections.synchronizedList(hand);
+    public synchronized void setHand(List<Integer> hand) {
+        this.hand = hand;
         if (this.state == GameState.NEW_GAME) {
             this.state = GameState.NEXT_ROUND;
         }
@@ -197,6 +201,8 @@ public abstract class AbstractPlayer {
         this.turnsQueue = turnsQueue;
     }
 
+    protected enum GameState {NEW_GAME, NEXT_ROUND}
+
     public int getPlayersNumber() {
         return playersNumber;
     }
@@ -240,7 +246,5 @@ public abstract class AbstractPlayer {
         chosenCardValue = card;
         setChoosingCardToTake(false);
     }
-
-    protected enum GameState {NEW_GAME, NEXT_ROUND}
 
 }

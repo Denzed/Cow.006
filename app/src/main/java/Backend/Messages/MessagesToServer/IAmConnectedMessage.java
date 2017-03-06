@@ -12,6 +12,8 @@ public class IAmConnectedMessage {
     }
 
     public static void receive(ClientConnection connection) throws IOException {
-        connection.getClientInput().readLine();
+        if (!connection.getClientInput().readLine().equals("I_AM_CONNECTED")){
+            throw new IOException("CLIENT IS DISCONNECTED");
+        }
     }
 }

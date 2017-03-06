@@ -30,10 +30,17 @@ public class DealStartedMessage {
     public static void receive(GameClient client) throws IOException {
         while (!client.getConnectedPlayer().getCardsQueue().isEmpty()){
             try {
+                System.out.println("WAITING FOR DRAWING");
                 Thread.sleep(100);
             } catch (InterruptedException e) {
                 //ignore
             }
+        }
+        try {
+            System.out.println("FINAL WAITING FOR DRAWING");
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            //ignore
         }
 
         List<Integer> hand = new ArrayList<>();

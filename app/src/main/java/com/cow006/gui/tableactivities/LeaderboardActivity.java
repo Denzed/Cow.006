@@ -46,10 +46,7 @@ public class LeaderboardActivity extends AppCompatActivity {
     private void setupLeaderboard() {
         boolean isSuccess[] = {false}; // effectively final hack
         try {
-            System.out.println("HERE");
             table.add(new ArrayList<>(Arrays.asList("Name and position", "Rating")));
-            System.out.println(table.size());
-
             LeaderboardRequester leaderboardRequester = new LeaderboardRequester(LEADERBOARD_SIZE);
             int position = 1;
             for (LeaderboardRecord record : leaderboardRequester.requestLeaderboard()) {
@@ -61,7 +58,7 @@ public class LeaderboardActivity extends AppCompatActivity {
             }
             isSuccess[0] = true;
         } catch (IOException e) {
-            e.printStackTrace();
+            //ignore
         }
         handler.post(() -> {
             ViewFlipper flipper =

@@ -1,6 +1,7 @@
 package Backend.Player;
 
 public class PlayerInformation {
+    private final static int STRIPPED_LENGTH = 10;
 
     private String username;
     private String userID;
@@ -16,6 +17,12 @@ public class PlayerInformation {
 
     public String getUserID() {
         return userID;
+    }
+
+    String getStrippedUsername() {
+        return (username.length() > STRIPPED_LENGTH
+                ? username.substring(0, STRIPPED_LENGTH) + "..."
+                : username);
     }
 
 }

@@ -29,8 +29,7 @@ public class LeaderboardServer {
             int leaderbordSize = SendLeaderboardMessage.receive(connection);
             LeaderboardSentMessage.submit(connection, dbConnection.requestLeaderboard(leaderbordSize));
         } catch (SQLException e) {
-            //TODO
-            e.printStackTrace();
+            //ignore
         }
     }
 }

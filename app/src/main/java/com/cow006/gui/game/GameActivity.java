@@ -22,7 +22,6 @@ import static Backend.Client.Client.MY_LAPTOP_HOST;
 public class GameActivity extends AppCompatActivity {
     private int players;
     private int bots;
-    private int botLevel;
     private GameClient localClient;
     private String username;
     private String userID;
@@ -40,7 +39,6 @@ public class GameActivity extends AppCompatActivity {
         Intent intent = getIntent();
         players = intent.getIntExtra("Player count", 0);
         bots = intent.getIntExtra("Bot count", 0);
-        botLevel = intent.getIntExtra("Bot level", 5);
         username = intent.getStringExtra("username");
         userID = intent.getStringExtra("userID");
         if (players == 0) {
@@ -53,7 +51,7 @@ public class GameActivity extends AppCompatActivity {
             try {
                 SinglePlayServer.main(new String[0]);
             } catch (IOException e) {
-                e.printStackTrace();
+                //ignore
             }
         }).start();
     }
@@ -71,7 +69,7 @@ public class GameActivity extends AppCompatActivity {
             try {
                 localClient.requestGame(players == 0 ? LOCALHOST : MY_LAPTOP_HOST, GAME_PORT_NUMBER);
             } catch (IOException e) {
-                e.printStackTrace();
+                //ignore
             }
         }).start();
     }
@@ -80,11 +78,10 @@ public class GameActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         System.out.println("USER LEFT THE GAME!");
-        // do something useful
         try {
             localClient.disconnectFromServer();
         } catch (Exception e) {
-            e.printStackTrace();
+            //ignore
         }
         super.onBackPressed();
     }

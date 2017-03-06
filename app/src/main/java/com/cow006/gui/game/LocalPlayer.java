@@ -50,13 +50,13 @@ class LocalPlayer extends Player {
     }
 
     @Override
-    public void setBoard(Board board) {
+    public synchronized void setBoard(Board board) {
         super.setBoard(board);
         gameView.post(gameView::requestLayout);
     }
 
     @Override
-    public void setHand(List<Integer> hand) {
+    public synchronized void setHand(List<Integer> hand) {
         GameActivity parentActivity = gameView.parentActivity;
         String message;
         if (getState() == GameState.NEW_GAME) {
@@ -111,32 +111,15 @@ class LocalPlayer extends Player {
         return stringBuilder.toString();
     }
 
-
-/*    private void addMinimalScore(StringBuilder stringBuilder,
-                                 ArrayList<Integer> scoresList,
-                                 ArrayList<Integer> playerList) {
-        Integer topScore = Collections.min(scoresList);
-        int index = scoresList.indexOf(topScore);
-//        if (playerList.get(index) == getId()) {
-            stringBuilder.append("YOU ");
-//        } else {
-            stringBuilder.append("Opponent #").append(playerList.get(index));
-//        }
-        stringBuilder.append(" - ").append(scoresList.get(index)).append("; ");
-        scoresList.remove(index);
-        playerList.remove(index);
-    }
-*/
-
     private String getFinalScoresAsString() {
         System.err.println("Final scores: " + getFinalResults());
         StringBuilder stringBuilder = new StringBuilder();
-        for (List<String> line : getFinalResults()) {
-            for (String element : line) {
-                stringBuilder.append(element).append("\n");
-            }
-            stringBuilder.append("\n");
-            }
+            for (List<String> line : getFinalResults()) {
+                for (String element : line) {
+                    stringBuilder.append(element).append("\n");
+                }
+                stringBuilder.append("\n");
+                }
         return stringBuilder.toString();
-        }
     }
+}
